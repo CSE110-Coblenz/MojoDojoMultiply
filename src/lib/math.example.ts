@@ -13,7 +13,7 @@ import {
     getDifficultyLevel,
     generateMultipleProblems,
     getRandomInt
-} from './math.js';
+} from './math';
 
 console.log('=== Math Library Examples ===\n');
 

@@ -116,11 +116,15 @@ export function generateMultipleProblems(
     const seen = new Set<string>();
     
     let attempts = 0;
-    const maxAttempts = count * 100; // Prevent infinite loops
+    // Calculate max possible unique combinations, then multiply by a safety factor
+    const range = maxFactor - minFactor + 1;
+    const possibleCombinations = range * range;
+    const maxAttempts = Math.max(count * 10, possibleCombinations * 2);
     
     while (problems.length < count && attempts < maxAttempts) {
         const problem = generateMultiplicationProblem(minFactor, maxFactor);
-        const key = `${problem.factor1}x${problem.factor2}`;
+        // Create normalized key to avoid duplicates like 3x4 and 4x3
+        const key = `${Math.min(problem.factor1, problem.factor2)}x${Math.max(problem.factor1, problem.factor2)}`;
         
         if (allowDuplicates || !seen.has(key)) {
             problems.push(problem);
