@@ -20,6 +20,10 @@ export interface MultipleChoiceProblem extends MultiplicationProblem {
 
 export type DifficultyLevel = "easy" | "medium" | "hard";
 
+// Constants for multiple choice generation
+const WRONG_ANSWER_RANGE = 10;
+const WRONG_ANSWER_OFFSET = 5;
+
 /**
  * Generate a random multiplication problem based on difficulty level
  * 
@@ -74,7 +78,7 @@ export function generateMultipleChoiceOptions(
 
 	// Generate wrong answers that are plausible
 	while (options.size < numOptions) {
-		const offset = Math.floor(Math.random() * 10) - 5;
+		const offset = Math.floor(Math.random() * WRONG_ANSWER_RANGE) - WRONG_ANSWER_OFFSET;
 		const wrongAnswer = problem.correctAnswer + offset;
 		
 		// Ensure wrong answer is positive and different from correct answer
@@ -83,8 +87,12 @@ export function generateMultipleChoiceOptions(
 		}
 	}
 
-	// Shuffle the options
-	const shuffledOptions = Array.from(options).sort(() => Math.random() - 0.5);
+	// Shuffle the options using Fisher-Yates algorithm
+	const shuffledOptions = Array.from(options);
+	for (let i = shuffledOptions.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
+	}
 
 	return {
 		...problem,

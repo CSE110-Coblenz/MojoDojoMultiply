@@ -99,12 +99,10 @@ function example6() {
 	console.log(`Game Over! Score: ${finalScore}%`);
 }
 
-// Run examples
-if (import.meta.url === `file://${process.argv[1]}`) {
-	example1();
-	example2();
-	example3();
-	example4();
-	example5();
-	example6();
-}
+// Run examples (uncomment when running directly)
+// example1();
+// example2();
+// example3();
+// example4();
+// example5();
+// example6();
