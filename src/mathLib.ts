@@ -30,6 +30,11 @@ export enum Difficulty {
 }
 
 /**
+ * Maximum valid answer value for validation
+ */
+export const MAX_VALID_ANSWER = 1000;
+
+/**
  * Default configurations for each difficulty level
  */
 export const DIFFICULTY_CONFIGS: Record<Difficulty, ProblemConfig> = {
@@ -143,5 +148,5 @@ export function formatProblem(problem: MultiplicationProblem): string {
  * Validates that a number is within a valid range for the game
  */
 export function isValidAnswer(answer: number): boolean {
-	return Number.isInteger(answer) && answer >= 0 && answer <= 1000;
+	return Number.isInteger(answer) && answer >= 0 && answer <= MAX_VALID_ANSWER;
 }
