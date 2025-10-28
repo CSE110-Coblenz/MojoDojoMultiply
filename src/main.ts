@@ -1,17 +1,24 @@
-// import Konva from "konva";
-// import type { ScreenSwitcher, Screen } from "./types.ts";
-// import { MenuScreenController } from "./screens/MenuScreen/MenuScreenController.ts";
-// import { GameScreenController } from "./screens/GameScreen/GameScreenController.ts";
-// import { ResultsScreenController } from "./screens/ResultsScreen/ResultsScreenController.ts";
-// import { STAGE_WIDTH, STAGE_HEIGHT } from "./constants.ts";
+import Konva from "konva";
+import { STAGE_WIDTH, STAGE_HEIGHT } from "./constants.js";
+import { MainPageView } from "./MainPageScreen/MainPageView.js";
 
-/**
- * Main Application - Coordinates all screens
- *
- * This class demonstrates screen management using Konva Groups.
- * Each screen (Menu, Game, Results) has its own Konva.Group that can be
- * shown or hidden independently.
- *
- * Key concept: All screens are added to the same layer, but only one is
- * visible at a time. This is managed by the switchToScreen() method.
- */
+// Create the Konva stage and a single layer. The views expose Konva.Groups
+// so we add them to the layer.
+const stage = new Konva.Stage({
+	container: "root",
+	width: STAGE_WIDTH,
+	height: STAGE_HEIGHT,
+});
+
+const layer = new Konva.Layer();
+stage.add(layer);
+
+// Instantiate the main page view and add its group to the layer so it is visible.
+const mainView = new MainPageView(() => {
+	// placeholder start handler
+	// Later this would switch screens / start the game
+	// console.log("Start clicked");
+});
+
+layer.add(mainView.getGroup());
+layer.draw();
