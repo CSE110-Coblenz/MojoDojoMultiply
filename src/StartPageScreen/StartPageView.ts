@@ -3,7 +3,7 @@ import type { View } from "../types";
 import { STAGE_WIDTH } from "../constants";
 
 /**
- * MenuScreenView - Renders the menu screen
+ * StartPageView - Renders the main screen
  */
 export class StartPageView implements View {
     private group: Konva.Group;
@@ -13,9 +13,9 @@ export class StartPageView implements View {
 
         // Title text (part 1)
         const title1 = new Konva.Text({
-            x: STAGE_WIDTH / 2,
-            y: 150,
-            text: "Mojo Dojo",
+            x: STAGE_WIDTH / 2 ,
+			y: 150,
+            text: "MojoDojo",
             fontSize: 48,
             fontFamily: "Arial",
             fill: "yellow",
@@ -25,13 +25,13 @@ export class StartPageView implements View {
         });
         // Center the text using offsetX
         title1.offsetX(title1.width() / 2);
-        this.group.add(title1);
+		this.group.add(title1);
 
         //Want to add a "slash animation" then "Multiply" will lay on it once the slash animation finishes
 
         //Want to make this an animation for it to slam onto "Mojo Dojo" (lower priority)
         const title2 = new Konva.Text({
-            x: STAGE_WIDTH / 2 - 10,
+            x: STAGE_WIDTH / 2 - 100,
             y: 150,
             text: "MULTIPLY",
             fontSize: 48,
@@ -57,7 +57,7 @@ export class StartPageView implements View {
             strokeWidth: 3,
         });
         const startText = new Konva.Text({
-            x: STAGE_WIDTH / 2 - 200,
+            x: STAGE_WIDTH / 2,
             y: 315,
             text: "START GAME",
             fontSize: 24,
