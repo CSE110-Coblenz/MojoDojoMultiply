@@ -1,58 +1,24 @@
-// import Konva from "konva";
-// import type { ScreenSwitcher, Screen } from "./types";
-//import { MainPageController } from "./MainPageScreen/MainPageController"; (template imports)
-//import { GameScreenController } from "./GameScreen/GameScreenController"; (not yet implemented)
-//import { ResultsScreenController } from "./ResultsScreen/ResultsScreenController"; (not yet created)
-//import { BonusLevelScreenController } from "./BonusLevelScreen/BonusLevelScreenController"; (not yet implemented)
+import Konva from "konva";
 import { STAGE_WIDTH, STAGE_HEIGHT } from "./constants";
+import { StartPageView } from "./StartPageScreen/StartPageView";
 
-/**
- * Main Application - Coordinates all screens
- *
- * This class demonstrates screen management using Konva Groups.
- * Each screen (Menu, Game, Results) has its own Konva.Group that can be
- * shown or hidden independently.
- *
- * Key concept: All screens are added to the same layer, but only one is
- * visible at a time. This is managed by the switchToScreen() method.
- */
+// Create the Konva stage and a single layer. The views expose Konva.Groups
+// so we add them to the layer.
+const stage = new Konva.Stage({
+	container: "root",
+	width: STAGE_WIDTH,
+	height: STAGE_HEIGHT,
+});
 
-// class App implements ScreenSwitcher {
-// 	private stage: Konva.Stage;
-// 	private layer: Konva.Layer;
+const layer = new Konva.Layer();
+stage.add(layer);
 
-// 	private menuController: MainScreenController;
-// 	private gameController: GameScreenController;
-// 	private resultsController: ResultsScreenController;
+// Instantiate the main page view and add its group to the layer so it is visible.
+const startView = new StartPageView(() => {
+	// placeholder start handler
+	// Later this would switch screens / start the game
+	// console.log("Start clicked");
+});
 
-// 	constructor(container: string) {
-// 		// Initialize Konva stage (the main canvas)
-// 		this.stage = new Konva.Stage({
-// 			container,
-// 			width: STAGE_WIDTH,
-// 			height: STAGE_HEIGHT,
-// 		});
-
-// 		// Create a layer (screens will be added to this layer)
-// 		this.layer = new Konva.Layer();
-// 		this.stage.add(this.layer);
-
-// 		// Initialize all screen controllers
-// 		// Each controller manages a Model, View, and handles user interactions
-// 		this.menuController = new MenuScreenController(this);
-// 		this.gameController = new GameScreenController(this);
-// 		this.resultsController = new ResultsScreenController(this);
-
-// 		// Add all screen groups to the layer
-// 		// All screens exist simultaneously but only one is visible at a time
-// 		this.layer.add(this.menuController.getView().getGroup());
-// 		this.layer.add(this.gameController.getView().getGroup());
-// 		this.layer.add(this.resultsController.getView().getGroup());
-
-// 		// Draw the layer (render everything to the canvas)
-// 		this.layer.draw();
-
-// 		// Start with menu screen visible
-// 		this.menuController.getView().show();
-// 	}
-// }
+layer.add(startView.getGroup());
+layer.draw();
