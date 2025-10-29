@@ -20,9 +20,8 @@ export interface View {
  *   - score: Final score to display on results screen
  */
 export type Screen =
-	| { type: "menu" }
-	| { type: "game" }
-	| { type: "result"; score: number };
+	| { type: "start" }
+	| { type: "main" };
 
 export abstract class ScreenController {
 	abstract getView(): View;

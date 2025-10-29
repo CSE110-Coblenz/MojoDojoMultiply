@@ -1,72 +1,26 @@
 import Konva from "konva";
 import type { View } from "../types.js";
-import { STAGE_WIDTH } from "../constants.js";
+import { STAGE_HEIGHT, STAGE_WIDTH } from "../constants.js";
 
 /**
- * MenuScreenView - Renders the menu screen
+ * MainPageView - Renders the main game screen
  */
 export class MainPageView implements View {
     private group: Konva.Group;
 
-	constructor(onStartClick: () => void) {
-		this.group = new Konva.Group({ visible: true });
+	// later change to constructor(onStartClick: () => void) {
+	constructor() {
+		this.group = new Konva.Group({ visible: false });
 
-		// Title text (part 1)
-		const title1 = new Konva.Text({
+		const text = new Konva.Text({
 			x: STAGE_WIDTH / 2,
-			y: 150,
-			text: "Mojo Dojo",
-			fontSize: 48,
-			fontFamily: "Arial",
-			fill: "yellow",
-			stroke: "orange",
-			strokeWidth: 2,
-			align: "center",
-		});
-		// Center the text using offsetX
-		title1.offsetX(title1.width() / 2);
-		this.group.add(title1);
-
-        //Want to make this an animation for it to slam onto "Mojo Dojo"
-        const title2 = new Konva.Text({
-			x: STAGE_WIDTH / 2,
-			y: 150,
-			text: "MULTIPLY",
-			fontSize: 48,
-			fontFamily: "Arial",
-			fill: "yellow",
-			stroke: "orange",
-			strokeWidth: 2,
-			align: "center",
-		});
-        title2.offsetX(title2.width() / 2);
-		this.group.add(title2);
-
-		const startButtonGroup = new Konva.Group();
-		const startButton = new Konva.Rect({
-			x: STAGE_WIDTH / 2 - 100,
-			y: 300,
-			width: 200,
-			height: 60,
-			fill: "green",
-			cornerRadius: 10,
-			stroke: "darkgreen",
-			strokeWidth: 3,
-		});
-		const startText = new Konva.Text({
-			x: STAGE_WIDTH / 2,
-			y: 315,
-			text: "START GAME",
-			fontSize: 24,
-			fontFamily: "Arial",
-			fill: "white",
-			align: "center",
-		});
-		startText.offsetX(startText.width() / 2);
-		startButtonGroup.add(startButton);
-		startButtonGroup.add(startText);
-		startButtonGroup.on("click", onStartClick);
-		this.group.add(startButtonGroup);
+			y: STAGE_HEIGHT / 2,
+			text: "MAIN GAME",
+			fontSize: 100
+		})
+		text.offsetX(text.width() / 2);
+		text.offsetY(text.height() / 2);
+		this.group.add(text);
 	}
 
 	/**
