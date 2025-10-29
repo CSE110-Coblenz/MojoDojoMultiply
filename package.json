@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/coswald04/MojoDojoMULTIPLY#readme",
   "dependencies": {
-    "konva": "^10.0.2"
+    "konva": "^10.0.8"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
