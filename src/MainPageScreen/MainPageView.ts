@@ -1,91 +1,60 @@
-import Konva from "konva";
-import type { View } from "../types.js";
-import { STAGE_WIDTH } from "../constants.js";
-
 /**
- * MenuScreenView - Renders the menu screen
+ * MainPageView - Handles the visual representation of the game screen
  */
-export class MainPageView implements View {
-    private group: Konva.Group;
+export class MainPageView {
+    private readonly timerDigitElements: HTMLImageElement[];
+    private readonly numberImagePaths: string[];
+    private gameContainer: HTMLElement;
 
-	constructor(onStartClick: () => void) {
-		this.group = new Konva.Group({ visible: true });
+    constructor() {
+        // Initialize container for the game
+        this.gameContainer = document.createElement('div');
+        this.gameContainer.className = 'game-container';
+        document.body.appendChild(this.gameContainer);
 
-		// Title text (part 1)
-		const title1 = new Konva.Text({
-			x: STAGE_WIDTH / 2,
-			y: 150,
-			text: "Mojo Dojo",
-			fontSize: 48,
-			fontFamily: "Arial",
-			fill: "yellow",
-			stroke: "orange",
-			strokeWidth: 2,
-			align: "center",
-		});
-		// Center the text using offsetX
-		title1.offsetX(title1.width() / 2);
-		this.group.add(title1);
+        // Create timer container
+        const timerContainer = document.createElement('div');
+        timerContainer.className = 'timer-container';
+        this.gameContainer.appendChild(timerContainer);
 
-        //Want to make this an animation for it to slam onto "Mojo Dojo"
-        const title2 = new Konva.Text({
-			x: STAGE_WIDTH / 2,
-			y: 150,
-			text: "MULTIPLY",
-			fontSize: 48,
-			fontFamily: "Arial",
-			fill: "yellow",
-			stroke: "orange",
-			strokeWidth: 2,
-			align: "center",
-		});
-        title2.offsetX(title2.width() / 2);
-		this.group.add(title2);
+        // Initialize array for timer digit elements
+        this.timerDigitElements = [];
 
-		const startButtonGroup = new Konva.Group();
-		const startButton = new Konva.Rect({
-			x: STAGE_WIDTH / 2 - 100,
-			y: 300,
-			width: 200,
-			height: 60,
-			fill: "green",
-			cornerRadius: 10,
-			stroke: "darkgreen",
-			strokeWidth: 3,
-		});
-		const startText = new Konva.Text({
-			x: STAGE_WIDTH / 2,
-			y: 315,
-			text: "START GAME",
-			fontSize: 24,
-			fontFamily: "Arial",
-			fill: "white",
-			align: "center",
-		});
-		startText.offsetX(startText.width() / 2);
-		startButtonGroup.add(startButton);
-		startButtonGroup.add(startText);
-		startButtonGroup.on("click", onStartClick);
-		this.group.add(startButtonGroup);
-	}
+        // Create three digit places for the timer (e.g., 1:45 would need 3 spots)
+        for (let i = 0; i < 3; i++) {
+            const digitImg = document.createElement('img');
+            digitImg.className = 'timer-digit';
+            digitImg.alt = 'timer digit';
+            timerContainer.appendChild(digitImg);
+            this.timerDigitElements.push(digitImg);
+        }
 
-	/**
-	 * Show the screen
-	 */
-	show(): void {
-		this.group.visible(true);
-		this.group.getLayer()?.draw();
-	}
+        // Paths to number images (0-9)
+        this.numberImagePaths = Array.from({length: 10}, (_, i) => 
+            `/assets/numbers/${i}.png`
+        );
 
-	/**
-	 * Hide the screen
-	 */
-	hide(): void {
-		this.group.visible(false);
-		this.group.getLayer()?.draw();
-	}
+        // Set initial display to 0's
+        this.updateTimer([0, 0, 0]);
+    }
 
-	getGroup(): Konva.Group {
-		return this.group;
-	}
+    /**
+     * Updates the timer display with new digits
+     * @param digits - Array of numbers representing each digit of the time
+     */
+    updateTimer(digits: number[]): void {
+        for (const [index, digit] of digits.entries()) {
+            if (this.timerDigitElements[index] && digit >= 0 && digit <= 9) {
+                this.timerDigitElements[index].src = this.numberImagePaths[digit];
+            }
+        }
+    }
+
+    /**
+     * Get the main game container element
+     * @returns HTMLElement containing the game
+     */
+    getGameContainer(): HTMLElement {
+        return this.gameContainer;
+    }
 }

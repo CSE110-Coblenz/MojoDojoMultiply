@@ -1,8 +1,8 @@
 /**
- * GameScreenModel - Manages game state
+ * MainPageController - Manages game logic and user interactions
  */
 
-export class GameScreenModel {
+export class MainPageController {
     //use Math class for calculations (ie. Math.random())
 
     /**
