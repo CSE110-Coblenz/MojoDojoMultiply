@@ -13,9 +13,9 @@ export class StartPageView implements View {
 
         // Title text (part 1)
         const title1 = new Konva.Text({
-            x: STAGE_WIDTH / 2 ,
+            x: STAGE_WIDTH / 2,
 			y: 150,
-            text: "MojoDojo",
+            text: "Mojo Dojo",
             fontSize: 48,
             fontFamily: "Arial",
             fill: "yellow",
@@ -31,8 +31,8 @@ export class StartPageView implements View {
 
         //Want to make this an animation for it to slam onto "Mojo Dojo" (lower priority)
         const title2 = new Konva.Text({
-            x: STAGE_WIDTH / 2 - 100,
-            y: 150,
+            x: STAGE_WIDTH / 2 ,
+            y: 200,
             text: "MULTIPLY",
             fontSize: 48,
             fontFamily: "Arial",
@@ -47,8 +47,8 @@ export class StartPageView implements View {
 
         const startButtonGroup = new Konva.Group();
         const startButton = new Konva.Rect({
-            x: STAGE_WIDTH / 2 - 200,
-            y: 300,
+            x: STAGE_WIDTH / 2 - 100,
+            y: 275,
             width: 200,
             height: 60,
             fill: "yellow",
@@ -58,7 +58,7 @@ export class StartPageView implements View {
         });
         const startText = new Konva.Text({
             x: STAGE_WIDTH / 2,
-            y: 315,
+            y: 290,
             text: "START GAME",
             fontSize: 24,
             fontFamily: "Arial",
@@ -74,8 +74,8 @@ export class StartPageView implements View {
         //Help Button
         const helpButtonGroup = new Konva.Group();
         const helpButton = new Konva.Rect({
-            x: STAGE_WIDTH / 2 - 300,
-            y: 300,
+            x: STAGE_WIDTH / 2 - 100,
+            y: 350,
             width: 200,
             height: 60,
             fill: "yellow",
@@ -84,8 +84,8 @@ export class StartPageView implements View {
             strokeWidth: 3,
         });
         const helpText = new Konva.Text({
-            x: STAGE_WIDTH / 2 - 300,
-            y: 315,
+            x: STAGE_WIDTH / 2,
+            y: 365,
             text: "HELP",
             fontSize: 24,
             fontFamily: "Arial",
@@ -101,9 +101,9 @@ export class StartPageView implements View {
         //Practice Button
         const practiceButtonGroup = new Konva.Group();
         const practiceButton = new Konva.Rect({
-            x: STAGE_WIDTH / 2 - 400,
-            y: 300,
-            width: 400,
+            x: STAGE_WIDTH / 2 - 125,
+            y: 425,
+            width: 250,
             height: 60,
             fill: "yellow",
             cornerRadius: 10,
@@ -111,8 +111,8 @@ export class StartPageView implements View {
             strokeWidth: 3,
         });
         const practiceText = new Konva.Text({
-            x: STAGE_WIDTH / 2 - 400,
-            y: 315,
+            x: STAGE_WIDTH / 2,
+            y: 440,
             text: "PRACTICE ARENA",
             fontSize: 24,
             fontFamily: "Arial",
