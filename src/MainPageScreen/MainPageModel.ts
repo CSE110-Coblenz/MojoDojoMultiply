@@ -1,7 +1,7 @@
 /**
  * GameScreenModel - Manages game state
  */
-export class GameScreenModel {
+export class MainPageModel {
 	private score = 0;
 
 	/**

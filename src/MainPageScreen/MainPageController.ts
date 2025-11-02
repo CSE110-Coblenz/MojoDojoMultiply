@@ -1,16 +1,16 @@
 /**
  * GameScreenModel - Manages game state
  */
-import { ScreenController } from "../types.ts";
+import { ScreenController } from "../types";
 import type { ScreenSwitcher } from "../types.ts";
-import { GameScreenModel } from "./GameScreenModel.ts";
-import { GameScreenView } from "./GameScreenView.ts";
-import { GAME_DURATION } from "../../constants.ts";
+import { MainPageModel } from "./MainPageModel";
+import { MainPageView } from "./MainPageView";
+import { GAME_DURATION } from "../constants";
 
 
-export class GameScreenController extends ScreenController {
-	private model: GameScreenModel;
-	private view: GameScreenView;
+export class MainPageController extends ScreenController {
+	private model: MainPageModel;
+	private view: MainPageView;
 	private screenSwitcher: ScreenSwitcher;
 	private gameTimer: number | null = null;
 
@@ -20,8 +20,8 @@ export class GameScreenController extends ScreenController {
 		super();
 		this.screenSwitcher = screenSwitcher;
 
-		this.model = new GameScreenModel();
-		this.view = new GameScreenView(() => this.handleLemonClick());
+		this.model = new MainPageModel();
+		this.view = new MainPageView(() => this.handleLemonClick());
 
 		// TODO: Task 4 - Initialize squeeze sound audio
 		this.squeezeSound = new Audio("/squeeze.mp3");
@@ -109,7 +109,7 @@ export class GameScreenController extends ScreenController {
 	/**
 	 * Get the view group
 	 */
-	getView(): GameScreenView {
+	getView(): MainPageView {
 		return this.view;
 	}
 }

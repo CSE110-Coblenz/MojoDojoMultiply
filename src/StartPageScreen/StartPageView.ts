@@ -5,7 +5,7 @@ import { STAGE_WIDTH } from "../constants.js";
 /**
  * MenuScreenView - Renders the menu screen
  */
-export class MainPageView implements View {
+export class StartPageView implements View {
     private group: Konva.Group;
 
 	constructor(onStartClick: () => void) {
