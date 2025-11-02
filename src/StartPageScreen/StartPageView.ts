@@ -99,7 +99,7 @@ export class StartPageView implements View {
         helpText.offsetX(helpText.width() / 2);
         helpButtonGroup.add(helpButton);
         helpButtonGroup.add(helpText);
-        helpButtonGroup.on("click", onPracticeClick); 
+        helpButtonGroup.on("click", onHelpClick); 
         this.group.add(helpButtonGroup);
 
         //Practice Button

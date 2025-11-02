@@ -25,11 +25,13 @@ class App implements ScreenSwitcher {
     this.layer = new Konva.Layer();
     this.stage.add(this.layer);
 
+    // Controllers create views
     this.startController = new StartPageController(this);
     this.mainController = new MainPageController(this);
     this.helpController = new HelpPageController(this);
     this.practiceController = new PracticeAreaController(this);
 
+    // Add screen groups to same layer
     this.layer.add(this.startController.getView().getGroup());
     this.layer.add(this.mainController.getView().getGroup());
     this.layer.add(this.helpController.getView().getGroup());
@@ -37,7 +39,7 @@ class App implements ScreenSwitcher {
 
     this.layer.draw();
 
-    // boot on Start
+    // Start on start screen
     this.startController.show();
   }
 
