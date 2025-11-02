@@ -1,31 +1,31 @@
-import { ScreenController } from "../types.js";
-import type { ScreenSwitcher } from "../types.js";
-import { StartPageView } from "./StartPageView.js";
+import { ScreenController, type ScreenSwitcher } from "../types";
+import { StartPageView } from "./StartPageView";
 
-/**
- * StartPageController - Handles menu interactions
- */
 export class StartPageController extends ScreenController {
-	private view: StartPageView;
-	private screenSwitcher: ScreenSwitcher;
+  private view: StartPageView;
+  private screenSwitcher: ScreenSwitcher;
 
-	constructor(screenSwitcher: ScreenSwitcher) {
-		super();
-		this.screenSwitcher = screenSwitcher;
-		this.view = new StartPageView(() => this.handleStartClick());
-	}
+  constructor(screenSwitcher: ScreenSwitcher) {
+    super();
+    this.screenSwitcher = screenSwitcher;
+    this.view = new StartPageView(
+      () => this.handleStartClick(),
+      () => this.handleHelpClick(),
+      () => this.handlePracticeClick()
+    );
+  }
 
-	/**
-	 * Handle start button click
-	 */
-	private handleStartClick(): void {
-		this.screenSwitcher.switchToScreen({ type: "main" });
-	}
+  private handleStartClick(): void {
+    this.screenSwitcher.switchToScreen({ type: "main" });
+  }
+  private handleHelpClick(): void {
+    this.screenSwitcher.switchToScreen({ type: "help" });
+  }
+  private handlePracticeClick(): void {
+    this.screenSwitcher.switchToScreen({ type: "practice" });
+  }
 
-	/**
-	 * Get the view
-	 */
-	getView(): StartPageView {
-		return this.view;
-	}
+  getView(): StartPageView {
+    return this.view;
+  }
 }

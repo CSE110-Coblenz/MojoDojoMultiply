@@ -1,19 +1,18 @@
-import { ScreenController } from "../types.js";
-import type { ScreenSwitcher } from "../types.js";
-import { MainPageView } from "./MainPageView.js";
+import { ScreenController, type ScreenSwitcher } from "../types";
+import { MainPageView } from "./MainPageView";
 
-/**
- * MainPageController - placeholder to see main game screen for testing
- */
 export class MainPageController extends ScreenController {
-    private view: MainPageView;
+  private view: MainPageView;
+  // keep a reference for future transitions if needed
+  private _screenSwitcher: ScreenSwitcher;
 
-    constructor(screenSwitcher: ScreenSwitcher) {
-        super();
-        this.view = new MainPageView();
-    }
+  constructor(screenSwitcher: ScreenSwitcher) {
+    super();
+    this._screenSwitcher = screenSwitcher;
+    this.view = new MainPageView(); // currently just a placeholder view
+  }
 
-    getView(): MainPageView {
-        return this.view;
-    }
+  getView(): MainPageView {
+    return this.view;
+  }
 }
