@@ -22,17 +22,15 @@ export class MainPageController extends ScreenController {
 		this.screenSwitcher = screenSwitcher;
 
 		this.model = new MainPageModel();
-		this.clickSound = new Audio("/Punch sound.mp3");
+		this.clickSound = new Audio("/PunchSound.mp3");
 		this.hoverSound = new Audio("/Picking.mp3");
 
-		// Pass the event handlers and helper functions to the view
+		// Pass the event handlers to the view. The controller will coordinate
+		// with the model to generate questions and supply answers to the view.
 		this.view = new MainPageView(
 			(answer: number) => this.handleAnswerClick(answer),
 			() => this.handleAnswerHoverStart(),
-			() => this.handleAnswerHoverEnd(),
-			(min: number, max: number) => this.getRandomNumber(min, max),
-			(correctAnswer: number, count: number) => this.getWrongAnswers(correctAnswer, count),
-			(answers: number[]) => this.randomizeOrder(answers)
+			() => this.handleAnswerHoverEnd()
 		);
 	}
 
@@ -59,14 +57,20 @@ export class MainPageController extends ScreenController {
 		// Reset model state
 		this.model.reset();
 
-		// Generate new random numbers for multiplication
-		const num1 = this.getRandomNumber(1, 12);
-		const num2 = this.getRandomNumber(1, 12);
+		// Generate first question inside the model
+		this.model.generateNewQuestion(
+			(min, max) => this.getRandomNumber(min, max),
+			(correct, count) => this.getWrongAnswers(correct, count),
+			(answers) => this.randomizeOrder(answers),
+			1,
+			12,
+			3
+		);
 
 		// Update view
 		this.view.updateScore(this.model.getScore());
 		this.view.updateTimer(GAME_DURATION);
-		this.view.updateQuestion(num1, num2);
+		this.view.updateQuestion(this.model.getNum1(), this.model.getNum2(), this.model.getAllAnswers());
 		this.view.show();
 
 		this.startTimer();
@@ -105,18 +109,22 @@ export class MainPageController extends ScreenController {
 	 */
 	private handleAnswerClick(selectedAnswer: number): void {
 		// Check if answer is correct
-		if (selectedAnswer === this.view.getCorrectAnswer()) {
+		if (selectedAnswer === this.model.getCorrectAnswer()) {
 			// Update model only if correct
 			this.model.incrementScore();
 			this.view.updateScore(this.model.getScore());
 		}
 
-		// Generate new random numbers for multiplication
-		const num1 = this.getRandomNumber(1, 12);
-		const num2 = this.getRandomNumber(1, 12);
-
-		// Update view with new question
-		this.view.updateQuestion(num1, num2);
+		// Generate next question in model and update view
+		this.model.generateNewQuestion(
+			(min, max) => this.getRandomNumber(min, max),
+			(correct, count) => this.getWrongAnswers(correct, count),
+			(answers) => this.randomizeOrder(answers),
+			1,
+			12,
+			3
+		);
+		this.view.updateQuestion(this.model.getNum1(), this.model.getNum2(), this.model.getAllAnswers());
 
 		this.clickSound.play();
 		this.clickSound.currentTime = 0;
