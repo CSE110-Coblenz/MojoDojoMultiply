@@ -1,8 +1,23 @@
+import { ScreenController, type ScreenSwitcher } from "../types";
+import { MainPageView } from "./MainPageView";
+
 /**
  * MainPageController - Manages game logic and user interactions
  */
 
-export class MainPageController {
+export class MainPageController extends ScreenController{
+    private view: MainPageView;
+    private _screenSwitcher: ScreenSwitcher;
+  
+    constructor(screenSwitcher: ScreenSwitcher) {
+      super();
+      this._screenSwitcher = screenSwitcher;
+      this.view = new MainPageView(); // currently just a placeholder view
+    }
+  
+    getView(): MainPageView {
+      return this.view;
+    }
     //use Math class for calculations (ie. Math.random())
 
     /**
