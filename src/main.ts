@@ -1,91 +1,61 @@
 import Konva from "konva";
-import type { ScreenSwitcher, Screen } from "./types.ts";
+import type { Screen, ScreenSwitcher } from "./types";
+import { STAGE_WIDTH, STAGE_HEIGHT } from "./constants";
+
 import { StartPageController } from "./StartPageScreen/StartPageController";
 import { MainPageController } from "./MainPageScreen/MainPageController";
 import { HelpPageController } from "./HelpPageScreen/HelpPageController";
-import { STAGE_WIDTH, STAGE_HEIGHT } from "./constants";
+import { PracticeAreaController } from "./PracticeAreaScreen/PracticeAreaController";
 
-/**
- * Main Application - Coordinates all screens
- *
- * This class demonstrates screen management using Konva Groups.
- * Each screen (Menu, Game, Results) has its own Konva.Group that can be
- * shown or hidden independently.
- *
- * Key concept: All screens are added to the same layer, but only one is
- * visible at a time. This is managed by the switchToScreen() method.
- */
 class App implements ScreenSwitcher {
-	private stage: Konva.Stage;
-	private layer: Konva.Layer;
+  private stage: Konva.Stage;
+  private layer: Konva.Layer;
 
-	private menuController: StartPageController;
-	private gameController: MainPageController;
-	private resultsController: HelpPageController;
+  private startController: StartPageController;
+  private mainController: MainPageController;
+  private helpController: HelpPageController;
+  private practiceController: PracticeAreaController;
 
-	constructor(container: string) {
-		// Initialize Konva stage (the main canvas)
-		this.stage = new Konva.Stage({
-			container,
-			width: STAGE_WIDTH,
-			height: STAGE_HEIGHT,
-		});
+  constructor(containerId: string) {
+    this.stage = new Konva.Stage({
+      container: containerId,
+      width: STAGE_WIDTH,
+      height: STAGE_HEIGHT,
+    });
+    this.layer = new Konva.Layer();
+    this.stage.add(this.layer);
 
-		// Create a layer (screens will be added to this layer)
-		this.layer = new Konva.Layer();
-		this.stage.add(this.layer);
+    // Controllers create views
+    this.startController = new StartPageController(this);
+    this.mainController = new MainPageController(this);
+    this.helpController = new HelpPageController(this);
+    this.practiceController = new PracticeAreaController(this);
 
-		// Initialize all screen controllers
-		// Each controller manages a Model, View, and handles user interactions
-		this.menuController = new StartPageController(this);
-		this.gameController = new MainPageController(this);
-		this.resultsController = new HelpPageController(this);
+    // Add screen groups to same layer
+    this.layer.add(this.startController.getView().getGroup());
+    this.layer.add(this.mainController.getView().getGroup());
+    this.layer.add(this.helpController.getView().getGroup());
+    this.layer.add(this.practiceController.getView().getGroup());
 
-		// Add all screen groups to the layer
-		// All screens exist simultaneously but only one is visible at a time
-		this.layer.add(this.menuController.getView().getGroup());
-		this.layer.add(this.gameController.getView().getGroup());
-		this.layer.add(this.resultsController.getView().getGroup());
+    this.layer.draw();
 
-		// Draw the layer (render everything to the canvas)
-		this.layer.draw();
+    // Start on start screen
+    this.startController.show();
+  }
 
-		// Start with menu screen visible
-		this.gameController.getView().show();
-	}
+  switchToScreen(screen: Screen): void {
+    this.startController.hide();
+    this.mainController.hide();
+    this.helpController.hide();
+    this.practiceController.hide();
 
-	/**
-	 * Switch to a different screen
-	 *
-	 * This method implements screen management by:
-	 * 1. Hiding all screens (setting their Groups to invisible)
-	 * 2. Showing only the requested screen
-	 *
-	 * This pattern ensures only one screen is visible at a time.
-	 */
-	switchToScreen(screen: Screen): void {
-		// Hide all screens first by setting their Groups to invisible
-		this.menuController.hide();
-		this.gameController.hide();
-		this.resultsController.hide();
-
-		// Show the requested screen based on the screen type
-		switch (screen.type) {
-			case "menu":
-				this.menuController.show();
-				break;
-
-			case "game":
-				// Start the game (which also shows the game screen)
-				this.gameController.startGame();
-				break;
-
-			case "result":
-				//this.resultsController.showResults(screen.score);
-				break;
-		}
-	}
+    switch (screen.type) {
+      case "start": this.startController.show(); break;
+      case "main": this.mainController.show(); break;
+      case "help": this.helpController.show(); break;
+      case "practice": this.practiceController.show(); break;
+    }
+  }
 }
 
-// Initialize the application
 new App("root");

@@ -68,8 +68,8 @@ export class MainPageController extends ScreenController {
 		);
 
 		// Update view
-		this.view.updateScore(this.model.getScore());
-		this.view.updateTimer(GAME_DURATION);
+		//this.view.updateScore(this.model.getScore());
+		//this.view.updateTimer(GAME_DURATION);
 		this.view.updateQuestion(this.model.getNum1(), this.model.getNum2(), this.model.getAllAnswers());
 		this.view.show();
 
@@ -83,7 +83,7 @@ export class MainPageController extends ScreenController {
 		let timeRemaining = GAME_DURATION;
 		const timerId = setInterval(() => {
 			timeRemaining--;
-			this.view.updateTimer(timeRemaining);
+			//this.view.updateTimer(timeRemaining);
   			console.log("This runs every 1000ms");
 			if (timeRemaining <= 0) {
 				this.endGame();
@@ -112,7 +112,7 @@ export class MainPageController extends ScreenController {
 		if (selectedAnswer === this.model.getCorrectAnswer()) {
 			// Update model only if correct
 			this.model.incrementScore();
-			this.view.updateScore(this.model.getScore());
+			//this.view.updateScore(this.model.getScore());
 		}
 
 		// Generate next question in model and update view

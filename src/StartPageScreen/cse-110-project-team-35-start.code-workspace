@@ -1,14 +1,7 @@
 {
-	"folders": [
-		{
-			"path": "../.."
-		},
-		{
-			"path": "../../../lab-3-Sam-Ham-UCSD"
-		},
-		{
-			"path": "../../../cse110-lab1"
-		}
-	],
-	"settings": {}
+    "folders": [
+        {
+            "path": "../.."
+        }
+    ]
 }
