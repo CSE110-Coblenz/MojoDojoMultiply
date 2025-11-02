@@ -51,7 +51,7 @@ class App implements ScreenSwitcher {
 		this.layer.draw();
 
 		// Start with menu screen visible
-		this.menuController.getView().show();
+		this.gameController.getView().show();
 	}
 
 	/**
@@ -88,4 +88,4 @@ class App implements ScreenSwitcher {
 }
 
 // Initialize the application
-new App("container");
+new App("root");
