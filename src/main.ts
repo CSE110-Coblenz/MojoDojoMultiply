@@ -1,6 +1,6 @@
 import Konva from "konva";
-import { STAGE_WIDTH, STAGE_HEIGHT } from "./constants";
-import { StartPageView } from "./StartPageScreen/StartPageView";
+import { STAGE_WIDTH, STAGE_HEIGHT } from "./constants.js";
+import { StartPageView } from "./StartPageScreen/StartPageView.js";
 
 // Create the Konva stage and a single layer. The views expose Konva.Groups
 // so we add them to the layer.

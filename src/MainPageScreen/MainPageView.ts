@@ -1,60 +1,128 @@
-/**
- * MainPageView - Handles the visual representation of the game screen
- */
-export class MainPageView {
-    private readonly timerDigitElements: HTMLImageElement[];
-    private readonly numberImagePaths: string[];
-    private gameContainer: HTMLElement;
+import Konva from "konva";
+import type { View } from "../types.ts";
+import { STAGE_WIDTH, STAGE_HEIGHT } from "../constants";
 
-    constructor() {
-        // Initialize container for the game
-        this.gameContainer = document.createElement('div');
-        this.gameContainer.className = 'game-container';
-        document.body.appendChild(this.gameContainer);
+export class MainPageView implements View {
+	private group: Konva.Group;
+	private lemonImage: Konva.Image | Konva.Circle | null = null;
+	private scoreText: Konva.Text;
+	private timerText: Konva.Text;
 
-        // Create timer container
-        const timerContainer = document.createElement('div');
-        timerContainer.className = 'timer-container';
-        this.gameContainer.appendChild(timerContainer);
+	constructor(onLemonClick: () => void) {
+		this.group = new Konva.Group({ visible: false });
 
-        // Initialize array for timer digit elements
-        this.timerDigitElements = [];
+		// Background
+		const bg = new Konva.Rect({
+			x: 0,
+			y: 0,
+			width: STAGE_WIDTH,
+			height: STAGE_HEIGHT,
+			fill: "#87CEEB", // Sky blue
+		});
+		this.group.add(bg);
 
-        // Create three digit places for the timer (e.g., 1:45 would need 3 spots)
-        for (let i = 0; i < 3; i++) {
-            const digitImg = document.createElement('img');
-            digitImg.className = 'timer-digit';
-            digitImg.alt = 'timer digit';
-            timerContainer.appendChild(digitImg);
-            this.timerDigitElements.push(digitImg);
-        }
+		// Score display (top-left)
+		this.scoreText = new Konva.Text({
+			x: 20,
+			y: 20,
+			text: "Score: 0",
+			fontSize: 32,
+			fontFamily: "Arial",
+			fill: "black",
+		});
+		this.group.add(this.scoreText);
 
-        // Paths to number images (0-9)
-        this.numberImagePaths = Array.from({length: 10}, (_, i) => 
-            `/assets/numbers/${i}.png`
-        );
+		// Timer display (top-right)
+		this.timerText = new Konva.Text({
+			x: STAGE_WIDTH - 150,
+			y: 20,
+			text: "Time: 60",
+			fontSize: 32,
+			fontFamily: "Arial",
+			fill: "red",
+		});
+		this.group.add(this.timerText);
 
-        // Set initial display to 0's
-        this.updateTimer([0, 0, 0]);
-    }
+		// TODO: Task 2 - Load and display lemon image using Konva.Image.fromURL()
+		// Placeholder circle (remove this when implementing the image)
+		//const placeholder = new Konva.Circle({
+		//	x: STAGE_WIDTH / 2,
+		//	y: STAGE_HEIGHT / 2,
+		//	radius: 50,
+		//	fill: "yellow",
+		//	stroke: "orange",
+		//	strokeWidth: 3,
+		//})
+		//	.width(100)
+		//	.height(100);
 
-    /**
-     * Updates the timer display with new digits
-     * @param digits - Array of numbers representing each digit of the time
-     */
-    updateTimer(digits: number[]): void {
-        for (const [index, digit] of digits.entries()) {
-            if (this.timerDigitElements[index] && digit >= 0 && digit <= 9) {
-                this.timerDigitElements[index].src = this.numberImagePaths[digit];
-            }
-        }
-    }
+		Konva.Image.fromURL("/lemon.png", (lemon) => {
+			lemon.x(STAGE_WIDTH / 2);
+			lemon.y(STAGE_HEIGHT / 2);
+			lemon.width(100);
+			lemon.height(100);
+			lemon.on("click", onLemonClick);
+			this.lemonImage = lemon;
+			this.group.add(this.lemonImage);
+		});
+	}
 
-    /**
-     * Get the main game container element
-     * @returns HTMLElement containing the game
-     */
-    getGameContainer(): HTMLElement {
-        return this.gameContainer;
-    }
+	/**
+	 * Update score display
+	 */
+	updateScore(score: number): void {
+		this.scoreText.text(`Score: ${score}`);
+		this.group.getLayer()?.draw();
+	}
+
+	/**
+	 * Randomize lemon position
+	 */
+	randomizeLemonPosition(): void {
+		if (!this.lemonImage) return;
+
+		// Define safe boundaries (avoid edges)
+		const padding = 100;
+		const minX = padding;
+		const maxX = STAGE_WIDTH - padding;
+		const minY = padding;
+		const maxY = STAGE_HEIGHT - padding;
+
+		// Generate random position
+		const randomX = Math.random() * (maxX - minX) + minX;
+		const randomY = Math.random() * (maxY - minY) + minY;
+
+		// Update lemon position
+		this.lemonImage.x(randomX);
+		this.lemonImage.y(randomY);
+		this.group.getLayer()?.draw();
+	}
+
+	/**
+	 * Update timer display
+	 */
+	updateTimer(timeRemaining: number): void {
+		this.timerText.text(`Time: ${timeRemaining}`);
+		this.group.getLayer()?.draw();
+	}
+
+	/**
+	 * Show the screen
+	 */
+	show(): void {
+		this.group.visible(true);
+		this.group.getLayer()?.draw();
+	}
+
+	/**
+	 * Hide the screen
+	 */
+	hide(): void {
+		this.group.visible(false);
+		this.group.getLayer()?.draw();
+	}
+
+	getGroup(): Konva.Group {
+		return this.group;
+	}
 }

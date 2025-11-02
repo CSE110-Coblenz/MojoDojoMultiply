@@ -1,48 +1,115 @@
 /**
- * MainPageController - Manages game logic and user interactions
+ * GameScreenModel - Manages game state
  */
+import { ScreenController } from "../types.ts";
+import type { ScreenSwitcher } from "../types.ts";
+import { GameScreenModel } from "./GameScreenModel.ts";
+import { GameScreenView } from "./GameScreenView.ts";
+import { GAME_DURATION } from "../../constants.ts";
 
-export class MainPageController {
-    //use Math class for calculations (ie. Math.random())
 
-    /**
-    * Helper function to generate random num, generates problems for model
-    * @param min - minimum number generate can produce
-    * @param max - maximum number generate can produce
-    * @return number - random number between min and max
-    */ 
-    getRandomNumber(min: number, max: number): number {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+export class GameScreenController extends ScreenController {
+	private model: GameScreenModel;
+	private view: GameScreenView;
+	private screenSwitcher: ScreenSwitcher;
+	private gameTimer: number | null = null;
 
-    /**
-     * Helper function to generate wrong answers, used to make multiple choice options
-     * TODO: Modify to create better wrong answers
-     * @param correctAnswer - the correct answer to base wrong answers off of
-     * @param count - the number of wrong answers to generate
-     * @returns an array of wrong answers
-     */
-    getWrongAnswers(correctAnswer: number, count: number): number[] {
-        const wrongAnswers: Set<number> = new Set();
-        while (wrongAnswers.size < count) {
-            const wrongAnswer = this.getRandomNumber(correctAnswer - 10, correctAnswer + 10); //TODO: bad implementation, generates random wrong based on +- 10
-            if (wrongAnswer !== correctAnswer) {
-                wrongAnswers.add(wrongAnswer);
-            }
-        }
-        return Array.from(wrongAnswers);
-    }
+	private squeezeSound: HTMLAudioElement;
 
-    /**
-     * Helper function to randomize order of multiple choice options
-     * @param items - array of items to randomize
-     * @returns randomized array of items
-     */
-    randomizeOrder<T>(items: T[]): T[] {
-        for (let i = items.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1)); //generate random swap
-            [items[i], items[j]] = [items[j], items[i]]; //perform swap
-        }
-        return items;
-    }
+	constructor(screenSwitcher: ScreenSwitcher) {
+		super();
+		this.screenSwitcher = screenSwitcher;
+
+		this.model = new GameScreenModel();
+		this.view = new GameScreenView(() => this.handleLemonClick());
+
+		// TODO: Task 4 - Initialize squeeze sound audio
+		this.squeezeSound = new Audio("/squeeze.mp3");
+	}
+
+	/**
+	 * Start the game
+	 */
+	startGame(): void {
+		// Reset model state
+		this.model.reset();
+
+		// Update view
+		this.view.updateScore(this.model.getScore());
+		this.view.updateTimer(GAME_DURATION);
+		this.view.show();
+
+		this.startTimer();
+	}
+
+	/**
+	 * Start the countdown timer
+	 */
+	private startTimer(): void {
+		let timeRemaining = GAME_DURATION;
+		const timerId = setInterval(() => {
+			timeRemaining--;
+			this.view.updateTimer(timeRemaining);
+  			console.log("This runs every 1000ms");
+			if (timeRemaining <= 0) {
+				this.endGame();
+			}
+		}, 1000);
+
+		// Stop the timer
+		this.gameTimer = timerId;
+	}
+
+	/**
+	 * Stop the timer
+	 */
+	private stopTimer(): void {
+		if (this.gameTimer !== null) {
+			clearInterval(this.gameTimer);
+			this.gameTimer = null;
+		}
+	}
+
+	/**
+	 * Handle lemon click event
+	 */
+	private handleLemonClick(): void {
+		// Update model
+		this.model.incrementScore();
+
+		// Update view
+		this.view.updateScore(this.model.getScore());
+		this.view.randomizeLemonPosition();
+
+		this.squeezeSound.play();
+
+		this.squeezeSound.currentTime = 0;
+	}
+
+	/**
+	 * End the game
+	 */
+	private endGame(): void {
+		this.stopTimer();
+
+		// Switch to results screen with final score
+		this.screenSwitcher.switchToScreen({
+			type: "result",
+			score: this.model.getScore(),
+		});
+	}
+
+	/**
+	 * Get final score
+	 */
+	getFinalScore(): number {
+		return this.model.getScore();
+	}
+
+	/**
+	 * Get the view group
+	 */
+	getView(): GameScreenView {
+		return this.view;
+	}
 }
