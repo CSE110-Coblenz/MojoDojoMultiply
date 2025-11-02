@@ -14,17 +14,42 @@ export class MainPageController extends ScreenController {
 	private screenSwitcher: ScreenSwitcher;
 	private gameTimer: number | null = null;
 
-	private squeezeSound: HTMLAudioElement;
+	private clickSound: HTMLAudioElement;
+	private hoverSound: HTMLAudioElement;
 
 	constructor(screenSwitcher: ScreenSwitcher) {
 		super();
 		this.screenSwitcher = screenSwitcher;
 
 		this.model = new MainPageModel();
-		this.view = new MainPageView(() => this.handleLemonClick());
+		this.clickSound = new Audio("/Punch sound.mp3");
+		this.hoverSound = new Audio("/Picking.mp3");
 
-		// TODO: Task 4 - Initialize squeeze sound audio
-		this.squeezeSound = new Audio("/squeeze.mp3");
+		// Pass the event handlers and helper functions to the view
+		this.view = new MainPageView(
+			(answer: number) => this.handleAnswerClick(answer),
+			() => this.handleAnswerHoverStart(),
+			() => this.handleAnswerHoverEnd(),
+			(min: number, max: number) => this.getRandomNumber(min, max),
+			(correctAnswer: number, count: number) => this.getWrongAnswers(correctAnswer, count),
+			(answers: number[]) => this.randomizeOrder(answers)
+		);
+	}
+
+	/**
+	 * Handle hover start on answer squares
+	 */
+	private handleAnswerHoverStart(): void {
+		document.body.style.cursor = 'pointer';
+		this.hoverSound.currentTime = 0;
+		this.hoverSound.play();
+	}
+
+	/**
+	 * Handle hover end on answer squares
+	 */
+	private handleAnswerHoverEnd(): void {
+		document.body.style.cursor = 'default';
 	}
 
 	/**
@@ -34,9 +59,14 @@ export class MainPageController extends ScreenController {
 		// Reset model state
 		this.model.reset();
 
+		// Generate new random numbers for multiplication
+		const num1 = this.getRandomNumber(1, 12);
+		const num2 = this.getRandomNumber(1, 12);
+
 		// Update view
 		this.view.updateScore(this.model.getScore());
 		this.view.updateTimer(GAME_DURATION);
+		this.view.updateQuestion(num1, num2);
 		this.view.show();
 
 		this.startTimer();
@@ -71,19 +101,25 @@ export class MainPageController extends ScreenController {
 	}
 
 	/**
-	 * Handle lemon click event
+	 * Handle answer click event
 	 */
-	private handleLemonClick(): void {
-		// Update model
-		this.model.incrementScore();
+	private handleAnswerClick(selectedAnswer: number): void {
+		// Check if answer is correct
+		if (selectedAnswer === this.view.getCorrectAnswer()) {
+			// Update model only if correct
+			this.model.incrementScore();
+			this.view.updateScore(this.model.getScore());
+		}
 
-		// Update view
-		this.view.updateScore(this.model.getScore());
-		this.view.randomizeLemonPosition();
+		// Generate new random numbers for multiplication
+		const num1 = this.getRandomNumber(1, 12);
+		const num2 = this.getRandomNumber(1, 12);
 
-		this.squeezeSound.play();
+		// Update view with new question
+		this.view.updateQuestion(num1, num2);
 
-		this.squeezeSound.currentTime = 0;
+		this.clickSound.play();
+		this.clickSound.currentTime = 0;
 	}
 
 	/**
@@ -112,4 +148,45 @@ export class MainPageController extends ScreenController {
 	getView(): MainPageView {
 		return this.view;
 	}
+
+	/**
+    * Helper function to generate random num, generates problems for model
+    * @param min - minimum number generate can produce
+    * @param max - maximum number generate can produce
+    * @return number - random number between min and max
+    */ 
+    getRandomNumber(min: number, max: number): number {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    /**
+     * Helper function to generate wrong answers, used to make multiple choice options
+     * TODO: Modify to create better wrong answers
+     * @param correctAnswer - the correct answer to base wrong answers off of
+     * @param count - the number of wrong answers to generate
+     * @returns an array of wrong answers
+     */
+    getWrongAnswers(correctAnswer: number, count: number): number[] {
+        const wrongAnswers: Set<number> = new Set();
+        while (wrongAnswers.size < count) {
+            const wrongAnswer = this.getRandomNumber(correctAnswer - 10, correctAnswer + 10); //TODO: bad implementation, generates random wrong based on +- 10
+            if (wrongAnswer !== correctAnswer) {
+                wrongAnswers.add(wrongAnswer);
+            }
+        }
+        return Array.from(wrongAnswers);
+    }
+
+    /**
+     * Helper function to randomize order of multiple choice options
+     * @param items - array of items to randomize
+     * @returns randomized array of items
+     */
+    randomizeOrder<T>(items: T[]): T[] {
+        for (let i = items.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1)); //generate random swap
+            [items[i], items[j]] = [items[j], items[i]]; //perform swap
+        }
+        return items;
+    }
 }
