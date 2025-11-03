@@ -1,9 +1,14 @@
-import { ScreenController, type ScreenSwitcher } from "../types";
+import { ScreenController } from "../types";
+import type { ScreenSwitcher} from "../types";
 import { HelpPageView } from "./HelpPageView";
 
+/**
+ * MenuScreenController - Handles menu interactions
+ */
+
 export class HelpPageController extends ScreenController {
-  private view: HelpPageView;
-  private _screenSwitcher: ScreenSwitcher;
+    private view: HelpPageView;
+    private screenSwitcher: ScreenSwitcher;
 
   constructor(screenSwitcher: ScreenSwitcher) {
     super();
@@ -17,7 +22,10 @@ export class HelpPageController extends ScreenController {
     });
   }
 
-  getView(): HelpPageView {
-    return this.view;
-  }
+     /**
+         * Get the view
+         */
+    getView(): HelpPageView {
+        return this.view;
+    }
 }
