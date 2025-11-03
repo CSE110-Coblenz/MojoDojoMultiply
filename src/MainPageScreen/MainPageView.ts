@@ -1,6 +1,6 @@
 import Konva from "konva";
 import type { View } from "../types.js";
-import { STAGE_HEIGHT, STAGE_WIDTH } from "../constants.js";
+import { STAGE_WIDTH, STAGE_HEIGHT } from "../constants.js";
 
 /**
  * MainPageView - Renders the main game screen
@@ -33,7 +33,28 @@ export class MainPageView implements View {
             this.timerImageNodes.push(img);
             this.group.add(img);
         }
-    }
+
+		//Stage background for Konva Group
+		const bg = new Konva.Rect({
+			x: 0,
+			y: 0,
+			width: STAGE_WIDTH,
+			height: STAGE_HEIGHT,
+			fill: "#c5c6c7"
+		});
+		this.group.add(bg)
+
+		const roundAnswerOptions = new Konva.Group();
+
+		const sectionPlatter = new Konva.Rect({
+			x: 10,
+			y: 10,
+			width: 200,
+			height: 100,
+			fill: "#c5c6c7"
+		})
+
+	}
 
     show(): void {
         this.group.visible(true);
