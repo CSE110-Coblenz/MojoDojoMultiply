@@ -11,6 +11,7 @@ export class HelpPageView implements View {
     private group: Konva.Group;
 
     // The ? For the constructor values makes it so the value is optional, both buttons do not have to be clicked
+    /** TODO: Change constructor to proper Back and Start buttons */
     constructor(onBack?: Handler, onStart?: Handler) {
         this.group = new Konva.Group({ visible: false });
 
