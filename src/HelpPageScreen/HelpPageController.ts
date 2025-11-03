@@ -9,6 +9,12 @@ export class HelpPageController extends ScreenController {
     super();
     this._screenSwitcher = screenSwitcher;
     this.view = new HelpPageView();
+
+    const backButton = this.view.getBackButton();
+
+    backButton.on('click tap', () => {
+      this._screenSwitcher.switchToScreen({ type: "start" });
+    });
   }
 
   getView(): HelpPageView {
