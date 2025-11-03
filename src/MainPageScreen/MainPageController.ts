@@ -1,5 +1,5 @@
 /**
- * GameScreenModel - Manages game state
+ * MainPageController - Manages game logic and user interaction
  */
 import { ScreenController } from "../types";
 import type { ScreenSwitcher } from "../types.ts";
