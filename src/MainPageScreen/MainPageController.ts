@@ -1,3 +1,6 @@
+import { ScreenController, type ScreenSwitcher } from "../types";
+import { MainPageView } from "./MainPageView";
+
 /**
  * MainPageController - Manages game logic and user interaction
  */
@@ -6,7 +9,6 @@ import type { ScreenSwitcher } from "../types.ts";
 import { MainPageModel } from "./MainPageModel";
 import { MainPageView } from "./MainPageView";
 import { GAME_DURATION } from "../constants";
-
 
 export class MainPageController extends ScreenController {
 	private model: MainPageModel;
