@@ -1,5 +1,5 @@
 import { ScreenController } from "../types";
-import type { ScreenSwitcher, View } from "../types";
+import type { ScreenSwitcher} from "../types";
 import { HelpPageView } from "./HelpPageView";
 
 /**

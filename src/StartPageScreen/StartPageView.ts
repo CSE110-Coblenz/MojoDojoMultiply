@@ -8,7 +8,11 @@ import { STAGE_WIDTH } from "../constants";
 export class StartPageView implements View {
     private group: Konva.Group;
 
-    constructor(onStartClick: () => void) {
+    constructor(
+        onStartClick: () => void,
+        onHelpClick: () => void,
+        onPracticeClick: () => void
+        ) {
         this.group = new Konva.Group({ visible: true });
 
         // Title text (part 1)
@@ -95,7 +99,7 @@ export class StartPageView implements View {
         helpText.offsetX(helpText.width() / 2);
         helpButtonGroup.add(helpButton);
         helpButtonGroup.add(helpText);
-        helpButtonGroup.on("click", onStartClick); //Need to create a onHelpClick func, remove onStartClick later, left as spaceholder
+        helpButtonGroup.on("click", onHelpClick); 
         this.group.add(helpButtonGroup);
 
         //Practice Button
@@ -122,7 +126,7 @@ export class StartPageView implements View {
         practiceText.offsetX(practiceText.width() / 2);
         practiceButtonGroup.add(practiceButton);
         practiceButtonGroup.add(practiceText);
-        helpButtonGroup.on("click", onStartClick); //Need to create a onPracticeClick func, remove onStartClick later, left as spaceholder
+        practiceButtonGroup.on("click", onPracticeClick); 
         this.group.add(practiceButtonGroup);
     }
 
