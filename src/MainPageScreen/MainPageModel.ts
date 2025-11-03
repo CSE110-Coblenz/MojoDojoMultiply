@@ -2,11 +2,17 @@
  * MainPageModel - Manages game state
  */
 export class MainPageModel {
-    private timeRemaining: number; // Time in seconds
+	private timeRemaining: number; // Time in seconds
     private timerInterval: number | null;
     private isTimerRunning: boolean;
     private readonly defaultTime: number = 60; // Default time in seconds
     private tickCallback: ((digits: number[]) => void) | null = null; // stored callback for resume
+	private score = 0;
+	private num1: number = 0;
+	private num2: number = 0;
+	private correctAnswer: number = 0;
+	private wrongAnswers: number[] = [];
+	private allAnswers: number[] = [];
 
     constructor() {
         this.timeRemaining = this.defaultTime;
@@ -145,4 +151,74 @@ export class MainPageModel {
             }
         }
     }
+
+	/**
+	 * Reset game state for a new game
+	 */
+	private reset(): void {
+		this.score = 0;
+	}    
+
+	/**
+	 * Increment score when lemon is clicked
+	 */
+	incrementScore(): void {
+		this.score++;
+	}
+
+	/**
+	 * Get current score
+	 */
+	getScore(): number {
+		return this.score;
+	}
+
+    getAnswer(): number {
+        return 42;
+    }
+
+	/**
+	 * Populate the model with a new question and its answers.
+	 * The model accepts helper functions for randomness and wrong-answer generation so
+	 * it doesn't need to know about the controller's implementation details.
+	 */
+	generateNewQuestion(
+		getRandomNumber: (min: number, max: number) => number,
+		getWrongAnswers: (correctAnswer: number, count: number) => number[],
+		randomizeOrder: (answers: number[]) => number[],
+		min = 1,
+		max = 12,
+		wrongCount = 3
+	): void {
+		this.num1 = getRandomNumber(min, max);
+		this.num2 = getRandomNumber(min, max);
+		this.correctAnswer = this.num1 * this.num2;
+		this.wrongAnswers = getWrongAnswers(this.correctAnswer, wrongCount);
+		this.allAnswers = randomizeOrder([this.correctAnswer, ...this.wrongAnswers]);
+	}
+
+	// Gets the first number in the multiplication problem
+	getNum1(): number {
+		return this.num1;
+	}
+
+	// Gets the second number in the multiplication problem
+	getNum2(): number {
+		return this.num2;
+	}
+
+	//Gets the correct answer to the current multiplication problem
+	getCorrectAnswer(): number {
+		return this.correctAnswer;
+	}
+
+	// Gets the list of wrong answers for the current multiplication problem
+	getWrongAnswersList(): number[] {
+		return this.wrongAnswers;
+	}
+
+	// Gets all answer choices for the current multiplication problem
+	getAllAnswers(): number[] {
+		return this.allAnswers;
+	}
 }
