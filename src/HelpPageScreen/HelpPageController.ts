@@ -2,10 +2,6 @@ import { ScreenController } from "../types";
 import type { ScreenSwitcher} from "../types";
 import { HelpPageView } from "./HelpPageView";
 
-/**
- * MenuScreenController - Handles menu interactions
- */
-
 export class HelpPageController extends ScreenController {
     private view: HelpPageView;
     private screenSwitcher: ScreenSwitcher;
@@ -15,6 +11,8 @@ export class HelpPageController extends ScreenController {
         this.screenSwitcher = screenSwitcher;
         this.view = new HelpPageView(() => this.handleLeaveClick());
     }
+
+    //Im sorry mohammed :(
 
     /**
      * Handle leave button click

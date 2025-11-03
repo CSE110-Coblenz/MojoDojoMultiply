@@ -8,12 +8,11 @@ type Handler = () => void;
  * HelpPageView - Renders the help screen
  */
 export class HelpPageView implements View {
-    private group: Konva.Group;
+  private group: Konva.Group;
+  private backButton: Konva.Text;
 
-    // The ? For the constructor values makes it so the value is optional, both buttons do not have to be clicked
-    /** TODO: Change constructor to proper Back and Start buttons */
-    constructor(onBack?: Handler, onStart?: Handler) {
-        this.group = new Konva.Group({ visible: false });
+  constructor() {
+    this.group = new Konva.Group({ visible: false });
 
         // Title text
         const title = new Konva.Text({
