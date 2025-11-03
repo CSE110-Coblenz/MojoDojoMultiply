@@ -55,18 +55,6 @@ export class MainPageView implements View {
 		});
 		this.group.add(bg);
 
-		const roundAnswerOptions = new Konva.Group();
-
-		const sectionPlatter = new Konva.Rect({
-			x: 10,
-			y: 10,
-			width: 200,
-			height: 100,
-			fill: "#c5c6c7"
-		})
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 		// Score display (top-left)
 		this.scoreText = new Konva.Text({
 			x: 20,
