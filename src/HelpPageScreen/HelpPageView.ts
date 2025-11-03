@@ -92,6 +92,7 @@ export class HelpPageView implements View {
             fill: "black",
             align: "center",
         });
+        
         //GetClientRect gets the full x and y which includes any shadow or stoke later added, is more precise
         const { width: bW, height: bH } = btnText.getClientRect();
         btnText.offset({ x: bW / 2, y: bH / 2});
