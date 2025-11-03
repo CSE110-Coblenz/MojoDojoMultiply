@@ -123,4 +123,4 @@ export class HelpPageView implements View {
     getGroup(): Konva.Group {
         return this.group;
     }
-}
+} 
