@@ -2,25 +2,24 @@ import { ScreenController } from "../types";
 import type { ScreenSwitcher} from "../types";
 import { HelpPageView } from "./HelpPageView";
 
-/**
- * MenuScreenController - Handles menu interactions
- */
-
 export class HelpPageController extends ScreenController {
     private view: HelpPageView;
     private screenSwitcher: ScreenSwitcher;
 
-  constructor(screenSwitcher: ScreenSwitcher) {
-    super();
-    this._screenSwitcher = screenSwitcher;
-    this.view = new HelpPageView();
+    constructor(screenSwitcher: ScreenSwitcher) {
+        super();
+        this.screenSwitcher = screenSwitcher;
+        this.view = new HelpPageView(() => this.handleLeaveClick());
+    }
 
-    const backButton = this.view.getBackButton();
+    //Im sorry mohammed :(
 
-    backButton.on('click tap', () => {
-      this._screenSwitcher.switchToScreen({ type: "start" });
-    });
-  }
+    /**
+     * Handle leave button click
+     */
+    private handleLeaveClick(): void {
+     // TODO: Implement screen transition from helpScreen to mainGame
+    }
 
      /**
          * Get the view
