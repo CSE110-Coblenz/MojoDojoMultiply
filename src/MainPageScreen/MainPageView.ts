@@ -5,10 +5,8 @@ import { STAGE_HEIGHT, STAGE_WIDTH } from "../constants.js";
 /**
  * MainPageView - Renders the main game screen
  */
-
-// # region TEMP BAD CODE FROM RICHARD
 //export class MainPageView {
-    
+    // # region TEMP BAD CODE FROM RICHARD
     // private readonly timerDigitElements: HTMLImageElement[];
     // private readonly numberImagePaths: string[];
     // private gameContainer: HTMLElement;
