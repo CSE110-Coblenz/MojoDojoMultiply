@@ -6,6 +6,7 @@ export class MainPageModel {
     private timerInterval: number | null;
     private isTimerRunning: boolean;
     private readonly defaultTime: number = 60; // Default time in seconds
+    private tickCallback: ((digits: number[]) => void) | null = null; // stored callback for resume
 	private score = 0;
 	private num1: number = 0;
 	private num2: number = 0;
@@ -26,6 +27,8 @@ export class MainPageModel {
     startTimer(callback: (digits: number[]) => void): void {
         if (!this.isTimerRunning) {
             this.isTimerRunning = true;
+            // store the callback so we can resume later without the caller needing to re-supply it
+            this.tickCallback = callback;
             // Initial call to set initial state
             callback(this.getTimeDigits());
             
@@ -38,6 +41,35 @@ export class MainPageModel {
                 }
             }, 1000);
         }
+    }
+
+    /**
+     * Pause the countdown timer without resetting any state.
+     * This keeps `timeRemaining` intact so the timer can be resumed later.
+     */
+    pause(): void {
+        // pause is a thin wrapper around stopTimer which preserves timeRemaining
+        this.stopTimer();
+    }
+
+    /**
+     * Resume the countdown timer using the last callback passed to `startTimer`.
+     * If `startTimer` was never called with a callback, resume will do nothing and warn.
+     */
+    resume(): void {
+        if (this.isTimerRunning) {
+            // already running
+            return;
+        }
+        if (!this.tickCallback) {
+            // No callback stored, cannot resume automatically. Caller should call startTimer(callback) instead.
+            // Keep this silent in production, but warn in dev to help debugging.
+            // eslint-disable-next-line no-console
+            console.warn('MainPageModel.resume() called but no tick callback is stored. Call startTimer(callback) instead.');
+            return;
+        }
+        // reuse stored callback to restart interval
+        this.startTimer(this.tickCallback);
     }
 
     /**
@@ -78,6 +110,16 @@ export class MainPageModel {
         if (callback) {
             callback(this.getTimeDigits());
         }
+    }
+
+    /**
+     * Teardown the timer state when leaving the page or exiting the game.
+     * This will stop any running interval and clear the stored tick callback
+     * so the model does not try to update a view that no longer exists.
+     */
+    teardown(): void {
+        this.stopTimer();
+        this.tickCallback = null;
     }
 
     /**
