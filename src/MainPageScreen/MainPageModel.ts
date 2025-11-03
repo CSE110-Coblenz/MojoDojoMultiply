@@ -7,6 +7,7 @@ export class MainPageModel {
     private isTimerRunning: boolean;
     private readonly defaultTime: number = 60; // Default time in seconds
     private tickCallback: ((digits: number[]) => void) | null = null; // stored callback for resume
+    private onCompleteCallback: (() => void) | null = null; // optional completion callback
 	private score = 0;
 	private num1: number = 0;
 	private num2: number = 0;
@@ -24,20 +25,34 @@ export class MainPageModel {
      * Start the countdown timer
      * @param callback - Function to call on each timer tick with array of digits
      */
-    startTimer(callback: (digits: number[]) => void): void {
+    /**
+     * Start the countdown timer
+     * @param callback - Function to call on each timer tick with array of digits
+     * @param onComplete - Optional callback called when timer reaches zero
+     */
+    startTimer(callback: (digits: number[]) => void, onComplete?: () => void): void {
+        // store callbacks so resume() can reuse them
+        this.tickCallback = callback;
+        this.onCompleteCallback = onComplete ?? null;
+
         if (!this.isTimerRunning) {
             this.isTimerRunning = true;
-            // store the callback so we can resume later without the caller needing to re-supply it
-            this.tickCallback = callback;
             // Initial call to set initial state
             callback(this.getTimeDigits());
-            
+
             this.timerInterval = globalThis.setInterval(() => {
                 if (this.timeRemaining > 0) {
                     this.timeRemaining--;
-                    callback(this.getTimeDigits());
+                    // call tick callback if present
+                    if (this.tickCallback) {
+                        this.tickCallback(this.getTimeDigits());
+                    }
                 } else {
+                    // reached zero: stop and call completion
                     this.stopTimer();
+                    if (this.onCompleteCallback) {
+                        this.onCompleteCallback();
+                    }
                 }
             }, 1000);
         }
@@ -68,8 +83,8 @@ export class MainPageModel {
             console.warn('MainPageModel.resume() called but no tick callback is stored. Call startTimer(callback) instead.');
             return;
         }
-        // reuse stored callback to restart interval
-        this.startTimer(this.tickCallback);
+        // reuse stored callback and onComplete to restart interval
+        this.startTimer(this.tickCallback, this.onCompleteCallback ?? undefined);
     }
 
     /**
@@ -152,12 +167,12 @@ export class MainPageModel {
         }
     }
 
-	/**
-	 * Reset game state for a new game
-	 */
-	private reset(): void {
-		this.score = 0;
-	}    
+    /**
+     * Reset game state for a new game
+     */
+    reset(): void {
+        this.score = 0;
+    }
 
 	/**
 	 * Increment score when lemon is clicked

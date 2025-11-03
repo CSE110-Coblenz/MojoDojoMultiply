@@ -1,14 +1,6 @@
 import { ScreenController, type ScreenSwitcher } from "../types";
-import { MainPageView } from "./MainPageView";
-
-/**
- * MainPageController - Manages game logic and user interaction
- */
-import { ScreenController } from "../types";
-import type { ScreenSwitcher } from "../types.ts";
 import { MainPageModel } from "./MainPageModel";
 import { MainPageView } from "./MainPageView";
-import { GAME_DURATION } from "../constants";
 
 export class MainPageController extends ScreenController {
 	private model: MainPageModel;
@@ -75,35 +67,60 @@ export class MainPageController extends ScreenController {
 		this.view.updateQuestion(this.model.getNum1(), this.model.getNum2(), this.model.getAllAnswers());
 		this.view.show();
 
-		this.startTimer();
+		// Start timer via model (model handles ticking and view updates)
+		this.model.resetTimer((digits) => this.view.updateTimer(digits));
+		this.model.startTimer(
+			(digits) => this.view.updateTimer(digits),
+			() => this.endGame()
+		);
 	}
 
 	/**
 	 * Start the countdown timer
 	 */
+	/**
+	 * Start timer through model (kept for compatibility if other code calls it)
+	 */
 	private startTimer(): void {
-		let timeRemaining = GAME_DURATION;
-		const timerId = setInterval(() => {
-			timeRemaining--;
-			//this.view.updateTimer(timeRemaining);
-  			console.log("This runs every 1000ms");
-			if (timeRemaining <= 0) {
-				this.endGame();
-			}
-		}, 1000);
-
-		// Stop the timer
-		this.gameTimer = timerId;
+		this.model.startTimer((digits) => this.view.updateTimer(digits), () => this.endGame());
 	}
 
 	/**
 	 * Stop the timer
 	 */
 	private stopTimer(): void {
-		if (this.gameTimer !== null) {
-			clearInterval(this.gameTimer);
-			this.gameTimer = null;
+		// delegate to model
+		this.model.stopTimer();
+	}
+
+	/**
+	 * Pause the game timer (used by pause/help menus)
+	 */
+	pauseGame(): void {
+		this.model.pause();
+	}
+
+	/**
+	 * Resume the game timer; if the view was recreated, re-start with the view callback.
+	 */
+	resumeGame(): void {
+		// try to resume; if resume fails (no stored callback), startTimer with current view
+		// (resume returns void in model; we detect by model.isActive())
+		if (!this.model.isActive()) {
+			// attempt to resume; if stored callback missing, start fresh
+			this.model.resume();
+			if (!this.model.isActive()) {
+				// fallback: start with view callback
+				this.model.startTimer((digits) => this.view.updateTimer(digits), () => this.endGame());
+			}
 		}
+	}
+
+	/**
+	 * Exit the game screen: teardown model so it doesn't call destroyed view
+	 */
+	exitGame(): void {
+		this.model.teardown();
 	}
 
 	/**
