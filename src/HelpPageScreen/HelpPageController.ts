@@ -10,18 +10,17 @@ export class HelpPageController extends ScreenController {
     private view: HelpPageView;
     private screenSwitcher: ScreenSwitcher;
 
-    constructor(screenSwitcher: ScreenSwitcher) {
-        super();
-        this.screenSwitcher = screenSwitcher;
-        this.view = new HelpPageView(() => this.handleLeaveClick());
-    }
+  constructor(screenSwitcher: ScreenSwitcher) {
+    super();
+    this._screenSwitcher = screenSwitcher;
+    this.view = new HelpPageView();
 
-    /**
-     * Handle leave button click
-     */
-    private handleLeaveClick(): void {
-     // TODO: Implement screen transition from helpScreen to mainGame
-    }
+    const backButton = this.view.getBackButton();
+
+    backButton.on('click tap', () => {
+      this._screenSwitcher.switchToScreen({ type: "start" });
+    });
+  }
 
      /**
          * Get the view
