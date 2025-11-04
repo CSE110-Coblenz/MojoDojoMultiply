@@ -1,6 +1,6 @@
 import Konva from "konva";
 import type { View } from "../types.js";
-import { STAGE_WIDTH, STAGE_HEIGHT } from "../constants.js";
+import { GAMECST } from "../constants.js";
 
 /**
  * MainPageView - Renders the main game screen
@@ -9,14 +9,13 @@ export class MainPageView implements View {
     private group: Konva.Group;
     // Konva.Image placeholders for timer digits (minute, tens, ones)
     private readonly timerImageNodes: Konva.Image[] = [];
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private scoreText: Konva.Text;
 	private timerText: Konva.Text;
 	private questionText: Konva.Text;
 	private answerTexts: Konva.Text[];
 	private correctAnswer: number;
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	
 	// later change to constructor(onStartClick: () => void) {
 	constructor(
 		onAnswerClick: (answer: number) => void,
@@ -26,8 +25,8 @@ export class MainPageView implements View {
 		this.group = new Konva.Group({ visible: false });
 
         const text = new Konva.Text({
-            x: STAGE_WIDTH / 2,
-            y: STAGE_HEIGHT / 2,
+            x: GAMECST.STAGE_WIDTH / 2,
+            y: GAMECST.STAGE_HEIGHT / 2,
             text: "MAIN GAME",
             fontSize: 100
         });
@@ -49,9 +48,9 @@ export class MainPageView implements View {
 		const bg = new Konva.Rect({
 			x: 0,
 			y: 0,
-			width: STAGE_WIDTH,
-			height: STAGE_HEIGHT,
-			fill: "#87CEEB"
+			width: GAMECST.STAGE_WIDTH,
+			height: GAMECST.STAGE_HEIGHT,
+			fill: "#FFFFC5"
 		});
 		this.group.add(bg);
 
@@ -68,7 +67,7 @@ export class MainPageView implements View {
 
 		// Timer display (top-right)
 		this.timerText = new Konva.Text({
-			x: STAGE_WIDTH - 150,
+			x: GAMECST.STAGE_WIDTH - 150,
 			y: 20,
 			text: "Time: 60",
 			fontSize: 32,
@@ -82,8 +81,8 @@ export class MainPageView implements View {
 		const spacing = 20;
 		const totalWidth = (squareSize * 2) + spacing;
 		const totalHeight = (squareSize * 2) + spacing;
-		const startX = (STAGE_WIDTH - totalWidth) / 2;
-		const startY = (STAGE_HEIGHT - totalHeight) / 2;
+		const startX = (GAMECST.STAGE_WIDTH - totalWidth) / 2;
+		const startY = (GAMECST.STAGE_HEIGHT - totalHeight) / 2;
 		// initial empty values; controller will populate the first question
 		this.correctAnswer = 0;
 		const allAnswers: (string | number)[] = ["", "", "", ""];
@@ -94,57 +93,69 @@ export class MainPageView implements View {
 			y: startY - spacing * 5,
 			width: squareSize * 2 + spacing,
 			height: squareSize,
-			fill: 'green',
+			fill: GAMECST.HIGHLIGHT_COLOR,
 			stroke: 'black',
 			strokeWidth: 4
 		});
 		this.group.add(question);
 
 		//This is the answer 1 box
+		const answer1Group = new Konva.Group();
+
 		const answer1 = new Konva.Rect({
 			x: startX,
 			y: startY,
 			width: squareSize,
 			height: squareSize,
-			fill: 'green',
+			fill: GAMECST.HIGHLIGHT_COLOR,
 			stroke: 'black',
 			strokeWidth: 4
 		});
-		this.group.add(answer1);
+		answer1Group.add(answer1);
+		this.group.add(answer1Group);
 
 		//This is the answer 2 box
+		const answer2Group = new Konva.Group();
+
 		const answer2 = new Konva.Rect({
 			x: startX + squareSize + spacing,
 			y: startY,
 			width: squareSize,
 			height: squareSize,
-			fill: 'green',
+			fill: GAMECST.HIGHLIGHT_COLOR,
 			stroke: 'black',
 			strokeWidth: 4
 		});
-		this.group.add(answer2);
+		answer2Group.add(answer2);
+		this.group.add(answer2Group);
+
+		const answer3Group = new Konva.Group();
 
 		const answer3 = new Konva.Rect({
 			x: startX,
 			y: startY + squareSize + spacing,
 			width: squareSize,
 			height: squareSize,
-			fill: 'green',
+			fill: GAMECST.HIGHLIGHT_COLOR,
 			stroke: 'black',
 			strokeWidth: 4
 		});
-		this.group.add(answer3);
+		answer3Group.add(answer3);
+		this.group.add(answer3Group);
+
+		const answer4Group = new Konva.Group();
 
 		const answer4 = new Konva.Rect({
 			x: startX + squareSize + spacing,
 			y: startY + squareSize + spacing,
 			width: squareSize,
 			height: squareSize,
-			fill: 'green',
+			fill: GAMECST.HIGHLIGHT_COLOR,
 			stroke: 'black',
 			strokeWidth: 4
 		});
-		this.group.add(answer4);
+		answer4Group.add(answer4);
+		this.group.add(answer4Group);
 
 		this.questionText = new Konva.Text({
 			x: question.x() + 25,
@@ -192,23 +203,25 @@ export class MainPageView implements View {
 		];
 
 		// Attach click/hover handlers now that answerTexts exist
-		answer1.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[0].text())));
-		answer1.on('mouseover', onAnswerHoverStart);
-		answer1.on('mouseout', onAnswerHoverEnd);
+		answer1Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[0].text())));
+		answer1Group.on('mouseover', onAnswerHoverStart);
+		answer1Group.on('mouseout', onAnswerHoverEnd);
 
-		answer2.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[1].text())));
-		answer2.on('mouseover', onAnswerHoverStart);
-		answer2.on('mouseout', onAnswerHoverEnd);
+		answer2Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[1].text())));
+		answer2Group.on('mouseover', onAnswerHoverStart);
+		answer2Group.on('mouseout', onAnswerHoverEnd);
 
-		answer3.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[2].text())));
-		answer3.on('mouseover', onAnswerHoverStart);
-		answer3.on('mouseout', onAnswerHoverEnd);
+		answer3Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[2].text())));
+		answer3Group.on('mouseover', onAnswerHoverStart);
+		answer3Group.on('mouseout', onAnswerHoverEnd);
 
-		answer4.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[3].text())));
-		answer4.on('mouseover', onAnswerHoverStart);
-		answer4.on('mouseout', onAnswerHoverEnd);
+		answer4Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[3].text())));
+		answer4Group.on('mouseover', onAnswerHoverStart);
+		answer4Group.on('mouseout', onAnswerHoverEnd);
 
-		this.answerTexts.forEach(text => this.group.add(text));
+		[answer1Group, answer2Group, answer3Group, answer4Group].forEach((g, i) =>
+			g.add(this.answerTexts[i])
+		);
 	}
 
 	/**
