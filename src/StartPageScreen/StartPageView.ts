@@ -1,6 +1,7 @@
 import Konva from "konva";
 import type { View } from "../types";
 import { STAGE_WIDTH } from "../constants";
+import { GAMECST } from "../constants.js"
 
 /**
  * StartPageView - Renders the main screen
@@ -22,7 +23,7 @@ export class StartPageView implements View {
             text: "Mojo Dojo",
             fontSize: 48,
             fontFamily: "Arial",
-            fill: "yellow",
+            fill: GAMECST.HIGHLIGHT_COLOR,
             stroke: "orange",
             strokeWidth: 2,
             align: "center",
@@ -40,7 +41,7 @@ export class StartPageView implements View {
             text: "MULTIPLY",
             fontSize: 48,
             fontFamily: "Arial",
-            fill: "yellow",
+            fill: GAMECST.HIGHLIGHT_COLOR,
             stroke: "orange",
             strokeWidth: 2,
             align: "center",
@@ -55,7 +56,7 @@ export class StartPageView implements View {
             y: 275,
             width: 200,
             height: 60,
-            fill: "#fea59f",
+            fill: GAMECST.HIGHLIGHT_COLOR,
             cornerRadius: 10,
             stroke: "orange",
             strokeWidth: 3,
@@ -81,8 +82,8 @@ export class StartPageView implements View {
             x: STAGE_WIDTH / 2 - 100,
             y: 350,
             width: 200,
-            height: 60,
-            fill: "#fea59f",
+            height: 60,         
+            fill: GAMECST.HIGHLIGHT_COLOR,
             cornerRadius: 10,
             stroke: "orange",
             strokeWidth: 3,
@@ -109,7 +110,7 @@ export class StartPageView implements View {
             y: 425,
             width: 250,
             height: 60,
-            fill: "#fea59f",
+            fill: GAMECST.HIGHLIGHT_COLOR,
             cornerRadius: 10,
             stroke: "orange",
             strokeWidth: 3,
