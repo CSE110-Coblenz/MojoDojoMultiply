@@ -82,7 +82,7 @@ export class StartPageView implements View {
             x: STAGE_WIDTH / 2 - 100,
             y: 350,
             width: 200,
-            height: 60,
+            height: 60,         
             fill: GAMECST.HIGHLIGHT_COLOR,
             cornerRadius: 10,
             stroke: "orange",
