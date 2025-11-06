@@ -14,9 +14,17 @@ export class MainPageView implements View {
 	private questionText: Konva.Text;
 	private answerTexts: Konva.Text[];
 	private correctAnswer: number;
+	//Used to change the health bar of the player
+	private playerHealthPercent: number;
+	//Used to change the health bar of the opponent
+	private opponentHealthPercent: number;
+	// Konva image for the player's avatar
+	private playerAvatar?: Konva.Image;
+	// Konva image for the opponent's avatar
+	private opponentAvatar?: Konva.Image;
 
 	
-	// later change to constructor(onStartClick: () => void) {
+	// constructor for the interface Main page interface
 	constructor(
 		onAnswerClick: (answer: number) => void,
 		onAnswerHoverStart: () => void,
@@ -54,15 +62,19 @@ export class MainPageView implements View {
 		});
 		this.group.add(bg);
 
-		// Score display (top-left)
+		// Score display (bottom-center). origin will be set to the center so
+		// the text remains centered as its content changes.
 		this.scoreText = new Konva.Text({
-			x: 20,
-			y: 20,
+			x: GAMECST.STAGE_WIDTH / 2,
+			y: GAMECST.STAGE_HEIGHT - 30,
 			text: "Score: 0",
 			fontSize: 32,
 			fontFamily: "Arial",
 			fill: "black",
 		});
+		// make origin the visual center
+		this.scoreText.offsetX(this.scoreText.width() / 2);
+		this.scoreText.offsetY(this.scoreText.height() / 2);
 		this.group.add(this.scoreText);
 
 		// Timer display (top-right)
@@ -72,9 +84,96 @@ export class MainPageView implements View {
 			text: "Time: 60",
 			fontSize: 32,
 			fontFamily: "Arial",
-			fill: "red",
+			fill: GAMECST.ALERT_COLOR,
 		});
 		this.group.add(this.timerText);
+
+
+		//Health bar that visualizes the health of the player's character
+		const playerHealthGroup = new Konva.Group();
+		this.group.add(playerHealthGroup);
+		const healthBarWidth = 150;
+		this.playerHealthPercent = 0.5;
+
+		const playerBarBacking = new Konva.Rect({
+			x: 20,
+			y: 20,
+			width: healthBarWidth,
+			height: 40,
+			stroke: 'black',
+			strokeWidth: 4,
+			fill: 'grey'
+		});
+		playerHealthGroup.add(playerBarBacking);
+
+		const playerHealthBar = new Konva.Rect({
+			x: 22,
+			y: 22,
+			width: (healthBarWidth - 4) * this.playerHealthPercent,
+			height: 36,
+			strokeEnabled: false,
+			fill: GAMECST.ALERT_COLOR
+		})
+		playerHealthGroup.add(playerHealthBar);
+
+
+		//Health bar that visualizes the health of the player's character
+		const opponentHealthGroup = new Konva.Group();
+		this.group.add(opponentHealthGroup);
+
+		this.opponentHealthPercent = 0.75; //Hard coded value for testing
+
+		const opponentBarBacking = new Konva.Rect({
+			x: 270,
+			y: 20,
+			width: healthBarWidth,
+			height: 40,
+			stroke: 'black',
+			strokeWidth: 4,
+			fill: 'grey'
+		});
+		opponentHealthGroup.add(opponentBarBacking);
+
+		const opponentHealthBar = new Konva.Rect({
+			x: 272,
+			y: 22,
+			width: (healthBarWidth - 4) * this.playerHealthPercent,
+			height: 36,
+			strokeEnabled: false,
+			fill: GAMECST.ALERT_COLOR
+		})
+		opponentHealthGroup.add(opponentHealthBar);
+
+		const fightingStage = new Konva.Group();
+		this.group.add(fightingStage);
+
+		// load boxer image and store it on the instance so other code can access it
+		Konva.Image.fromURL('/boxer.png', (image) => {
+			// keep a reference to the Konva.Image node
+			this.playerAvatar = image;
+
+			// set desired scale and position (adjust values as needed)
+			image.scale({ x: 0.3, y: 0.3 });
+			image.position({ x: 20, y: GAMECST.STAGE_HEIGHT / 2 - 40});
+
+			// add to the fighting stage group
+			fightingStage.add(image);
+		});
+
+		// load boxer image and store it on the instance so other code can access it
+		Konva.Image.fromURL('/boxer2.png', (image) => {
+			// keep a reference to the Konva.Image node
+			this.playerAvatar = image;
+
+			// set desired scale and position (adjust values as needed)
+			image.scale({ x: 0.3, y: 0.3 });
+			image.position({ x: 300, y: GAMECST.STAGE_HEIGHT / 2 - 40});
+
+			// add to the fighting stage group
+			fightingStage.add(image);
+		});
+
+
 
 		// Create four answer squares in a 2x2 grid pattern in the center of the screen
 		const squareSize = 80;
@@ -87,114 +186,139 @@ export class MainPageView implements View {
 		this.correctAnswer = 0;
 		const allAnswers: (string | number)[] = ["", "", "", ""];
 
-		//This is the question box
-		const question = new Konva.Rect({
-			x: startX,
-			y: startY - spacing * 5,
-			width: squareSize * 2 + spacing,
+		// Group that holds the question block and all the answer choices.
+		// We'll position this group on the right third of the stage and vertically
+		// All children coordinates will be relative to the group's origin
+		const gameQuestAnsGroup = new Konva.Group();
+
+		// compute block dimensions and position the group's origin to its center
+		const groupTop = startY - spacing * 5; // original top of the block (unused but kept for clarity)
+		const groupHeight = totalHeight + spacing * 5;
+
+		// place group's center quarter line of the screen and center it vertically
+		const centerX = GAMECST.STAGE_WIDTH * 3 / 4;
+		const centerY = GAMECST.STAGE_HEIGHT / 2;
+
+		// set offset so the group's origin becomes its center, then position at center point
+		gameQuestAnsGroup.offset({ x: totalWidth / 2, y: groupHeight / 2 });
+		gameQuestAnsGroup.position({ x: centerX, y: centerY });
+		this.group.add(gameQuestAnsGroup);
+
+		//Group that holds the question text and the question box
+		const questionGroup = new Konva.Group();
+		gameQuestAnsGroup.add(questionGroup);
+		
+		// The question box sits at the top of the group's local coords
+		const questionBox = new Konva.Rect({
+			x: 0,
+			y: 0,
+			width: totalWidth,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
 			stroke: 'black',
 			strokeWidth: 4
 		});
-		this.group.add(question);
+		questionGroup.add(questionBox);
 
-		//This is the answer 1 box
+		// Answer 1 (top-left)
 		const answer1Group = new Konva.Group();
+		gameQuestAnsGroup.add(answer1Group);
 
-		const answer1 = new Konva.Rect({
-			x: startX,
-			y: startY,
+		// The box that serves as the background and touch target of answer 1
+		const answer1Box = new Konva.Rect({
+			x: 0,
+			y: spacing * 5,
 			width: squareSize,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
 			stroke: 'black',
 			strokeWidth: 4
 		});
-		answer1Group.add(answer1);
-		this.group.add(answer1Group);
+		answer1Group.add(answer1Box);
 
-		//This is the answer 2 box
+		// Answer 2 (top-right)
 		const answer2Group = new Konva.Group();
+		gameQuestAnsGroup.add(answer2Group);
 
-		const answer2 = new Konva.Rect({
-			x: startX + squareSize + spacing,
-			y: startY,
+		const answer2Box = new Konva.Rect({
+			x: squareSize + spacing,
+			y: spacing * 5,
 			width: squareSize,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
 			stroke: 'black',
 			strokeWidth: 4
 		});
-		answer2Group.add(answer2);
-		this.group.add(answer2Group);
-
+		answer2Group.add(answer2Box);
+		
+		// Answer 3 (bottom-left)
 		const answer3Group = new Konva.Group();
+		gameQuestAnsGroup.add(answer3Group);
 
-		const answer3 = new Konva.Rect({
-			x: startX,
-			y: startY + squareSize + spacing,
+		const answer3Box = new Konva.Rect({
+			x: 0,
+			y: spacing * 5 + squareSize + spacing,
 			width: squareSize,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
 			stroke: 'black',
 			strokeWidth: 4
 		});
-		answer3Group.add(answer3);
-		this.group.add(answer3Group);
+		answer3Group.add(answer3Box);
 
+		// Answer 4 (bottom-right)
 		const answer4Group = new Konva.Group();
+		gameQuestAnsGroup.add(answer4Group);
 
-		const answer4 = new Konva.Rect({
-			x: startX + squareSize + spacing,
-			y: startY + squareSize + spacing,
+		const answer4Box = new Konva.Rect({
+			x: squareSize + spacing,
+			y: spacing * 5 + squareSize + spacing,
 			width: squareSize,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
 			stroke: 'black',
 			strokeWidth: 4
 		});
-		answer4Group.add(answer4);
-		this.group.add(answer4Group);
+		answer4Group.add(answer4Box);
 
 		this.questionText = new Konva.Text({
-			x: question.x() + 25,
-			y: question.y() + 25,
+			x: 25,
+			y: 25,
 			text: ``,
 			fontSize: 30,
 			fontFamily: 'Calibri',
 			fill: 'Black'
 		});
-		this.group.add(this.questionText);
+		gameQuestAnsGroup.add(this.questionText);
 
 		this.answerTexts = [
 			new Konva.Text({
-				x: answer1.x() + 25,
-				y: answer1.y() + 25,
+				x: 0 + 25,
+				y: spacing * 5 + 25,
 				text: `${allAnswers[0]}`,
 				fontSize: 30,
 				fontFamily: 'Calibri',
 				fill: 'Black'
 			}),
 			new Konva.Text({
-				x: answer2.x() + 25,
-				y: answer2.y() + 25,
+				x: squareSize + spacing + 25,
+				y: spacing * 5 + 25,
 				text: `${allAnswers[1]}`,
 				fontSize: 30,
 				fontFamily: 'Calibri',
 				fill: 'Black'
 			}),
 			new Konva.Text({
-				x: answer3.x() + 25,
-				y: answer3.y() + 25,
+				x: 0 + 25,
+				y: spacing * 5 + squareSize + spacing + 25,
 				text: `${allAnswers[2]}`,
 				fontSize: 30,
 				fontFamily: 'Calibri',
 				fill: 'Black'
 			}),
 			new Konva.Text({
-				x: answer4.x() + 25,
-				y: answer4.y() + 25,
+				x: squareSize + spacing + 25,
+				y: spacing * 5 + squareSize + spacing + 25,
 				text: `${allAnswers[3]}`,
 				fontSize: 30,
 				fontFamily: 'Calibri',
@@ -229,6 +353,11 @@ export class MainPageView implements View {
 	 */
 	setScoreText(scoreText: string): void {
 		this.scoreText.text(scoreText);
+		// update origin so the text remains centered as width/height change
+		this.scoreText.offsetX(this.scoreText.width() / 2);
+		this.scoreText.offsetY(this.scoreText.height() / 2);
+		// keep positioned at bottom-center
+		this.scoreText.position({ x: GAMECST.STAGE_WIDTH / 2, y: GAMECST.STAGE_HEIGHT - 30 });
 		this.group.getLayer()?.draw();
 	}
 
@@ -251,7 +380,6 @@ export class MainPageView implements View {
 		this.group.getLayer()?.draw();
 	}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     show(): void {
         this.group.visible(true);

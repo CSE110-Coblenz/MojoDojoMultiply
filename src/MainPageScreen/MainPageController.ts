@@ -158,7 +158,7 @@ export class MainPageController extends ScreenController {
     private handleAnswerHoverStart(): void {
         document.body.style.cursor = 'pointer';
         this.hoverSound.currentTime = 0;
-        this.hoverSound.play();
+        //this.hoverSound.play();
     }
 
     /**
