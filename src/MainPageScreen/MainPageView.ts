@@ -137,7 +137,7 @@ export class MainPageView implements View {
 		const opponentHealthBar = new Konva.Rect({
 			x: 272,
 			y: 22,
-			width: (healthBarWidth - 4) * this.playerHealthPercent,
+			width: (healthBarWidth - 4) * this.opponentHealthPercent,
 			height: 36,
 			strokeEnabled: false,
 			fill: GAMECST.ALERT_COLOR
