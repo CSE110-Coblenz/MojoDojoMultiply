@@ -25,6 +25,7 @@ export class StartPageController extends ScreenController {
     this.screenSwitcher.switchToScreen({ type: "practice" });
   }
 
+
   getView(): StartPageView {
     return this.view;
   }
