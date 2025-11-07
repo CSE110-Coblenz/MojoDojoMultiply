@@ -66,7 +66,7 @@ export class MainPageView implements View {
 			y: GAMECST.STAGE_HEIGHT - 30,
 			text: "Score: 0",
 			fontSize: 32,
-			fontFamily: "Arial",
+			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: "black",
 		});
 		// make origin the visual center
@@ -80,7 +80,7 @@ export class MainPageView implements View {
 			y: 20,
 			text: "Time: 60",
 			fontSize: 32,
-			fontFamily: "Arial",
+			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.ALERT_COLOR,
 		});
 		this.group.add(this.timerText);
@@ -93,7 +93,7 @@ export class MainPageView implements View {
 
 		const playerBarBacking = new Konva.Rect({
 			x: 20,
-			y: 20,
+			y: 100,
 			width: healthBarWidth,
 			height: 40,
 			stroke: 'black',
@@ -118,7 +118,7 @@ export class MainPageView implements View {
 
 		const opponentBarBacking = new Konva.Rect({
 			x: 270,
-			y: 20,
+			y: 100,
 			width: healthBarWidth,
 			height: 40,
 			stroke: 'black',
@@ -180,7 +180,7 @@ export class MainPageView implements View {
 		const startY = (GAMECST.STAGE_HEIGHT - totalHeight) / 2;
 		// initial empty values; controller will populate the first question
 		const allAnswers: (string | number)[] = ["", "", "", ""];
-
+		
 		// Group that holds the question block and all the answer choices.
 		// We'll position this group on the right third of the stage and vertically
 		// All children coordinates will be relative to the group's origin
@@ -280,7 +280,7 @@ export class MainPageView implements View {
 			y: 0,
 			text: ``,
 			fontSize: 30,
-			fontFamily: 'Calibri',
+			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: 'Black'
 		});
 		// Center the question text within its box
@@ -299,7 +299,7 @@ export class MainPageView implements View {
 				y: spacing * 5 + 25,
 				text: `${allAnswers[0]}`,
 				fontSize: 30,
-				fontFamily: 'Calibri',
+				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: 'Black'
 			}),
 			new Konva.Text({
@@ -307,7 +307,7 @@ export class MainPageView implements View {
 				y: spacing * 5 + 25,
 				text: `${allAnswers[1]}`,
 				fontSize: 30,
-				fontFamily: 'Calibri',
+				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: 'Black'
 			}),
 			new Konva.Text({
@@ -315,7 +315,7 @@ export class MainPageView implements View {
 				y: spacing * 5 + squareSize + spacing + 25,
 				text: `${allAnswers[2]}`,
 				fontSize: 30,
-				fontFamily: 'Calibri',
+				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: 'Black'
 			}),
 			new Konva.Text({
@@ -323,10 +323,13 @@ export class MainPageView implements View {
 				y: spacing * 5 + squareSize + spacing + 25,
 				text: `${allAnswers[3]}`,
 				fontSize: 30,
-				fontFamily: 'Calibri',
+				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: 'Black'
 			})
+		
 		];
+	
+	
 
 		// Attach click/hover handlers now that answerTexts exist
 		answer1Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[0].text())));
