@@ -6,18 +6,15 @@ import { GAMECST } from "../constants.js";
  * MainPageView - Renders the main game screen
  */
 export class MainPageView implements View {
-    private group: Konva.Group;
+	private group: Konva.Group;
     // Konva.Image placeholders for timer digits (minute, tens, ones)
     private readonly timerImageNodes: Konva.Image[] = [];
 	private scoreText: Konva.Text;
 	private timerText: Konva.Text;
 	private questionText: Konva.Text;
 	private answerTexts: Konva.Text[];
-	private correctAnswer: number;
-	//Used to change the health bar of the player
-	private playerHealthPercent: number;
-	//Used to change the health bar of the opponent
-	private opponentHealthPercent: number;
+	private playerHealthBar: Konva.Rect;
+	private opponentHealthBar: Konva.Rect;
 	// Konva image for the player's avatar
 	private playerAvatar?: Konva.Image;
 	// Konva image for the opponent's avatar
@@ -93,7 +90,6 @@ export class MainPageView implements View {
 		const playerHealthGroup = new Konva.Group();
 		this.group.add(playerHealthGroup);
 		const healthBarWidth = 150;
-		this.playerHealthPercent = 0.5;
 
 		const playerBarBacking = new Konva.Rect({
 			x: 20,
@@ -106,22 +102,19 @@ export class MainPageView implements View {
 		});
 		playerHealthGroup.add(playerBarBacking);
 
-		const playerHealthBar = new Konva.Rect({
+		this.playerHealthBar = new Konva.Rect({
 			x: 22,
 			y: 22,
-			width: (healthBarWidth - 4) * this.playerHealthPercent,
+			width: healthBarWidth - 4,
 			height: 36,
 			strokeEnabled: false,
 			fill: GAMECST.ALERT_COLOR
-		})
-		playerHealthGroup.add(playerHealthBar);
+		});
+		playerHealthGroup.add(this.playerHealthBar);
 
-
-		//Health bar that visualizes the health of the player's character
+		//Health bar that visualizes the health of the opponent's character
 		const opponentHealthGroup = new Konva.Group();
 		this.group.add(opponentHealthGroup);
-
-		this.opponentHealthPercent = 0.75; //Hard coded value for testing
 
 		const opponentBarBacking = new Konva.Rect({
 			x: 270,
@@ -134,15 +127,18 @@ export class MainPageView implements View {
 		});
 		opponentHealthGroup.add(opponentBarBacking);
 
-		const opponentHealthBar = new Konva.Rect({
+		this.opponentHealthBar = new Konva.Rect({
 			x: 272,
 			y: 22,
-			width: (healthBarWidth - 4) * this.opponentHealthPercent,
+			width: healthBarWidth - 4,
 			height: 36,
 			strokeEnabled: false,
 			fill: GAMECST.ALERT_COLOR
-		})
-		opponentHealthGroup.add(opponentHealthBar);
+		});
+		opponentHealthGroup.add(this.opponentHealthBar);
+
+		// Initialize health bars to full
+		this.updateHealthBars(1, 1);
 
 		const fightingStage = new Konva.Group();
 		this.group.add(fightingStage);
@@ -183,7 +179,6 @@ export class MainPageView implements View {
 		const startX = (GAMECST.STAGE_WIDTH - totalWidth) / 2;
 		const startY = (GAMECST.STAGE_HEIGHT - totalHeight) / 2;
 		// initial empty values; controller will populate the first question
-		this.correctAnswer = 0;
 		const allAnswers: (string | number)[] = ["", "", "", ""];
 
 		// Group that holds the question block and all the answer choices.
@@ -192,7 +187,6 @@ export class MainPageView implements View {
 		const gameQuestAnsGroup = new Konva.Group();
 
 		// compute block dimensions and position the group's origin to its center
-		const groupTop = startY - spacing * 5; // original top of the block (unused but kept for clarity)
 		const groupHeight = totalHeight + spacing * 5;
 
 		// place group's center quarter line of the screen and center it vertically
@@ -282,14 +276,22 @@ export class MainPageView implements View {
 		answer4Group.add(answer4Box);
 
 		this.questionText = new Konva.Text({
-			x: 25,
-			y: 25,
+			x: 0,
+			y: 0,
 			text: ``,
 			fontSize: 30,
 			fontFamily: 'Calibri',
 			fill: 'Black'
 		});
-		gameQuestAnsGroup.add(this.questionText);
+		// Center the question text within its box
+		this.questionText.offsetX(this.questionText.width() / 2);
+		questionGroup.add(this.questionText);
+		
+		// Position the question text in the middle of the box
+		this.questionText.position({
+			x: questionBox.width() / 2,
+			y: questionBox.height() / 2 - this.questionText.height() / 2
+		});
 
 		this.answerTexts = [
 			new Konva.Text({
@@ -374,6 +376,9 @@ export class MainPageView implements View {
 	 */
 	setQuestionDisplay(questionText: string, answers: (string | number)[]): void {
 		this.questionText.text(questionText);
+		// Recenter the question text after changing it
+		this.questionText.offsetX(this.questionText.width() / 2);
+		
 		this.answerTexts.forEach((text, index) => {
 			text.text(`${answers[index] ?? ""}`);
 		});
@@ -404,5 +409,15 @@ export class MainPageView implements View {
      */
     getTimerImageNodes(): Konva.Image[] {
         return this.timerImageNodes;
+    }
+
+    /**
+     * Update the health bars with new percentage values
+     */
+    updateHealthBars(playerHealthPercent: number, opponentHealthPercent: number): void {
+        const healthBarWidth = 150;
+        this.playerHealthBar.width((healthBarWidth - 4) * playerHealthPercent);
+        this.opponentHealthBar.width((healthBarWidth - 4) * opponentHealthPercent);
+        this.group.getLayer()?.draw();
     }
 }
