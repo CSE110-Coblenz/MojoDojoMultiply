@@ -449,6 +449,10 @@ export class MainPageController extends ScreenController {
      * This is because the game should reset each time the user navigates to this screen
      */
     show(): void {
+<<<<<<< HEAD
         this.startGame(this.model.currentRound);
+=======
+        this.startGame();
+>>>>>>> d4cb259 (Implemented how health bars work, fixed an issue with the questions appearing, and also changed how score works)
     }
 }

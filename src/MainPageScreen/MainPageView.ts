@@ -106,6 +106,8 @@ export class MainPageView implements View {
 			x: 22,
 			y: 22,
 			width: healthBarWidth - 4,
+			y: 22,
+			width: healthBarWidth - 4,
 			height: 36,
 			strokeEnabled: false,
 			fill: GAMECST.ALERT_COLOR
