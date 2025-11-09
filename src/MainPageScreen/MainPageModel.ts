@@ -13,6 +13,13 @@ export class MainPageModel {
     correctAnswer: number;
     wrongAnswers: number[];
     allAnswers: number[];
+    readonly maxHealth: number = 100;
+    playerHealth: number;
+    opponentHealth: number;
+    playerResponse: number;
+    computerResponse: number;
+    playerTime: number;
+    computerTime: number;
 
     constructor() {
         this.timeRemaining = this.defaultTime;
@@ -25,5 +32,11 @@ export class MainPageModel {
         this.correctAnswer = 0;
         this.wrongAnswers = [];
         this.allAnswers = [];
+        this.playerHealth = this.maxHealth;
+        this.opponentHealth = this.maxHealth;
+        this.playerResponse = 0;
+        this.computerResponse = 0;
+        this.playerTime = 0;
+        this.computerTime = 0;
     }
 }
