@@ -51,7 +51,7 @@ class App implements ScreenSwitcher {
 
     switch (screen.type) {
       case "start": this.startController.show(); break;
-      case "main": this.mainController.show(); break;
+      case "main": this.mainController.startGame(); break;
       case "help": this.helpController.show(); break;
       case "practice": this.practiceController.show(); break;
     }
