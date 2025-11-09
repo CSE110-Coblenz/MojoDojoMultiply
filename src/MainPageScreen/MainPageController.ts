@@ -253,8 +253,11 @@ export class MainPageController extends ScreenController {
 
     /**
      * Update player's health and health bar
+<<<<<<< HEAD
      * @param newHealth new health value for the player after a question is answered
      * @returns void
+=======
+>>>>>>> 2a036e2 (Implemented how health bars work, fixed an issue with the questions appearing, and also changed how score works)
      */
     updatePlayerHealth(newHealth: number): void {
         this.model.playerHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
@@ -263,8 +266,11 @@ export class MainPageController extends ScreenController {
 
     /**
      * Update opponent's health and health bar
+<<<<<<< HEAD
      * @param newHealth new health value for the opponent after a question is answered
      * @returns void
+=======
+>>>>>>> 2a036e2 (Implemented how health bars work, fixed an issue with the questions appearing, and also changed how score works)
      */
     updateOpponentHealth(newHealth: number): void {
         this.model.opponentHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
@@ -364,6 +370,11 @@ export class MainPageController extends ScreenController {
         // Play sound effects
         this.clickSound.play();
         this.clickSound.currentTime = 0;
+
+        // Check if game should end due to health
+        if (this.model.playerHealth <= 0 || this.model.opponentHealth <= 0) {
+            this.endGame();
+        }
     }
 
     //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet

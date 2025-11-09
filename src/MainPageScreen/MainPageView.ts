@@ -416,9 +416,12 @@ export class MainPageView implements View {
 
     /**
      * Update the health bars with new percentage values
+<<<<<<< HEAD
 	 * @param playerHealthPercent The percentage of health for the player (0-1)
 	 * @param opponentHealthPercent The percentage of health for the opponent (0-1)
 	 * @returns void
+=======
+>>>>>>> 2a036e2 (Implemented how health bars work, fixed an issue with the questions appearing, and also changed how score works)
      */
     updateHealthBars(playerHealthPercent: number, opponentHealthPercent: number): void {
         const healthBarWidth = 150;
