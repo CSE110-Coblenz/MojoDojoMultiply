@@ -295,6 +295,7 @@ export class MainPageController extends ScreenController {
     }
 
     /**
+<<<<<<< HEAD
      * returns current round number
      */
     getCurrentRound(): number {
@@ -302,11 +303,18 @@ export class MainPageController extends ScreenController {
     }
     /**
      * Generate wrong answers for multiple choice
+<<<<<<< HEAD
      * Generate wrong answers for multiple choice, ensuring they don't match the correct answer
      * They are generated within a range of 0 to double the correct answer
      * @param correctAnswer the correct answer to avoid
      * @param count number of wrong answers to generate
      * @returns array of wrong answers
+=======
+=======
+     * Generate wrong answers for multiple choice, ensuring they don't match the correct answer
+     * They are generated within a range of 0 to double the correct answer
+>>>>>>> 0b85e44 (Fixed wrong answer generation so that it doesn't create answers below 0)
+>>>>>>> b9eaf94 (Fixed wrong answer generation so that it doesn't create answers below 0)
      */
     private getWrongAnswers(correctAnswer: number, count: number): number[] {
         const wrongAnswers: Set<number> = new Set();
@@ -391,6 +399,8 @@ export class MainPageController extends ScreenController {
     //TODO: switch screen at the end of each round to the results
     private resultsScreen(): void {
         this.screenSwitcher.switchToScreen({ type: "results"});
+    }
+
     /**
      * Returns negative value when player takes damage, positive when opponent takes damage
      * Takes no parameters but uses model properties determined by the handle click function to determine damages
@@ -408,7 +418,6 @@ export class MainPageController extends ScreenController {
         }
         return [15, 0];
     }
-
 
     /**
      * End the game which for now just goes back to the start screen
