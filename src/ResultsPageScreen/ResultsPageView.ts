@@ -31,7 +31,7 @@ export class ResultsPageView implements View {
 
 		// Final score display
 		this.finalScoreText = new Konva.Text({
-			x: STAGE_WIDTH / 2,
+			x: STAGE_WIDTH / 2 - 100,
 			y: 200,
 			text: "Final Score: 0",
 			fontSize: 36,
@@ -71,7 +71,7 @@ export class ResultsPageView implements View {
 		const nextRoundText = new Konva.Text({
 			x: STAGE_WIDTH / 2,
 			y: 495,
-			text: "PLAY AGAIN",
+			text: "NEXT ROUND",
 			fontSize: 24,
 			fontFamily: "Arial",
 			fill: GAMECST.HIGHLIGHT_COLOR,
