@@ -22,7 +22,10 @@ export class ResultsScreenController extends ScreenController {
 		super();
 		this.screenSwitcher = screenSwitcher;
 		this.model = new ResultsPageModel();
-		this.view = new ResultsPageView(() => this.handleNextRoundClick());
+		this.view = new ResultsPageView(
+  			() => this.handleNextRoundClick(),
+  			() => this.handleMainMenuClick()
+		);
 
 		// TODO: Task 4 - Initialize game over sound audio
 		this.gameOverSound = new Audio("/gameover.mp3"); // Placeholder
@@ -53,6 +56,13 @@ export class ResultsScreenController extends ScreenController {
 
 	/**
 	 * Handle play again button click
+	 */
+	private handleMainMenuClick(): void {
+		this.screenSwitcher.switchToScreen({ type: "start" });
+	}
+
+	/**
+	 * Handle main Menu button click
 	 */
 	private handleNextRoundClick(): void {
 		this.screenSwitcher.switchToScreen({ type: "intro", round: 1 });
