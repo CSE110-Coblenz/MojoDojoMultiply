@@ -253,16 +253,8 @@ export class MainPageController extends ScreenController {
 
     /**
      * Update player's health and health bar
-<<<<<<< HEAD
-<<<<<<< HEAD
      * @param newHealth new health value for the player after a question is answered
      * @returns void
-=======
->>>>>>> 2a036e2 (Implemented how health bars work, fixed an issue with the questions appearing, and also changed how score works)
-=======
-     * @param newHealth new health value for the player after a question is answered
-     * @returns void
->>>>>>> ddeb9b7 (Added comments for clarity)
      */
     updatePlayerHealth(newHealth: number): void {
         this.model.playerHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
@@ -271,16 +263,8 @@ export class MainPageController extends ScreenController {
 
     /**
      * Update opponent's health and health bar
-<<<<<<< HEAD
-<<<<<<< HEAD
      * @param newHealth new health value for the opponent after a question is answered
      * @returns void
-=======
->>>>>>> 2a036e2 (Implemented how health bars work, fixed an issue with the questions appearing, and also changed how score works)
-=======
-     * @param newHealth new health value for the opponent after a question is answered
-     * @returns void
->>>>>>> ddeb9b7 (Added comments for clarity)
      */
     updateOpponentHealth(newHealth: number): void {
         this.model.opponentHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
@@ -295,7 +279,6 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-<<<<<<< HEAD
      * returns current round number
      */
     getCurrentRound(): number {
@@ -303,18 +286,11 @@ export class MainPageController extends ScreenController {
     }
     /**
      * Generate wrong answers for multiple choice
-<<<<<<< HEAD
      * Generate wrong answers for multiple choice, ensuring they don't match the correct answer
      * They are generated within a range of 0 to double the correct answer
      * @param correctAnswer the correct answer to avoid
      * @param count number of wrong answers to generate
      * @returns array of wrong answers
-=======
-=======
-     * Generate wrong answers for multiple choice, ensuring they don't match the correct answer
-     * They are generated within a range of 0 to double the correct answer
->>>>>>> 0b85e44 (Fixed wrong answer generation so that it doesn't create answers below 0)
->>>>>>> b9eaf94 (Fixed wrong answer generation so that it doesn't create answers below 0)
      */
     private getWrongAnswers(correctAnswer: number, count: number): number[] {
         const wrongAnswers: Set<number> = new Set();
