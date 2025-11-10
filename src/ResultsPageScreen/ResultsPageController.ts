@@ -65,5 +65,3 @@ export class ResultsScreenController extends ScreenController {
 		return this.view;
 	}
 }
-
-

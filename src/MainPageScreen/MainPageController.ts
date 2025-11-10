@@ -28,6 +28,8 @@ export class MainPageController extends ScreenController {
         );
     }
 
+    //TODO: Create counter variable to announce what specific round player is on
+
     /**
      * Update score display in view
      */
@@ -51,7 +53,8 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * Generate a new question
+     * Generate a new question whiele setting up computer's response and their timing
+     * @returns void
      */
     private generateNewQuestion(): void {
         this.model.num1 = this.getRandomNumber(1, 12);
@@ -84,7 +87,8 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * Start the game
+     * Start the game running other functions that update the game view
+     * @returns void
      */
     startGame(round: number = this.model.currentRound): void {
         // Reset game state
@@ -147,6 +151,7 @@ export class MainPageController extends ScreenController {
 
     /**
      * when time runs out, its as if player got answer wrong
+     * Reset game state by setting model properties to default values
      */
     private onQuestionTimeout(): void {
         this.clearQuestionTimer();
@@ -237,7 +242,7 @@ export class MainPageController extends ScreenController {
 
 
     /**
-     * Update both player and opponent health bars
+     * Update both player and opponent health bars in the view
      */
     private updateHealthBars(): void {
         this.view.updateHealthBars(
@@ -248,6 +253,8 @@ export class MainPageController extends ScreenController {
 
     /**
      * Update player's health and health bar
+     * @param newHealth new health value for the player after a question is answered
+     * @returns void
      */
     updatePlayerHealth(newHealth: number): void {
         this.model.playerHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
@@ -256,6 +263,8 @@ export class MainPageController extends ScreenController {
 
     /**
      * Update opponent's health and health bar
+     * @param newHealth new health value for the opponent after a question is answered
+     * @returns void
      */
     updateOpponentHealth(newHealth: number): void {
         this.model.opponentHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
@@ -277,12 +286,18 @@ export class MainPageController extends ScreenController {
     }
     /**
      * Generate wrong answers for multiple choice
+     * Generate wrong answers for multiple choice, ensuring they don't match the correct answer
+     * They are generated within a range of 0 to double the correct answer
+     * @param correctAnswer the correct answer to avoid
+     * @param count number of wrong answers to generate
+     * @returns array of wrong answers
      */
     private getWrongAnswers(correctAnswer: number, count: number): number[] {
         const wrongAnswers: Set<number> = new Set();
+        const maxBetweenMultiplicands = Math.max(this.model.num1, this.model.num2)
         while (wrongAnswers.size < count) {
-            const wrongAnswer = this.getRandomNumber(correctAnswer - 10, correctAnswer + 10);
-            if (wrongAnswer !== correctAnswer) {
+            let wrongAnswer = this.getRandomNumber(0, correctAnswer * 2);
+            if (wrongAnswer != correctAnswer && !wrongAnswers.has(wrongAnswer)) {
                 wrongAnswers.add(wrongAnswer);
             }
         }
@@ -303,6 +318,7 @@ export class MainPageController extends ScreenController {
 
     /**
      * Handle hover start on answer squares
+     * Changes the cursor to a pointer
      */
     private handleAnswerHoverStart(): void {
         document.body.style.cursor = 'pointer';
@@ -310,13 +326,17 @@ export class MainPageController extends ScreenController {
 
     /**
      * Handle hover end on answer squares
+     * Resets the cursor to default
      */
     private handleAnswerHoverEnd(): void {
         document.body.style.cursor = 'default';
     }
 
     /**
-     * Handle answer click event
+     * Handles answer click event from the view where it calculates the damages and updates health bars accordingly
+     * after doing so it generates a new question for the player to answer
+     * @param selectedAnswer the clicked answer by the user
+     * @returns void
      */
     private handleAnswerClick(selectedAnswer: number): void {
         
@@ -325,10 +345,13 @@ export class MainPageController extends ScreenController {
         this.model.playerTime = Date.now();
 
          // Debug logging
-        console.log('Question:', this.model.num1, 'x', this.model.num2, '=', this.model.correctAnswer);
-        console.log('Player clicked:', selectedAnswer);
-        console.log('Player response value:', this.model.playerResponse);
-        console.log('Computer response value:', this.model.computerResponse);
+        //console.log('Question:', this.model.num1, 'x', this.model.num2, '=', this.model.correctAnswer);
+        //console.log('Player clicked:', selectedAnswer);
+        //console.log('Player response value:', this.model.playerResponse);
+        //console.log('Computer response value:', this.model.computerResponse);
+
+        // Store current question's correct answer
+        const currentCorrectAnswer = this.model.correctAnswer;
         
         // Calculate damages based on both player and computer responses
         const damages = this.damageCalculation();
@@ -343,7 +366,17 @@ export class MainPageController extends ScreenController {
         this.clickSound.currentTime = 0;
     }
 
-    //Returns negative value when player takes damage, positive when opponent takes damage
+    //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet
+    //TODO: switch screen at the end of each round to the results
+    private resultsScreen(): void {
+        this.screenSwitcher.switchToScreen({ type: "results"});
+    }
+
+    /**
+     * Returns negative value when player takes damage, positive when opponent takes damage
+     * Takes no parameters but uses model properties determined by the handle click function to determine damages
+     * @returns [playerDamage, opponentDamage]
+     */
     private damageCalculation(): number[] {
         if(this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse != this.model.correctAnswer){
             return [0, 15];
@@ -357,8 +390,14 @@ export class MainPageController extends ScreenController {
         return [15, 0];
     }
 
+    //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet
+    //TODO: switch screen at the end of each round to the results
+    private resultsScreen(): void {
+        this.screenSwitcher.switchToScreen({ type: "results"});
+    }
+
     /**
-     * End the game
+     * End the game which for now just goes back to the start screen
      */
     private endGame(): void {
         this.clearQuestionTimer();
@@ -385,6 +424,7 @@ export class MainPageController extends ScreenController {
         }
     }
 
+
     /**
      * Exit the game
      */
@@ -401,6 +441,7 @@ export class MainPageController extends ScreenController {
 
     /**
      * Override the show method to start a new game whenever the screen is shown
+     * This is because the game should reset each time the user navigates to this screen
      */
     show(): void {
         this.startGame(this.model.currentRound);

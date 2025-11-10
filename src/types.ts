@@ -15,6 +15,7 @@ export type Screen =
   | { type: "results" }
   | { type: "roundStats"; round: number; };
 
+
 export abstract class ScreenController {
   abstract getView(): View;
   show(): void { this.getView().show(); }

@@ -53,6 +53,7 @@ class App implements ScreenSwitcher {
 
     // Start on start screen
     this.startController.show();
+  
   }
 
   switchToScreen(screen: Screen): void {
