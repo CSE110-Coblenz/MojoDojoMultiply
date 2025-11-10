@@ -8,9 +8,15 @@ export interface View {
 
 export type Screen =
   | { type: "start" }
-  | { type: "main" }
+  | { type: "main"; round: number }
   | { type: "help" }
-  | { type: "practice" };
+  | { type: "practice" }
+  | { type: "roundIntro"; round: number }
+  | { type: "results" }
+  | { type: "roundStats"; 
+      round: number; 
+      stats: {roundScore: number; correct: number; total: number; fastestMs: number | null}; 
+    };
 
 export abstract class ScreenController {
   abstract getView(): View;
