@@ -16,7 +16,7 @@ export class StartPageController extends ScreenController {
   }
 
   private handleStartClick(): void {
-    this.screenSwitcher.switchToScreen({ type: "main" });
+    this.screenSwitcher.switchToScreen({ type: "roundIntro", round: 1 });
   }
   private handleHelpClick(): void {
     this.screenSwitcher.switchToScreen({ type: "help" });

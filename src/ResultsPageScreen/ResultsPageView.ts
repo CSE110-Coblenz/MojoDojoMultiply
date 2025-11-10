@@ -75,7 +75,7 @@ export class ResultsPageView implements View {
 		const nextRoundText = new Konva.Text({
 			x: STAGE_WIDTH / 2,
 			y: 495,
-			text: "NEXT ROUND",
+			text: "Play Again", // previously NEXT ROUND, changed to Play Again
 			fontSize: 24,
 			fontFamily: "Arial",
 			fill: GAMECST.HIGHLIGHT_COLOR,

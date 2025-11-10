@@ -6,7 +6,9 @@ import { StartPageController } from "./StartPageScreen/StartPageController";
 import { MainPageController } from "./MainPageScreen/MainPageController";
 import { HelpPageController } from "./HelpPageScreen/HelpPageController";
 import { PracticeAreaController } from "./PracticeAreaScreen/PracticeAreaController";
-import { ResultsScreenController } from "./ResultsPageScreen/ResultsPageController";
+import { ResultsScreenController} from "./ResultsPageScreen/ResultsPageController";
+import { RoundIntroController } from "./RoundIntroScreen/RoundIntroController";
+import { RoundStatsController } from "./RoundStatsScreen/RoundStatsController";
 
 class App implements ScreenSwitcher {
   private stage: Konva.Stage;
@@ -16,7 +18,9 @@ class App implements ScreenSwitcher {
   private mainController: MainPageController;
   private helpController: HelpPageController;
   private practiceController: PracticeAreaController;
-  private resultsController : ResultsScreenController;
+  private resultsController: ResultsScreenController;
+  private roundIntroController: RoundIntroController;
+  private roundStatsController: RoundStatsController;
 
   constructor(containerId: string) {
     this.stage = new Konva.Stage({
@@ -33,6 +37,8 @@ class App implements ScreenSwitcher {
     this.helpController = new HelpPageController(this);
     this.practiceController = new PracticeAreaController(this);
     this.resultsController = new ResultsScreenController(this);
+    this.roundIntroController = new RoundIntroController(this);
+    this.roundStatsController = new RoundStatsController(this);
 
     // Add screen groups to same layer
     this.layer.add(this.startController.getView().getGroup());
@@ -40,7 +46,8 @@ class App implements ScreenSwitcher {
     this.layer.add(this.helpController.getView().getGroup());
     this.layer.add(this.practiceController.getView().getGroup());
     this.layer.add(this.resultsController.getView().getGroup());
-
+    this.layer.add(this.roundIntroController.getView().getGroup());
+    this.layer.add(this.roundStatsController.getView().getGroup());
 
     this.layer.draw();
 
@@ -55,13 +62,25 @@ class App implements ScreenSwitcher {
     this.helpController.hide();
     this.practiceController.hide();
     this.resultsController.hide();
+    this.roundIntroController.hide();
+    this.roundStatsController.hide();
 
     switch (screen.type) {
       case "start": this.startController.show(); break;
-      case "main": this.mainController.startGame(); break;
+      case "main": this.mainController.startGame(screen.round); break;
       case "help": this.helpController.show(); break;
       case "practice": this.practiceController.show(); break;
-      case "results" : this.resultsController.show(); break;
+      case "roundIntro":
+        this.roundIntroController.setRound(screen.round);
+        this.roundIntroController.show();
+        break;
+      case "roundStats":
+        this.roundStatsController.setRound(screen.round);
+        this.roundStatsController.show();
+        break;
+      case "results":
+        this.resultsController.show()
+        break;
     }
   }
 }

@@ -68,7 +68,7 @@ export class MainPageController extends ScreenController {
         this.model.computerTime = 0;
         this.model.playerResponse = 0;
 
-        // 80% chance to get the correct answer
+        // 50% chance to get the correct answer
         if (Math.random() < 0.5) {
             this.model.computerResponse = this.model.correctAnswer;
         } else {
@@ -90,9 +90,9 @@ export class MainPageController extends ScreenController {
      * Start the game running other functions that update the game view
      * @returns void
      */
-    startGame(): void {
+    startGame(round: number = this.model.currentRound): void {
         // Reset game state
-        this.reset();
+        this.resetForRound(round);
 
         // Update view with initial state
         this.updateScore(this.model.score);
@@ -105,52 +105,141 @@ export class MainPageController extends ScreenController {
         this.view.show();
 
         // Start timer
-        this.startTimer((timeLeft: number) => this.updateTimer(timeLeft));
+        this.startQuestionTimer();
     }
 
     /**
-     * Start the timer
+     * reset state for new rounds
      */
-    private startTimer(callback: (timeLeft: number) => void): void {
-        if (!this.model.isTimerRunning) {
-            this.model.isTimerRunning = true;
-            
-            // Initial call to set initial state
-            callback(this.model.timeRemaining);
-            
-            this.model.timerInterval = globalThis.setInterval(() => {
-                if (this.model.timeRemaining > 0) {
-                    this.model.timeRemaining--;
-                    callback(this.model.timeRemaining);
-                } else {
-                    this.stopTimer();
-                    this.endGame();
-                }
-            }, 1000);
-        }
-    }
-
-    /**
-     * Stop the timer
-     */
-    private stopTimer(): void {
-        if (this.model.timerInterval) {
-            globalThis.clearInterval(this.model.timerInterval);
-            this.model.timerInterval = null;
-            this.model.isTimerRunning = false;
-        }
-    }
-
-    /**
-     * Reset game state by setting model properties to default values
-     */
-    private reset(): void {
-        this.model.score = 0;
-        this.model.timeRemaining = this.model.defaultTime;
+    private resetForRound(round: number): void {
+        this.model.currentRound = round;
         this.model.playerHealth = this.model.maxHealth;
         this.model.opponentHealth = this.model.maxHealth;
+        this.model.roundCorrect = 0;
+        this.model.roundScore = 0;
+        this.model.roundTotal = 0;
         this.updateHealthBars();
     }
+
+    /**
+     * new per-question timer
+     */
+    private startQuestionTimer(): void {
+        this.clearQuestionTimer();
+        this.model.questionTimeRemaining = 30;
+        this.updateTimer(this.model.questionTimeRemaining);
+
+        this.model.questionTimerId = window.setInterval(() => {
+            this.model.questionTimeRemaining--;
+            this.updateTimer(this.model.questionTimeRemaining);
+
+            if (this.model.questionTimeRemaining <= 0) {
+                this.onQuestionTimeout();
+            }
+        }, 1000);
+    }
+
+    /**
+     * clears timer for new questions
+     */
+    private clearQuestionTimer(): void {
+        if (this.model.questionTimerId !== null) {
+            clearInterval(this.model.questionTimerId);
+            this.model.questionTimerId = null;
+        }
+    }
+
+    /**
+     * when time runs out, its as if player got answer wrong
+     * Reset game state by setting model properties to default values
+     */
+    private onQuestionTimeout(): void {
+        this.clearQuestionTimer();
+        this.model.playerResponse = NaN;
+        this.model.playerTime = Number.POSITIVE_INFINITY;
+        const damages = this.damageCalculation();
+        this.applyDamagesAndAdvance(damages);
+    }
+
+    /**
+     * handles damage, score, advancing rounds
+     */
+    private applyDamagesAndAdvance([playerDmg, oppDmg]: number[]): void {
+        // debugging to show cur round
+        console.log("Current round: " + this.getCurrentRound());
+
+        // deals damage to player and opponet 
+        if (playerDmg > 0) {
+            this.model.playerHealth = Math.max(0, this.model.playerHealth - playerDmg);
+        }
+        if (oppDmg > 0) {
+            this.model.opponentHealth = Math.max(0, this.model.opponentHealth - oppDmg);
+        }
+
+        // increments score by one if player gets answer right
+        // TODO: update scoring system
+        if (this.model.playerResponse === this.model.correctAnswer) {
+            this.model.score++;
+            this.model.roundScore++;
+            this.updateScore(this.model.score);
+        }
+        this.updateHealthBars();
+
+        // handles winning round
+        if (this.model.opponentHealth <= 0) {
+            this.clearQuestionTimer();
+            this.screenSwitcher.switchToScreen({
+                type: "roundStats",
+                round: this.model.currentRound
+            });
+            return;
+        }
+        // handles losing round
+        if (this.model.playerHealth <= 0) {
+            this.clearQuestionTimer();
+            this.screenSwitcher.switchToScreen( {type: "results"});
+            return;
+        }
+
+        this.generateNewQuestion();
+        this.updateQuestion();
+        this.startQuestionTimer();
+    }
+
+// OLD TIMER FUNCTIONALITY
+    // /**
+    //  * Start the timer
+    //  */
+    // private startTimer(callback: (timeLeft: number) => void): void {
+    //     if (!this.model.isTimerRunning) {
+    //         this.model.isTimerRunning = true;
+            
+    //         // Initial call to set initial state
+    //         callback(this.model.timeRemaining);
+            
+    //         this.model.timerInterval = globalThis.setInterval(() => {
+    //             if (this.model.timeRemaining > 0) {
+    //                 this.model.timeRemaining--;
+    //                 callback(this.model.timeRemaining);
+    //             } else {
+    //                 this.stopTimer();
+    //                 this.endGame();
+    //             }
+    //         }, 1000);
+    //     }
+    // }
+
+    // /**
+    //  * Stop the timer
+    //  */
+    // private stopTimer(): void {
+    //     if (this.model.timerInterval) {
+    //         globalThis.clearInterval(this.model.timerInterval);
+    //         this.model.timerInterval = null;
+    //         this.model.isTimerRunning = false;
+    //     }
+    // }
+
 
     /**
      * Update both player and opponent health bars in the view
@@ -190,6 +279,13 @@ export class MainPageController extends ScreenController {
     }
 
     /**
+     * returns current round number
+     */
+    getCurrentRound(): number {
+        return this.model.currentRound;
+    }
+    /**
+     * Generate wrong answers for multiple choice
      * Generate wrong answers for multiple choice, ensuring they don't match the correct answer
      * They are generated within a range of 0 to double the correct answer
      * @param correctAnswer the correct answer to avoid
@@ -259,40 +355,15 @@ export class MainPageController extends ScreenController {
         
         // Calculate damages based on both player and computer responses
         const damages = this.damageCalculation();
-        
-        // Apply damages and update health bars
-        if (damages[0] > 0) { // Player takes damage
-            this.model.playerHealth = Math.max(0, this.model.playerHealth - damages[0]);
-        }
-        if (damages[1] > 0) { // Opponent takes damage
-            this.model.opponentHealth = Math.max(0, this.model.opponentHealth - damages[1]);
-        }
-        
-        // Update health bars if any damage was dealt
-        if (damages[0] > 0 || damages[1] > 0) {
-            this.updateHealthBars();
-        }
 
-        // Update score if player was correct
-        if (selectedAnswer === currentCorrectAnswer) {
-            this.model.score += damages[1]; // Increase score by damage dealt to opponent
-            this.updateScore(this.model.score);
-        }
+        // Stop timer
+        this.clearQuestionTimer();
 
-        // Generate next question first (this will set up computer's response)
-        this.generateNewQuestion();
-
-        // Update question display
-        this.updateQuestion();
-
+        // apply damage 
+        this.applyDamagesAndAdvance(damages);
         // Play sound effects
         this.clickSound.play();
         this.clickSound.currentTime = 0;
-
-        // Check if game should end due to health
-        if (this.model.playerHealth <= 0 || this.model.opponentHealth <= 0) {
-            this.endGame();
-        }
     }
 
     //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet
@@ -329,7 +400,7 @@ export class MainPageController extends ScreenController {
      * End the game which for now just goes back to the start screen
      */
     private endGame(): void {
-        this.stopTimer();
+        this.clearQuestionTimer();
 
         // Switch back to start screen
         this.screenSwitcher.switchToScreen({
@@ -341,15 +412,15 @@ export class MainPageController extends ScreenController {
      * Pause the game
      */
     pauseGame(): void {
-        this.stopTimer();
+        this.clearQuestionTimer();
     }
 
     /**
      * Resume the game
      */
     resumeGame(): void {
-        if (!this.model.isTimerRunning) {
-            this.startTimer((timeLeft: number) => this.updateTimer(timeLeft));
+        if (!this.model.questionTimerId) {
+            this.startQuestionTimer();
         }
     }
 
@@ -358,7 +429,7 @@ export class MainPageController extends ScreenController {
      * Exit the game
      */
     exitGame(): void {
-        this.stopTimer();
+        this.clearQuestionTimer();
     }
 
     /**
@@ -373,6 +444,6 @@ export class MainPageController extends ScreenController {
      * This is because the game should reset each time the user navigates to this screen
      */
     show(): void {
-        this.startGame();
+        this.startGame(this.model.currentRound);
     }
 }
