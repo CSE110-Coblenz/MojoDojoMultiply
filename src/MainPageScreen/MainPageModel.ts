@@ -2,10 +2,6 @@
  * MainPageModel - Stores game state
  */
 export class MainPageModel {
-    timeRemaining: number;
-    timerInterval: number | null;
-    isTimerRunning: boolean;
-    readonly defaultTime: number = 60;
     tickCallback: ((digits: number[]) => void) | null;
     score: number;
     num1: number;
@@ -20,11 +16,17 @@ export class MainPageModel {
     computerResponse: number;
     playerTime: number;
     computerTime: number;
+    questionTimeRemaining = 30;
+    questionTimerId: number | null = null;
+    questionStartMs = 0;
+    currentRound = 1;
+    roundScore = 0;
+    roundCorrect = 0;
+    roundTotal = 0;
+
+
 
     constructor() {
-        this.timeRemaining = this.defaultTime;
-        this.timerInterval = null;
-        this.isTimerRunning = false;
         this.tickCallback = null;
         this.score = 0;
         this.num1 = 0;

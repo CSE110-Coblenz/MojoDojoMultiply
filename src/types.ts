@@ -15,7 +15,7 @@ export type Screen =
   | { type: "results" }
   | { type: "roundStats"; 
       round: number; 
-      stats: {roundScore: number; correct: number; total: number; fastestMs: number | null}; 
+      stats: {roundScore: number; correct: number; total: number }; 
     };
 
 export abstract class ScreenController {
