@@ -26,6 +26,8 @@ export class MainPageController extends ScreenController {
         );
     }
 
+    //TODO: Create counter variable to announce what specific round player is on
+
     /**
      * Update score display in view
      */
@@ -188,6 +190,12 @@ export class MainPageController extends ScreenController {
         this.clickSound.currentTime = 0;
     }
 
+    //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet
+    //TODO: switch screen at the end of each round to the results
+    private resultsScreen(): void {
+        this.screenSwitcher.switchToScreen({ type: "results"});
+    }
+
     /**
      * End the game
      */
@@ -215,6 +223,7 @@ export class MainPageController extends ScreenController {
             this.startTimer((timeLeft: number) => this.updateTimer(timeLeft));
         }
     }
+
 
     /**
      * Exit the game
