@@ -190,6 +190,9 @@ export class MainPageController extends ScreenController {
     /**
      * Generate wrong answers for multiple choice, ensuring they don't match the correct answer
      * They are generated within a range of 0 to double the correct answer
+     * @param correctAnswer the correct answer to avoid
+     * @param count number of wrong answers to generate
+     * @returns array of wrong answers
      */
     private getWrongAnswers(correctAnswer: number, count: number): number[] {
         const wrongAnswers: Set<number> = new Set();
