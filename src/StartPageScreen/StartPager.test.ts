@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { StartPageController } from "./StartPageController";
 
-//TODO: See if we can import working screenswitcher instead of using a mock switcher
+//TODO: See if we can import screenswitcher instead of using a mock screenswitcher 
 
 /**
  * We mock StartPageView so Vitest doesn’t need to actually load or render Konva.
