@@ -14,7 +14,7 @@ export class ResultsPageView implements View {
 
 	/**
 		Sets up visual features for the ResultsPage
-		@param onNextRoundClick -> When the nextRound Button is clicked, it will hide resultspage and show maingame
+		@param onNextRoundClick -> When the nextRound Button is clicked, it will hide ResultsPageView and show MainGameView
 	*/
 	constructor(onNextRoundClick: () => void) {
 		this.group = new Konva.Group({ visible: false });
