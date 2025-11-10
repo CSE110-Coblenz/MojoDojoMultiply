@@ -6,17 +6,19 @@ export class MainPageController extends ScreenController {
     private model: MainPageModel;
     private view: MainPageView;
     private screenSwitcher: ScreenSwitcher;
-
     private clickSound: HTMLAudioElement;
-    private hoverSound: HTMLAudioElement;
 
     constructor(screenSwitcher: ScreenSwitcher) {
         super();
         this.screenSwitcher = screenSwitcher;
 
         this.model = new MainPageModel();
+        
+        // Initialize click sound with error handling
         this.clickSound = new Audio("/PunchSound.mp3");
-        this.hoverSound = new Audio("/Picking.mp3");
+        this.clickSound.onerror = (e) => {
+            console.error('Error loading sound:', e);
+        };
 
         // Pass the event handlers to the view
         this.view = new MainPageView(
@@ -49,26 +51,8 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * Start the game
-     */
-    startGame(): void {
-        // Reset game state
-        this.reset();
-
-        // Generate first question
-        this.generateNewQuestion();
-
-        // Update view with initial state
-        this.updateScore(this.model.score);
-        this.updateQuestion();
-        this.view.show();
-
-        // Start timer
-        this.startTimer((timeLeft: number) => this.updateTimer(timeLeft));
-    }
-
-    /**
-     * Generate a new question
+     * Generate a new question whiele setting up computer's response and their timing
+     * @returns void
      */
     private generateNewQuestion(): void {
         this.model.num1 = this.getRandomNumber(1, 12);
@@ -76,6 +60,50 @@ export class MainPageController extends ScreenController {
         this.model.correctAnswer = this.model.num1 * this.model.num2;
         this.model.wrongAnswers = this.getWrongAnswers(this.model.correctAnswer, 3);
         this.model.allAnswers = this.randomizeOrder([this.model.correctAnswer, ...this.model.wrongAnswers]);
+        
+        // Reset response times for new question
+        this.model.playerTime = 0;
+        this.model.computerTime = 0;
+        this.model.playerResponse = 0;
+
+        // 80% chance to get the correct answer
+        if (Math.random() < 0.5) {
+            this.model.computerResponse = this.model.correctAnswer;
+        } else {
+            // Pick a random wrong answer
+            this.model.computerResponse = this.model.wrongAnswers[
+                Math.floor(Math.random() * this.model.wrongAnswers.length)
+            ];
+        }
+
+        // Simulate computer's response after a random delay
+        const minDelay = 1000; // 1 second
+        const maxDelay = 3000; // 3 seconds
+        const delay = Math.random() * (maxDelay - minDelay) + minDelay;
+        
+        setTimeout(() => {this.model.computerTime = Date.now(); }, delay);
+    }
+
+    /**
+     * Start the game running other functions that update the game view
+     * @returns void
+     */
+    startGame(): void {
+        // Reset game state
+        this.reset();
+
+        // Update view with initial state
+        this.updateScore(this.model.score);
+        
+        // Generate first question
+        this.generateNewQuestion();
+        this.updateQuestion();
+
+        // Show the view after initial setup
+        this.view.show();
+
+        // Start timer
+        this.startTimer((timeLeft: number) => this.updateTimer(timeLeft));
     }
 
     /**
@@ -112,11 +140,44 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * Reset game state
+     * Reset game state by setting model properties to default values
      */
     private reset(): void {
         this.model.score = 0;
         this.model.timeRemaining = this.model.defaultTime;
+        this.model.playerHealth = this.model.maxHealth;
+        this.model.opponentHealth = this.model.maxHealth;
+        this.updateHealthBars();
+    }
+
+    /**
+     * Update both player and opponent health bars in the view
+     */
+    private updateHealthBars(): void {
+        this.view.updateHealthBars(
+            this.model.playerHealth / this.model.maxHealth,
+            this.model.opponentHealth / this.model.maxHealth
+        );
+    }
+
+    /**
+     * Update player's health and health bar
+     * @param newHealth new health value for the player after a question is answered
+     * @returns void
+     */
+    updatePlayerHealth(newHealth: number): void {
+        this.model.playerHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
+        this.updateHealthBars();
+    }
+
+    /**
+     * Update opponent's health and health bar
+     * @param newHealth new health value for the opponent after a question is answered
+     * @returns void
+     */
+    updateOpponentHealth(newHealth: number): void {
+        this.model.opponentHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
+        this.updateHealthBars();
     }
 
     /**
@@ -154,42 +215,99 @@ export class MainPageController extends ScreenController {
 
     /**
      * Handle hover start on answer squares
+     * Changes the cursor to a pointer
      */
     private handleAnswerHoverStart(): void {
         document.body.style.cursor = 'pointer';
-        this.hoverSound.currentTime = 0;
-        //this.hoverSound.play();
     }
 
     /**
      * Handle hover end on answer squares
+     * Resets the cursor to default
      */
     private handleAnswerHoverEnd(): void {
         document.body.style.cursor = 'default';
     }
 
     /**
-     * Handle answer click event
+     * Handles answer click event from the view where it calculates the damages and updates health bars accordingly
+     * after doing so it generates a new question for the player to answer
+     * @param selectedAnswer the clicked answer by the user
+     * @returns void
      */
     private handleAnswerClick(selectedAnswer: number): void {
-        // Check if answer is correct
-        if (selectedAnswer === this.model.correctAnswer) {
-            // Update model and view if correct
-            this.model.score++;
+        
+        // Record player's response and time
+        this.model.playerResponse = selectedAnswer;
+        this.model.playerTime = Date.now();
+
+         // Debug logging
+        //console.log('Question:', this.model.num1, 'x', this.model.num2, '=', this.model.correctAnswer);
+        //console.log('Player clicked:', selectedAnswer);
+        //console.log('Player response value:', this.model.playerResponse);
+        //console.log('Computer response value:', this.model.computerResponse);
+
+        // Store current question's correct answer
+        const currentCorrectAnswer = this.model.correctAnswer;
+        
+        // Calculate damages based on both player and computer responses
+        const damages = this.damageCalculation();
+        
+        // Apply damages and update health bars
+        if (damages[0] > 0) { // Player takes damage
+            this.model.playerHealth = Math.max(0, this.model.playerHealth - damages[0]);
+        }
+        if (damages[1] > 0) { // Opponent takes damage
+            this.model.opponentHealth = Math.max(0, this.model.opponentHealth - damages[1]);
+        }
+        
+        // Update health bars if any damage was dealt
+        if (damages[0] > 0 || damages[1] > 0) {
+            this.updateHealthBars();
+        }
+
+        // Update score if player was correct
+        if (selectedAnswer === currentCorrectAnswer) {
+            this.model.score += damages[1]; // Increase score by damage dealt to opponent
             this.updateScore(this.model.score);
         }
 
-        // Generate next question and update view
+        // Generate next question first (this will set up computer's response)
         this.generateNewQuestion();
+
+        // Update question display
         this.updateQuestion();
 
         // Play sound effects
         this.clickSound.play();
         this.clickSound.currentTime = 0;
+
+        // Check if game should end due to health
+        if (this.model.playerHealth <= 0 || this.model.opponentHealth <= 0) {
+            this.endGame();
+        }
     }
 
     /**
-     * End the game
+     * Returns negative value when player takes damage, positive when opponent takes damage
+     * Takes no parameters but uses model properties determined by the handle click function to determine damages
+     * @returns [playerDamage, opponentDamage]
+     */
+    private damageCalculation(): number[] {
+        if(this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse != this.model.correctAnswer){
+            return [0, 15];
+        }else if (this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse == this.model.correctAnswer && this.model.playerTime < this.model.computerTime){
+            return [0, 10];
+        }else if (this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse == this.model.correctAnswer){
+            return [5, 5];
+        }else if (this.model.playerResponse != this.model.correctAnswer && this.model.computerResponse != this.model.correctAnswer){
+            return [0, 0];
+        }
+        return [15, 0];
+    }
+
+    /**
+     * End the game which for now just goes back to the start screen
      */
     private endGame(): void {
         this.stopTimer();
@@ -228,5 +346,13 @@ export class MainPageController extends ScreenController {
      */
     getView(): MainPageView {
         return this.view;
+    }
+
+    /**
+     * Override the show method to start a new game whenever the screen is shown
+     * This is because the game should reset each time the user navigates to this screen
+     */
+    show(): void {
+        this.startGame();
     }
 }
