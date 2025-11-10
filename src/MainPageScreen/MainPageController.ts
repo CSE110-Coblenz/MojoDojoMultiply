@@ -254,10 +254,15 @@ export class MainPageController extends ScreenController {
     /**
      * Update player's health and health bar
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param newHealth new health value for the player after a question is answered
      * @returns void
 =======
 >>>>>>> 2a036e2 (Implemented how health bars work, fixed an issue with the questions appearing, and also changed how score works)
+=======
+     * @param newHealth new health value for the player after a question is answered
+     * @returns void
+>>>>>>> ddeb9b7 (Added comments for clarity)
      */
     updatePlayerHealth(newHealth: number): void {
         this.model.playerHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
@@ -267,10 +272,15 @@ export class MainPageController extends ScreenController {
     /**
      * Update opponent's health and health bar
 <<<<<<< HEAD
+<<<<<<< HEAD
      * @param newHealth new health value for the opponent after a question is answered
      * @returns void
 =======
 >>>>>>> 2a036e2 (Implemented how health bars work, fixed an issue with the questions appearing, and also changed how score works)
+=======
+     * @param newHealth new health value for the opponent after a question is answered
+     * @returns void
+>>>>>>> ddeb9b7 (Added comments for clarity)
      */
     updateOpponentHealth(newHealth: number): void {
         this.model.opponentHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
@@ -381,8 +391,6 @@ export class MainPageController extends ScreenController {
     //TODO: switch screen at the end of each round to the results
     private resultsScreen(): void {
         this.screenSwitcher.switchToScreen({ type: "results"});
-    }
-
     /**
      * Returns negative value when player takes damage, positive when opponent takes damage
      * Takes no parameters but uses model properties determined by the handle click function to determine damages
@@ -400,6 +408,7 @@ export class MainPageController extends ScreenController {
         }
         return [15, 0];
     }
+
 
     /**
      * End the game which for now just goes back to the start screen
@@ -449,10 +458,6 @@ export class MainPageController extends ScreenController {
      * This is because the game should reset each time the user navigates to this screen
      */
     show(): void {
-<<<<<<< HEAD
         this.startGame(this.model.currentRound);
-=======
-        this.startGame();
->>>>>>> d4cb259 (Implemented how health bars work, fixed an issue with the questions appearing, and also changed how score works)
     }
 }
