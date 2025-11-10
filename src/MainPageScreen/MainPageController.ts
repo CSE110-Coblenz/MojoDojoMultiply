@@ -188,13 +188,15 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * Generate wrong answers for multiple choice
+     * Generate wrong answers for multiple choice, ensuring they don't match the correct answer
+     * They are generated within a range of 0 to double the correct answer
      */
     private getWrongAnswers(correctAnswer: number, count: number): number[] {
         const wrongAnswers: Set<number> = new Set();
+        const maxBetweenMultiplicands = Math.max(this.model.num1, this.model.num2)
         while (wrongAnswers.size < count) {
-            const wrongAnswer = this.getRandomNumber(correctAnswer - 10, correctAnswer + 10);
-            if (wrongAnswer !== correctAnswer) {
+            let wrongAnswer = this.getRandomNumber(0, correctAnswer * 2);
+            if (wrongAnswer != correctAnswer && !wrongAnswers.has(wrongAnswer)) {
                 wrongAnswers.add(wrongAnswer);
             }
         }
