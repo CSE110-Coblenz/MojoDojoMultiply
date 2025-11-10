@@ -12,6 +12,10 @@ export class ResultsPageView implements View {
 	private finalScoreText: Konva.Text;
 	private leaderboardText: Konva.Text;
 
+	/**
+		Sets up visual features for the ResultsPage
+		@param onNextRoundClick -> When the nextRound Button is clicked, it will show mainGame
+	*/
 	constructor(onNextRoundClick: () => void) {
 		this.group = new Konva.Group({ visible: false });
 
