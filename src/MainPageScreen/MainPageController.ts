@@ -92,7 +92,6 @@ export class MainPageController extends ScreenController {
 
         // Update view with initial state
         this.updateScore(this.model.score);
-        this.updateQuestion();
         
         // Generate first question
         this.generateNewQuestion();
@@ -179,6 +178,9 @@ export class MainPageController extends ScreenController {
         if (this.model.opponentHealth <= 0) {
             this.model.currentRound += 1;
             this.resetForRound(this.model.currentRound);
+        }
+        if (this.model.playerHealth <= 0) {
+            this.endGame();
         }
 
         this.generateNewQuestion();
