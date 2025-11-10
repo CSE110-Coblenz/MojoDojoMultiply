@@ -53,7 +53,8 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * Generate a new question
+     * Generate a new question whiele setting up computer's response and their timing
+     * @returns void
      */
     private generateNewQuestion(): void {
         this.model.num1 = this.getRandomNumber(1, 12);
@@ -86,7 +87,8 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * Start the game
+     * Start the game running other functions that update the game view
+     * @returns void
      */
     startGame(): void {
         // Reset game state
@@ -140,7 +142,7 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * Reset game state
+     * Reset game state by setting model properties to default values
      */
     private reset(): void {
         this.model.score = 0;
@@ -151,7 +153,7 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * Update both player and opponent health bars
+     * Update both player and opponent health bars in the view
      */
     private updateHealthBars(): void {
         this.view.updateHealthBars(
@@ -162,6 +164,8 @@ export class MainPageController extends ScreenController {
 
     /**
      * Update player's health and health bar
+     * @param newHealth new health value for the player after a question is answered
+     * @returns void
      */
     updatePlayerHealth(newHealth: number): void {
         this.model.playerHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
@@ -170,6 +174,8 @@ export class MainPageController extends ScreenController {
 
     /**
      * Update opponent's health and health bar
+     * @param newHealth new health value for the opponent after a question is answered
+     * @returns void
      */
     updateOpponentHealth(newHealth: number): void {
         this.model.opponentHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
@@ -211,6 +217,7 @@ export class MainPageController extends ScreenController {
 
     /**
      * Handle hover start on answer squares
+     * Changes the cursor to a pointer
      */
     private handleAnswerHoverStart(): void {
         document.body.style.cursor = 'pointer';
@@ -218,13 +225,17 @@ export class MainPageController extends ScreenController {
 
     /**
      * Handle hover end on answer squares
+     * Resets the cursor to default
      */
     private handleAnswerHoverEnd(): void {
         document.body.style.cursor = 'default';
     }
 
     /**
-     * Handle answer click event
+     * Handles answer click event from the view where it calculates the damages and updates health bars accordingly
+     * after doing so it generates a new question for the player to answer
+     * @param selectedAnswer the clicked answer by the user
+     * @returns void
      */
     private handleAnswerClick(selectedAnswer: number): void {
         
@@ -233,10 +244,10 @@ export class MainPageController extends ScreenController {
         this.model.playerTime = Date.now();
 
          // Debug logging
-        console.log('Question:', this.model.num1, 'x', this.model.num2, '=', this.model.correctAnswer);
-        console.log('Player clicked:', selectedAnswer);
-        console.log('Player response value:', this.model.playerResponse);
-        console.log('Computer response value:', this.model.computerResponse);
+        //console.log('Question:', this.model.num1, 'x', this.model.num2, '=', this.model.correctAnswer);
+        //console.log('Player clicked:', selectedAnswer);
+        //console.log('Player response value:', this.model.playerResponse);
+        //console.log('Computer response value:', this.model.computerResponse);
 
         // Store current question's correct answer
         const currentCorrectAnswer = this.model.correctAnswer;
@@ -279,7 +290,11 @@ export class MainPageController extends ScreenController {
         }
     }
 
-    //Returns negative value when player takes damage, positive when opponent takes damage
+    /**
+     * Returns negative value when player takes damage, positive when opponent takes damage
+     * Takes no parameters but uses model properties determined by the handle click function to determine damages
+     * @returns [playerDamage, opponentDamage]
+     */
     private damageCalculation(): number[] {
         if(this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse != this.model.correctAnswer){
             return [0, 15];
@@ -300,7 +315,7 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * End the game
+     * End the game which for now just goes back to the start screen
      */
     private endGame(): void {
         this.stopTimer();
@@ -344,6 +359,7 @@ export class MainPageController extends ScreenController {
 
     /**
      * Override the show method to start a new game whenever the screen is shown
+     * This is because the game should reset each time the user navigates to this screen
      */
     show(): void {
         this.startGame();

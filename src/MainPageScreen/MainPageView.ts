@@ -413,6 +413,9 @@ export class MainPageView implements View {
 
     /**
      * Update the health bars with new percentage values
+	 * @param playerHealthPercent The percentage of health for the player (0-1)
+	 * @param opponentHealthPercent The percentage of health for the opponent (0-1)
+	 * @returns void
      */
     updateHealthBars(playerHealthPercent: number, opponentHealthPercent: number): void {
         const healthBarWidth = 150;
