@@ -6,6 +6,7 @@ import { StartPageController } from "./StartPageScreen/StartPageController";
 import { MainPageController } from "./MainPageScreen/MainPageController";
 import { HelpPageController } from "./HelpPageScreen/HelpPageController";
 import { PracticeAreaController } from "./PracticeAreaScreen/PracticeAreaController";
+import { ResultsScreenController } from "./ResultsPageScreen/ResultsPageController";
 
 class App implements ScreenSwitcher {
   private stage: Konva.Stage;
@@ -15,6 +16,7 @@ class App implements ScreenSwitcher {
   private mainController: MainPageController;
   private helpController: HelpPageController;
   private practiceController: PracticeAreaController;
+  private resultsController : ResultsScreenController;
 
   constructor(containerId: string) {
     this.stage = new Konva.Stage({
@@ -30,17 +32,21 @@ class App implements ScreenSwitcher {
     this.mainController = new MainPageController(this);
     this.helpController = new HelpPageController(this);
     this.practiceController = new PracticeAreaController(this);
+    this.resultsController = new ResultsScreenController(this);
 
     // Add screen groups to same layer
     this.layer.add(this.startController.getView().getGroup());
     this.layer.add(this.mainController.getView().getGroup());
     this.layer.add(this.helpController.getView().getGroup());
     this.layer.add(this.practiceController.getView().getGroup());
+    this.layer.add(this.resultsController.getView().getGroup());
+
 
     this.layer.draw();
 
     // Start on start screen
     this.startController.show();
+  
   }
 
   switchToScreen(screen: Screen): void {
@@ -48,12 +54,14 @@ class App implements ScreenSwitcher {
     this.mainController.hide();
     this.helpController.hide();
     this.practiceController.hide();
+    this.resultsController.hide();
 
     switch (screen.type) {
       case "start": this.startController.show(); break;
       case "main": this.mainController.startGame(); break;
       case "help": this.helpController.show(); break;
       case "practice": this.practiceController.show(); break;
+      case "results" : this.resultsController.show(); break;
     }
   }
 }

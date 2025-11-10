@@ -28,6 +28,8 @@ export class MainPageController extends ScreenController {
         );
     }
 
+    //TODO: Create counter variable to announce what specific round player is on
+
     /**
      * Update score display in view
      */
@@ -288,6 +290,12 @@ export class MainPageController extends ScreenController {
         }
     }
 
+    //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet
+    //TODO: switch screen at the end of each round to the results
+    private resultsScreen(): void {
+        this.screenSwitcher.switchToScreen({ type: "results"});
+    }
+
     /**
      * Returns negative value when player takes damage, positive when opponent takes damage
      * Takes no parameters but uses model properties determined by the handle click function to determine damages
@@ -304,6 +312,12 @@ export class MainPageController extends ScreenController {
             return [0, 0];
         }
         return [15, 0];
+    }
+
+    //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet
+    //TODO: switch screen at the end of each round to the results
+    private resultsScreen(): void {
+        this.screenSwitcher.switchToScreen({ type: "results"});
     }
 
     /**
@@ -333,6 +347,7 @@ export class MainPageController extends ScreenController {
             this.startTimer((timeLeft: number) => this.updateTimer(timeLeft));
         }
     }
+
 
     /**
      * Exit the game
