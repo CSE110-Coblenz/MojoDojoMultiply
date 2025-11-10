@@ -2,12 +2,23 @@ import { ScreenController, type ScreenSwitcher } from "../types";
 import { RoundIntroView } from "./RoundIntroView";
 
 export class RoundIntroController extends ScreenController {
+  private screenSwitcher: ScreenSwitcher;
   private view: RoundIntroView;
-  private round = 1;
-  constructor(private switcher: ScreenSwitcher) {
+  private currentRound = 1;
+
+  constructor(screenSwitcher: ScreenSwitcher) {
     super();
-    this.view = new RoundIntroView(() => this.switcher.switchToScreen({ type: "main", round: this.round }));
+    this.screenSwitcher = screenSwitcher;
+    this.view = new RoundIntroView(() => this.startRound())
   }
-  setRound(r: number) { this.round = r; this.view.setRound(r); }
+  
+  setRound(round: number) {
+    this.currentRound = round;
+    this.view.setRound(`Round ${round}`); 
+  }  
+  
+  private startRound() {
+    this.screenSwitcher.switchToScreen({type: "main", round: this.currentRound});
+  }
   getView(): RoundIntroView { return this.view; }
 }

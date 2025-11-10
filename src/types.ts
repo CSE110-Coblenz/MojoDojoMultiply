@@ -13,10 +13,7 @@ export type Screen =
   | { type: "practice" }
   | { type: "roundIntro"; round: number }
   | { type: "results" }
-  | { type: "roundStats"; 
-      round: number; 
-      stats: {roundScore: number; correct: number; total: number }; 
-    };
+  | { type: "roundStats"; round: number; };
 
 export abstract class ScreenController {
   abstract getView(): View;

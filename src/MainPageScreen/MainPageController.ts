@@ -65,7 +65,7 @@ export class MainPageController extends ScreenController {
         this.model.computerTime = 0;
         this.model.playerResponse = 0;
 
-        // 80% chance to get the correct answer
+        // 50% chance to get the correct answer
         if (Math.random() < 0.5) {
             this.model.computerResponse = this.model.correctAnswer;
         } else {
@@ -86,9 +86,9 @@ export class MainPageController extends ScreenController {
     /**
      * Start the game
      */
-    startGame(): void {
+    startGame(round: number = this.model.currentRound): void {
         // Reset game state
-        this.resetForRound(this.model.currentRound);
+        this.resetForRound(round);
 
         // Update view with initial state
         this.updateScore(this.model.score);
@@ -161,6 +161,9 @@ export class MainPageController extends ScreenController {
      * handles damage, score, advancing rounds
      */
     private applyDamagesAndAdvance([playerDmg, oppDmg]: number[]): void {
+        // debugging to show cur round
+        console.log("Current round: " + this.getCurrentRound());
+
         if (playerDmg > 0) {
             this.model.playerHealth = Math.max(0, this.model.playerHealth - playerDmg);
         }
@@ -176,11 +179,17 @@ export class MainPageController extends ScreenController {
         this.updateHealthBars();
 
         if (this.model.opponentHealth <= 0) {
-            this.model.currentRound += 1;
-            this.resetForRound(this.model.currentRound);
+            this.clearQuestionTimer();
+            this.screenSwitcher.switchToScreen({
+                type: "roundStats",
+                round: this.model.currentRound
+            });
+            return;
         }
         if (this.model.playerHealth <= 0) {
-            this.endGame();
+            this.clearQuestionTimer();
+            this.screenSwitcher.switchToScreen( {type: "results"});
+            return;
         }
 
         this.generateNewQuestion();
@@ -256,6 +265,12 @@ export class MainPageController extends ScreenController {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    /**
+     * returns current round number
+     */
+    getCurrentRound(): number {
+        return this.model.currentRound;
+    }
     /**
      * Generate wrong answers for multiple choice
      */
@@ -384,6 +399,6 @@ export class MainPageController extends ScreenController {
      * Override the show method to start a new game whenever the screen is shown
      */
     show(): void {
-        this.startGame();
+        this.startGame(this.model.currentRound);
     }
 }
