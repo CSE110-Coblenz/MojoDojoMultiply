@@ -107,7 +107,6 @@ export class MainPageController extends ScreenController {
     /**
      * reset state for new rounds
      */
-
     private resetForRound(round: number): void {
         this.model.currentRound = round;
         this.model.playerHealth = this.model.maxHealth;
@@ -164,6 +163,7 @@ export class MainPageController extends ScreenController {
         // debugging to show cur round
         console.log("Current round: " + this.getCurrentRound());
 
+        // deals damage to player and opponet 
         if (playerDmg > 0) {
             this.model.playerHealth = Math.max(0, this.model.playerHealth - playerDmg);
         }
@@ -171,6 +171,8 @@ export class MainPageController extends ScreenController {
             this.model.opponentHealth = Math.max(0, this.model.opponentHealth - oppDmg);
         }
 
+        // increments score by one if player gets answer right
+        // TODO: update scoring system
         if (this.model.playerResponse === this.model.correctAnswer) {
             this.model.score++;
             this.model.roundScore++;
@@ -178,6 +180,7 @@ export class MainPageController extends ScreenController {
         }
         this.updateHealthBars();
 
+        // handles winning round
         if (this.model.opponentHealth <= 0) {
             this.clearQuestionTimer();
             this.screenSwitcher.switchToScreen({
@@ -186,6 +189,7 @@ export class MainPageController extends ScreenController {
             });
             return;
         }
+        // handles losing round
         if (this.model.playerHealth <= 0) {
             this.clearQuestionTimer();
             this.screenSwitcher.switchToScreen( {type: "results"});
