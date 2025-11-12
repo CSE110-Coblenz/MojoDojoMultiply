@@ -104,7 +104,7 @@ export class MainPageView implements View {
 
 		this.playerHealthBar = new Konva.Rect({
 			x: 22,
-			y: 22,
+			y: 102,
 			width: healthBarWidth - 4,
 			height: 36,
 			strokeEnabled: false,
@@ -129,7 +129,7 @@ export class MainPageView implements View {
 
 		this.opponentHealthBar = new Konva.Rect({
 			x: 272,
-			y: 22,
+			y: 102,
 			width: healthBarWidth - 4,
 			height: 36,
 			strokeEnabled: false,
