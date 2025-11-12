@@ -364,6 +364,11 @@ export class MainPageController extends ScreenController {
         // Play sound effects
         this.clickSound.play();
         this.clickSound.currentTime = 0;
+
+        // Check if game should end due to health
+        if (this.model.playerHealth <= 0 || this.model.opponentHealth <= 0) {
+            this.endGame();
+        }
     }
 
     /**
@@ -382,12 +387,6 @@ export class MainPageController extends ScreenController {
             return [0, 0];
         }
         return [15, 0];
-    }
-
-    //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet
-    //TODO: switch screen at the end of each round to the results
-    private resultsScreen(): void {
-        this.screenSwitcher.switchToScreen({ type: "results"});
     }
 
     /**
