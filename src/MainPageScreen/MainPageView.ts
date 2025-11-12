@@ -62,8 +62,8 @@ export class MainPageView implements View {
 		// Score display (bottom-center). origin will be set to the center so
 		// the text remains centered as its content changes.
 		this.scoreText = new Konva.Text({
-			x: GAMECST.STAGE_WIDTH / 2,
-			y: GAMECST.STAGE_HEIGHT - 30,
+			x: GAMECST.STAGE_WIDTH - 100,
+			y: 30,
 			text: "Score: 0",
 			fontSize: 32,
 			fontFamily: GAMECST.DEFAULT_FONT,
@@ -80,8 +80,8 @@ export class MainPageView implements View {
 		const healthBarWidth = 150;
 
 		const playerBarBacking = new Konva.Rect({
-			x: 20,
-			y: 100,
+			x: 80,
+			y: GAMECST.STAGE_HEIGHT * 2 / 3,
 			width: healthBarWidth,
 			height: 40,
 			stroke: 'black',
@@ -91,8 +91,8 @@ export class MainPageView implements View {
 		playerHealthGroup.add(playerBarBacking);
 
 		this.playerHealthBar = new Konva.Rect({
-			x: 22,
-			y: 102,
+			x: playerBarBacking.x() + 2,
+			y: playerBarBacking.y() + 2,
 			width: healthBarWidth - 4,
 			height: 36,
 			strokeEnabled: false,
@@ -105,8 +105,8 @@ export class MainPageView implements View {
 		this.group.add(opponentHealthGroup);
 
 		const opponentBarBacking = new Konva.Rect({
-			x: 270,
-			y: 100,
+			x: 300,
+			y: playerBarBacking.y(),
 			width: healthBarWidth,
 			height: 40,
 			stroke: 'black',
@@ -116,8 +116,8 @@ export class MainPageView implements View {
 		opponentHealthGroup.add(opponentBarBacking);
 
 		this.opponentHealthBar = new Konva.Rect({
-			x: 272,
-			y: 102,
+			x: opponentBarBacking.x() + 2,
+			y: opponentBarBacking.y() + 2,
 			width: healthBarWidth - 4,
 			height: 36,
 			strokeEnabled: false,
@@ -138,7 +138,7 @@ export class MainPageView implements View {
 
 			// set desired scale and position (adjust values as needed)
 			image.scale({ x: 0.3, y: 0.3 });
-			image.position({ x: 20, y: GAMECST.STAGE_HEIGHT / 2 - 40});
+			image.position({ x: 80, y: GAMECST.STAGE_HEIGHT / 3});
 
 			// add to the fighting stage group
 			fightingStage.add(image);
@@ -147,11 +147,11 @@ export class MainPageView implements View {
 		// load boxer image and store it on the instance so other code can access it
 		Konva.Image.fromURL('/boxer2.png', (image) => {
 			// keep a reference to the Konva.Image node
-			this.playerAvatar = image;
+			this.opponentAvatar = image;
 
 			// set desired scale and position (adjust values as needed)
 			image.scale({ x: 0.3, y: 0.3 });
-			image.position({ x: 300, y: GAMECST.STAGE_HEIGHT / 2 - 40});
+			image.position({ x: 300, y: GAMECST.STAGE_HEIGHT / 3 });
 
 			// add to the fighting stage group
 			fightingStage.add(image);
@@ -163,9 +163,6 @@ export class MainPageView implements View {
 		const squareSize = 80;
 		const spacing = 20;
 		const totalWidth = (squareSize * 2) + spacing;
-		const totalHeight = (squareSize * 2) + spacing;
-		const startX = (GAMECST.STAGE_WIDTH - totalWidth) / 2;
-		const startY = (GAMECST.STAGE_HEIGHT - totalHeight) / 2;
 		// initial empty values; controller will populate the first question
 		const allAnswers: (string | number)[] = ["", "", "", ""];
 		
@@ -174,15 +171,7 @@ export class MainPageView implements View {
 		// All children coordinates will be relative to the group's origin
 		const gameQuestAnsGroup = new Konva.Group();
 
-		// compute block dimensions and position the group's origin to its center
-		const groupHeight = totalHeight + spacing * 5;
-
-		// place group's center quarter line of the screen and center it vertically
-		const centerX = GAMECST.STAGE_WIDTH * 3 / 4;
-		const centerY = GAMECST.STAGE_HEIGHT / 2;
-
-		// set offset so the group's origin becomes its center, then position at center point
-		// gameQuestAnsGroup.offset({ x: totalWidth / 2, y: groupHeight / 2 });
+		//Set the position of the entire group
 		gameQuestAnsGroup.position({ x: GAMECST.STAGE_WIDTH * 2 / 3, y: GAMECST.STAGE_HEIGHT / 4, });
 		this.group.add(gameQuestAnsGroup);
 
