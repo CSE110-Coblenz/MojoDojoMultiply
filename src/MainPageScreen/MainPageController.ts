@@ -390,12 +390,6 @@ export class MainPageController extends ScreenController {
         return [15, 0];
     }
 
-    //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet
-    //TODO: switch screen at the end of each round to the results
-    private resultsScreen(): void {
-        this.screenSwitcher.switchToScreen({ type: "results"});
-    }
-
     /**
      * End the game which for now just goes back to the start screen
      */
