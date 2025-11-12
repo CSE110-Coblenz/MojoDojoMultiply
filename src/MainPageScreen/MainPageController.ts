@@ -176,11 +176,10 @@ export class MainPageController extends ScreenController {
             this.model.opponentHealth = Math.max(0, this.model.opponentHealth - oppDmg);
         }
 
-        // increments score by one if player gets answer right
-        // TODO: update scoring system
+        // increments score by health gained if player gets answer right
         if (this.model.playerResponse === this.model.correctAnswer) {
-            this.model.score++;
-            this.model.roundScore++;
+            this.model.score += oppDmg;
+            this.model.roundScore += oppDmg;
             this.updateScore(this.model.score);
         }
         this.updateHealthBars();
@@ -364,11 +363,6 @@ export class MainPageController extends ScreenController {
         // Play sound effects
         this.clickSound.play();
         this.clickSound.currentTime = 0;
-
-        // Check if game should end due to health
-        if (this.model.playerHealth <= 0 || this.model.opponentHealth <= 0) {
-            this.endGame();
-        }
     }
 
     /**
