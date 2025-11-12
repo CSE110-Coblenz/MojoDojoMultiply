@@ -8,7 +8,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install dependencies ignoring optional platform packages
-        run: npm ci --ignore-scripts
+      - run: npm ci
       - run: npx tsc --noEmit
       - run: npm test
