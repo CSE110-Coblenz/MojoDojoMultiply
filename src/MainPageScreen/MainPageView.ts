@@ -74,13 +74,21 @@ export class MainPageView implements View {
 		this.scoreText.offsetY(this.scoreText.height() / 2);
 		this.group.add(this.scoreText);
 
+		// Timer display (top-right)
+		this.timerText = new Konva.Text({
+			x: GAMECST.STAGE_WIDTH - 150,
+			y: 20,
+			text: "Time: 60",
+			fontSize: 32,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			fill: GAMECST.ALERT_COLOR,
+		});
+		this.group.add(this.timerText);
 
-		const fightingStage = new Konva.Group();
-		this.group.add(fightingStage);
 
 		//Health bar that visualizes the health of the player's character
 		const playerHealthGroup = new Konva.Group();
-		fightingStage.add(playerHealthGroup);
+		this.group.add(playerHealthGroup);
 		const healthBarWidth = 150;
 
 		const playerBarBacking = new Konva.Rect({
@@ -98,6 +106,7 @@ export class MainPageView implements View {
 			x: 22,
 			y: 22,
 			width: healthBarWidth - 4,
+			height: 36,
 			strokeEnabled: false,
 			fill: GAMECST.ALERT_COLOR
 		});
@@ -131,11 +140,15 @@ export class MainPageView implements View {
 		// Initialize health bars to full
 		this.updateHealthBars(1, 1);
 
-		// avatar representing the player
+		const fightingStage = new Konva.Group();
+		this.group.add(fightingStage);
+
+		// load boxer image and store it on the instance so other code can access it
 		Konva.Image.fromURL('/boxer.png', (image) => {
-			// Store a reference to the image in the view 
+			// keep a reference to the Konva.Image node
 			this.playerAvatar = image;
 
+			// set desired scale and position (adjust values as needed)
 			image.scale({ x: 0.3, y: 0.3 });
 			image.position({ x: 20, y: GAMECST.STAGE_HEIGHT / 2 - 40});
 
@@ -143,10 +156,10 @@ export class MainPageView implements View {
 			fightingStage.add(image);
 		});
 
-		// avatar representing the opponent
+		// load boxer image and store it on the instance so other code can access it
 		Konva.Image.fromURL('/boxer2.png', (image) => {
-			// Store a reference to the image in the view 
-			this.opponentAvatar = image;
+			// keep a reference to the Konva.Image node
+			this.playerAvatar = image;
 
 			// set desired scale and position (adjust values as needed)
 			image.scale({ x: 0.3, y: 0.3 });
@@ -165,51 +178,34 @@ export class MainPageView implements View {
 		const totalHeight = (squareSize * 2) + spacing;
 		const startX = (GAMECST.STAGE_WIDTH - totalWidth) / 2;
 		const startY = (GAMECST.STAGE_HEIGHT - totalHeight) / 2;
-
 		// initial empty values; controller will populate the first question
 		const allAnswers: (string | number)[] = ["", "", "", ""];
 		
-		
-
 		// Group that holds the question block and all the answer choices.
 		// We'll position this group on the right third of the stage and vertically
 		// All children coordinates will be relative to the group's origin
-<<<<<<< HEAD
 		const gameQuestAnsGroup = new Konva.Group();
 
 		// compute block dimensions and position the group's origin to its center
 		const groupHeight = totalHeight + spacing * 5;
-=======
-		const quesAnsGroup = new Konva.Group({
-			x: 200,
-			y: GAMECST.STAGE_WIDTH * 3 / 4
-		});
->>>>>>> 5387697 (Correcting syntax)
 
 		// place group's center quarter line of the screen and center it vertically
-		const centerX = GAMECST.STAGE_WIDTH * 19 / 24;
+		const centerX = GAMECST.STAGE_WIDTH * 3 / 4;
 		const centerY = GAMECST.STAGE_HEIGHT / 2;
 
-
-		// Timer display
-		this.timerText = new Konva.Text({
-			x: 0,
-			y: 0,
-			text: "Time: 60",
-			fontSize: 32,
-			fontFamily: GAMECST.DEFAULT_FONT,
-			fill: GAMECST.ALERT_COLOR,
-		});
-		quesAnsGroup.add(this.timerText);
+		// set offset so the group's origin becomes its center, then position at center point
+		gameQuestAnsGroup.offset({ x: totalWidth / 2, y: groupHeight / 2 });
+		gameQuestAnsGroup.position({ x: centerX, y: centerY });
+		this.group.add(gameQuestAnsGroup);
 
 		//Group that holds the question text and the question box
 		const questionGroup = new Konva.Group();
-		quesAnsGroup.add(questionGroup);
+		gameQuestAnsGroup.add(questionGroup);
 		
 		// The question box sits at the top of the group's local coords
 		const questionBox = new Konva.Rect({
 			x: 0,
-			y: this.timerText.height() + spacing,
+			y: 0,
 			width: totalWidth,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
@@ -220,12 +216,12 @@ export class MainPageView implements View {
 
 		// Answer 1 (top-left)
 		const answer1Group = new Konva.Group();
-		quesAnsGroup.add(answer1Group);
+		gameQuestAnsGroup.add(answer1Group);
 
 		// The box that serves as the background and touch target of answer 1
 		const answer1Box = new Konva.Rect({
 			x: 0,
-			y: questionBox.y() + questionBox.height() + spacing,
+			y: spacing * 5,
 			width: squareSize,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
@@ -236,11 +232,11 @@ export class MainPageView implements View {
 
 		// Answer 2 (top-right)
 		const answer2Group = new Konva.Group();
-		quesAnsGroup.add(answer2Group);
+		gameQuestAnsGroup.add(answer2Group);
 
 		const answer2Box = new Konva.Rect({
-			x: answer1Box.x() + answer1Box.width() + spacing,
-			y: questionBox.y() + questionBox.height() + spacing,
+			x: squareSize + spacing,
+			y: spacing * 5,
 			width: squareSize,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
@@ -251,11 +247,11 @@ export class MainPageView implements View {
 		
 		// Answer 3 (bottom-left)
 		const answer3Group = new Konva.Group();
-		quesAnsGroup.add(answer3Group);
+		gameQuestAnsGroup.add(answer3Group);
 
 		const answer3Box = new Konva.Rect({
 			x: 0,
-			y: answer1Box.y() + answer1Box.height() + spacing,
+			y: spacing * 5 + squareSize + spacing,
 			width: squareSize,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
@@ -266,11 +262,11 @@ export class MainPageView implements View {
 
 		// Answer 4 (bottom-right)
 		const answer4Group = new Konva.Group();
-		quesAnsGroup.add(answer4Group);
+		gameQuestAnsGroup.add(answer4Group);
 
 		const answer4Box = new Konva.Rect({
-			x: answer3Box.x() + answer3Box.width() + spacing,
-			y: answer2Box.y() + answer2Box.height() + spacing,
+			x: squareSize + spacing,
+			y: spacing * 5 + squareSize + spacing,
 			width: squareSize,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
@@ -280,19 +276,13 @@ export class MainPageView implements View {
 		answer4Group.add(answer4Box);
 
 		this.questionText = new Konva.Text({
-<<<<<<< HEAD
 			x: 0,
 			y: 0,
-=======
-			x: questionBox.x() + (questionBox.width() / 2),
-			y: questionBox.y() + (questionBox.height() / 2) - 15,
->>>>>>> 5387697 (Correcting syntax)
 			text: ``,
 			fontSize: 30,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: 'Black'
 		});
-<<<<<<< HEAD
 		// Center the question text within its box
 		this.questionText.offsetX(this.questionText.width() / 2);
 		questionGroup.add(this.questionText);
@@ -302,38 +292,35 @@ export class MainPageView implements View {
 			x: questionBox.width() / 2,
 			y: questionBox.height() / 2 - this.questionText.height() / 2
 		});
-=======
-		quesAnsGroup.add(this.questionText);
->>>>>>> 5387697 (Correcting syntax)
 
 		this.answerTexts = [
 			new Konva.Text({
-				x: answer1Box.x() + (answer1Box.width() / 2),
-				y: answer1Box.y() + (answer1Box.height() / 2) - 15,
+				x: 0 + 25,
+				y: spacing * 5 + 25,
 				text: `${allAnswers[0]}`,
 				fontSize: 30,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: 'Black'
 			}),
 			new Konva.Text({
-				x: answer2Box.x() + (answer2Box.width() / 2),
-				y: answer2Box.y() + (answer2Box.height() / 2) - 15,
+				x: squareSize + spacing + 25,
+				y: spacing * 5 + 25,
 				text: `${allAnswers[1]}`,
 				fontSize: 30,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: 'Black'
 			}),
 			new Konva.Text({
-				x: answer3Box.x() + (answer3Box.width() / 2),
-				y: answer3Box.y() + (answer3Box.height() / 2) - 15,
+				x: 0 + 25,
+				y: spacing * 5 + squareSize + spacing + 25,
 				text: `${allAnswers[2]}`,
 				fontSize: 30,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: 'Black'
 			}),
 			new Konva.Text({
-				x: answer4Box.x() + (answer4Box.width() / 2),
-				y: answer4Box.y() + (answer4Box.height() / 2) - 15,
+				x: squareSize + spacing + 25,
+				y: spacing * 5 + squareSize + spacing + 25,
 				text: `${allAnswers[3]}`,
 				fontSize: 30,
 				fontFamily: GAMECST.DEFAULT_FONT,
@@ -392,16 +379,11 @@ export class MainPageView implements View {
 	 */
 	setQuestionDisplay(questionText: string, answers: (string | number)[]): void {
 		this.questionText.text(questionText);
-<<<<<<< HEAD
 		// Recenter the question text after changing it
 		this.questionText.offsetX(this.questionText.width() / 2);
 		
-=======
-		this.questionText.offsetX(this.questionText.width() / 2);
->>>>>>> 5387697 (Correcting syntax)
 		this.answerTexts.forEach((text, index) => {
 			text.text(`${answers[index] ?? ""}`);
-			text.offsetX(text.width() / 2);
 		});
 		this.group.getLayer()?.draw();
 	}
