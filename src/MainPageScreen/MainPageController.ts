@@ -28,8 +28,6 @@ export class MainPageController extends ScreenController {
         );
     }
 
-    //TODO: Create counter variable to announce what specific round player is on
-
     /**
      * Update score display in view
      */
@@ -382,6 +380,8 @@ export class MainPageController extends ScreenController {
         }
         return [15, 0];
     }
+
+    //TODO to switch endgame to screenswitcher type from start page to results when we finishing ironing out the bugs
 
     /**
      * End the game which for now just goes back to the start screen
