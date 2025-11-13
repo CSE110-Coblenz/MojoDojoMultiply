@@ -43,6 +43,7 @@ beforeEach(() => {
  * without rendering Konva.
  */
 describe("StartPageController", () => {
+  /*
   it("should transition from start to main game", () => {
     // Instantiate controller with our fake screenSwitcher
     const controller = new StartPageController(screenSwitcher as any);
@@ -54,6 +55,7 @@ describe("StartPageController", () => {
     // Expect that switchToScreen was called with the correct type
     expect(screenSwitcher.switchToScreen).toHaveBeenCalledWith({ type: "main" });
   });
+  */
 
   it("calls switchToScreen({ type: 'main' }) when start is triggered", () => {
     const controller = new StartPageController(screenSwitcher as any);
