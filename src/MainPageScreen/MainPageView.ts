@@ -75,9 +75,13 @@ export class MainPageView implements View {
 		})
 		pausePlayButtonGroup.add(pausePlayBox);
 
+		//Group containing both elements of the pause logo
 		const pauseLogo = new Konva.Group({visible: true});
+		pausePlayButtonGroup.add(pauseLogo);
+		//Change positioning of elements in pause group to be local to the group
 		pauseLogo.position({x: pausePlayBox.x() + 11, y: pausePlayBox.y() + 11});
 
+		//Left element of the pause logo
 		const pauseLogo1 = new Konva.Rect({
 			x: 0,
 			y: 0,
@@ -88,6 +92,7 @@ export class MainPageView implements View {
 		});
 		pauseLogo.add(pauseLogo1);
 
+		//Right element of the pause logo
 		const pauseLogo2 = new Konva.Rect({
 			x: pauseLogo1.x() + pauseLogo1.width() + 10,
 			y: 0,
@@ -98,9 +103,9 @@ export class MainPageView implements View {
 		});
 		pauseLogo.add(pauseLogo2);
 
+		//Center the pause logo in the button
 		pauseLogo.offsetX(pauseLogo.width() / 2);
 		pauseLogo.offsetY(pauseLogo.height() / 2);
-		pausePlayButtonGroup.add(pauseLogo);
 
 		// Logo that makes pause/play button play
 		const playLogo = new Konva.RegularPolygon({
@@ -114,10 +119,11 @@ export class MainPageView implements View {
 		});
 		pausePlayButtonGroup.add(playLogo);
 
-		
+		//Adds the click mouse appearance when hovering
 		pausePlayButtonGroup.on('mouseover', onAnswerHoverStart);
 		pausePlayButtonGroup.on('mouseout', onAnswerHoverEnd);
 
+		//Cycles between the play and pause logos when the button is clicked
 		pausePlayButtonGroup.on('click tap', () => {
 			playPauseGame(pauseLogo1.visible())
 			const showingPause = pauseLogo.visible();
@@ -136,7 +142,6 @@ export class MainPageView implements View {
 			playPauseGame(playLogo.visible());
 			pausePlayButtonGroup.getLayer()?.draw();
 		});
-		
 
 
 		//Health bar that visualizes the health of the player's character
@@ -144,6 +149,7 @@ export class MainPageView implements View {
 		this.group.add(playerHealthGroup);
 		const healthBarWidth = 150;
 
+		//Background to visualize the full size of the health bar
 		const playerBarBacking = new Konva.Rect({
 			x: 80,
 			y: GAMECST.STAGE_HEIGHT * 2 / 3,
@@ -155,6 +161,7 @@ export class MainPageView implements View {
 		});
 		playerHealthGroup.add(playerBarBacking);
 
+		//Health bar that shrinks to model the health level of the player 
 		this.playerHealthBar = new Konva.Rect({
 			x: playerBarBacking.x() + 2,
 			y: playerBarBacking.y() + 2,
@@ -169,6 +176,7 @@ export class MainPageView implements View {
 		const opponentHealthGroup = new Konva.Group();
 		this.group.add(opponentHealthGroup);
 
+		//Background to visualize the full size of the health bar
 		const opponentBarBacking = new Konva.Rect({
 			x: 300,
 			y: playerBarBacking.y(),
@@ -180,6 +188,7 @@ export class MainPageView implements View {
 		});
 		opponentHealthGroup.add(opponentBarBacking);
 
+		//Health bar that shrinks to model the health level of the opponent
 		this.opponentHealthBar = new Konva.Rect({
 			x: opponentBarBacking.x() + 2,
 			y: opponentBarBacking.y() + 2,
@@ -193,6 +202,7 @@ export class MainPageView implements View {
 		// Initialize health bars to full
 		this.updateHealthBars(1, 1);
 
+		//Group that contains all the elements of the fight scene
 		const fightingStage = new Konva.Group();
 		this.group.add(fightingStage);
 
@@ -327,6 +337,7 @@ export class MainPageView implements View {
 		});
 		answer4Group.add(answer4Box);
 
+		//Text that states the what multiplication question is being asked of the user
 		this.questionText = new Konva.Text({
 			x: questionBox.x() + questionBox.width() / 2,
 			y: questionBox.y() + questionBox.height() / 2,
@@ -338,8 +349,9 @@ export class MainPageView implements View {
 		// Center the question text within its box
 		questionGroup.add(this.questionText);
 		
-
+		//Text that shows the user their options for answers to the questions
 		this.answerTexts = [
+			//The answer in box 1 (upper-left corner)
 			new Konva.Text({
 				x: answer1Box.x() + answer1Box.width() / 2,
 				y: answer1Box.y() + answer1Box.height() / 2,
@@ -348,6 +360,7 @@ export class MainPageView implements View {
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: 'Black'
 			}),
+			//The answer in box 2 (upper-right corner)
 			new Konva.Text({
 				x: answer2Box.x() + answer2Box.width() / 2,
 				y: answer2Box.y() + answer2Box.height() / 2,
@@ -356,6 +369,7 @@ export class MainPageView implements View {
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: 'Black'
 			}),
+			//The answer in box 3 (lower-left corner)
 			new Konva.Text({
 				x: answer3Box.x() + answer3Box.width() / 2,
 				y: answer3Box.y() + answer3Box.height() / 2,
@@ -364,6 +378,7 @@ export class MainPageView implements View {
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: 'Black'
 			}),
+			//The answer in box 4 (lower-right corner)
 			new Konva.Text({
 				x: answer4Box.x() + answer4Box.width() / 2,
 				y: answer4Box.y() + answer4Box.height() / 2,
