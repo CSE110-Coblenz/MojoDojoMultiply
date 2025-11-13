@@ -1,4 +1,3 @@
-import { GAMECST } from "../constants";
 import { ScreenController, type ScreenSwitcher } from "../types";
 import { MainPageModel } from "./MainPageModel";
 import { MainPageView } from "./MainPageView";
