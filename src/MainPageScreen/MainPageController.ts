@@ -25,6 +25,7 @@ export class MainPageController extends ScreenController {
         // Pass the event handlers to the view
         this.view = new MainPageView(
             (answer: number) => this.handleAnswerClick(answer),
+            (pauseGame: boolean) => this.handlePausePlayGame(pauseGame),
             () => this.handleAnswerHoverStart(),
             () => this.handleAnswerHoverEnd()
         );
@@ -440,6 +441,15 @@ export class MainPageController extends ScreenController {
             this.endGame();
         }
     }
+
+    /**
+     * Pauses the timer, hides the question and answer choices for the user
+     * @param pauseGame Boolean telling whether the game needs to be paused or resumed
+     */
+    private handlePausePlayGame(pauseGame: boolean) {
+        //TO DO: Implement pausing and resuming game without loosing information
+    }
+
 
     //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet
     //TODO: switch screen at the end of each round to the results

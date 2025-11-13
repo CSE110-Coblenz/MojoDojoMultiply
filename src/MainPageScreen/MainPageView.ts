@@ -114,9 +114,10 @@ export class MainPageView implements View {
 		});
 		pausePlayButtonGroup.add(playLogo);
 
-
+		
 		pausePlayButtonGroup.on('mouseover', onAnswerHoverStart);
 		pausePlayButtonGroup.on('mouseout', onAnswerHoverEnd);
+
 		pausePlayButtonGroup.on('click tap', () => {
 			playPauseGame(pauseLogo1.visible())
 			const showingPause = pauseLogo.visible();
