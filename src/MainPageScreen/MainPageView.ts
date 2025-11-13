@@ -19,12 +19,14 @@ export class MainPageView implements View {
 	private playerAvatar?: Konva.Image;
 	// Konva image for the opponent's avatar
 	private opponentAvatar?: Konva.Image;
+	public pauseLogo?: Konva.Group;
+	public playLogo?: Konva.RegularPolygon;
 
 	
 	// constructor for the interface Main page interface
 	constructor(
 		onAnswerClick: (answer: number) => void,
-		playPauseGame: (pauseGame: boolean) => void,
+		pauseResumeGame: () => void,
 		onAnswerHoverStart: () => void,
 		onAnswerHoverEnd: () => void
 	) {
@@ -76,10 +78,10 @@ export class MainPageView implements View {
 		pausePlayButtonGroup.add(pausePlayBox);
 
 		//Group containing both elements of the pause logo
-		const pauseLogo = new Konva.Group({visible: true});
-		pausePlayButtonGroup.add(pauseLogo);
+		this.pauseLogo = new Konva.Group({visible: true});
+		pausePlayButtonGroup.add(this.pauseLogo);
 		//Change positioning of elements in pause group to be local to the group
-		pauseLogo.position({x: pausePlayBox.x() + 11, y: pausePlayBox.y() + 11});
+		this.pauseLogo.position({x: pausePlayBox.x() + 11, y: pausePlayBox.y() + 11});
 
 		//Left element of the pause logo
 		const pauseLogo1 = new Konva.Rect({
@@ -90,7 +92,7 @@ export class MainPageView implements View {
 			fill: 'black',
 			cornerRadius: 4
 		});
-		pauseLogo.add(pauseLogo1);
+		this.pauseLogo.add(pauseLogo1);
 
 		//Right element of the pause logo
 		const pauseLogo2 = new Konva.Rect({
@@ -101,14 +103,14 @@ export class MainPageView implements View {
 			fill: 'black',
 			cornerRadius: 4
 		});
-		pauseLogo.add(pauseLogo2);
+		this.pauseLogo.add(pauseLogo2);
 
 		//Center the pause logo in the button
-		pauseLogo.offsetX(pauseLogo.width() / 2);
-		pauseLogo.offsetY(pauseLogo.height() / 2);
+		this.pauseLogo.offsetX(this.pauseLogo.width() / 2);
+		this.pauseLogo.offsetY(this.pauseLogo.height() / 2);
 
 		// Logo that makes pause/play button play
-		const playLogo = new Konva.RegularPolygon({
+		this.playLogo = new Konva.RegularPolygon({
 			x: 25,
 			y: 30,
 			sides: 3,
@@ -117,31 +119,14 @@ export class MainPageView implements View {
 			rotation: 90,
 			visible: false
 		});
-		pausePlayButtonGroup.add(playLogo);
+		pausePlayButtonGroup.add(this.playLogo);
 
 		//Adds the click mouse appearance when hovering
 		pausePlayButtonGroup.on('mouseover', onAnswerHoverStart);
 		pausePlayButtonGroup.on('mouseout', onAnswerHoverEnd);
 
 		//Cycles between the play and pause logos when the button is clicked
-		pausePlayButtonGroup.on('click tap', () => {
-			playPauseGame(pauseLogo1.visible())
-			const showingPause = pauseLogo.visible();
-			if (showingPause) {
-				// switch to play icon
-				pauseLogo.visible(false);
-				//pauseLogo2.visible(false);
-				playLogo.visible(true);
-			} else {
-				// switch to pause icon
-				pauseLogo.visible(true);
-				//pauseLogo2.visible(true);
-				playLogo.visible(false);
-			}
-			// call controller with whether game is now paused (play icon visible => paused)
-			playPauseGame(playLogo.visible());
-			pausePlayButtonGroup.getLayer()?.draw();
-		});
+		pausePlayButtonGroup.on('click tap', () => { pauseResumeGame() });
 
 
 		//Health bar that visualizes the health of the player's character

@@ -25,7 +25,7 @@ export class MainPageController extends ScreenController {
         // Pass the event handlers to the view
         this.view = new MainPageView(
             (answer: number) => this.handleAnswerClick(answer),
-            (pauseGame: boolean) => this.handlePausePlayGame(pauseGame),
+            () => this.handlePausePlayGame(),
             () => this.handleAnswerHoverStart(),
             () => this.handleAnswerHoverEnd()
         );
@@ -446,8 +446,13 @@ export class MainPageController extends ScreenController {
      * Pauses the timer, hides the question and answer choices for the user
      * @param pauseGame Boolean telling whether the game needs to be paused or resumed
      */
-    private handlePausePlayGame(pauseGame: boolean) {
-        //TO DO: Implement pausing and resuming game without loosing information
+    private handlePausePlayGame() {
+        console.log(this.model.gamePaused);
+        if(this.model.gamePaused) {
+            this.resumeGame();
+        } else {
+            this.pauseGame();
+        }
     }
 
 
@@ -492,6 +497,9 @@ export class MainPageController extends ScreenController {
      */
     pauseGame(): void {
         this.pauseQuestionTimer();
+        this.model.gamePaused = true;
+        this.view.pauseLogo?.visible(false);
+        this.view.playLogo?.visible(true);
     }
 
     /**
@@ -499,6 +507,9 @@ export class MainPageController extends ScreenController {
      */
     resumeGame(): void {
         this.resumeQuestionTimer();
+        this.model.gamePaused = false;
+        this.view.pauseLogo?.visible(true);
+        this.view.playLogo?.visible(false);
     }
 
 
