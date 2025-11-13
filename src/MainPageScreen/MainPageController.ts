@@ -1,6 +1,8 @@
 import { ScreenController, type ScreenSwitcher } from "../types";
 import { MainPageModel } from "./MainPageModel";
 import { MainPageView } from "./MainPageView";
+import { GAMECST } from "../constants";
+import {GlobalState} from "../storageManager"
 
 export class MainPageController extends ScreenController {
     private model: MainPageModel;
@@ -26,6 +28,32 @@ export class MainPageController extends ScreenController {
             () => this.handleAnswerHoverStart(),
             () => this.handleAnswerHoverEnd()
         );
+
+        this.setupGlobalStateListener();
+    }
+
+    /**
+     * function for activating listener for stored data change to trigger resync
+     */
+    setupGlobalStateListener(): void {
+        // Listen for changes made by other windows (automatic updates when saving)
+        window.addEventListener('storage', (event: StorageEvent) => {
+            // Check if the change was made to the same key
+            if (event.key === GAMECST.GLOBAL_DATA_KEY) {
+                // event.newValue holds the new JSON string
+                if (event.newValue) {
+                    try {
+                        const newState = JSON.parse(event.newValue) as GlobalState;
+                        
+                        // Update data with loaded data from JSON
+                        this.model.currentRound=newState.currentRound;
+                        
+                    } catch (e) {
+                        console.error("Failed to parse storage update:", e);
+                    }
+                }
+            }
+        });
     }
 
     //TODO: Create counter variable to announce what specific round player is on

@@ -13,6 +13,9 @@ export const DEFAULT_FONT = "Impact";
 // Game settings
 export const GAME_DURATION = 10; // seconds
 
+// JSON storage key
+export const GLOBAL_DATA_KEY = "AppGlobalState";
+
 export const GAMECST = {
     STAGE_HEIGHT,
     STAGE_WIDTH,
@@ -20,5 +23,6 @@ export const GAMECST = {
     HIGHLIGHT_COLOR,
     ALERT_COLOR,
     DEFAULT_FONT,
-    GAME_DURATION
+    GAME_DURATION,
+    GLOBAL_DATA_KEY
 } as const;
