@@ -28,7 +28,7 @@ export class HelpPageController extends ScreenController {
      */
     private handleStartClick(): void {
      // TODO: Implement screen transition from helpScreen to mainGame
-     this.screenSwitcher.switchToScreen({ type: "main", round: 1 });
+     this.screenSwitcher.switchToScreen({ type: "main", round: 1});
     }
 
      /**
