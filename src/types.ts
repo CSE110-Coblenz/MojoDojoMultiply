@@ -13,7 +13,8 @@ export type Screen =
   | { type: "practice" }
   | { type: "intro"; round: number }
   | { type: "results" }
-  | { type: "stats"; round: number; };
+  | { type: "stats"; round: number; }
+  | { type: "bonus" };
 
 
 export abstract class ScreenController {
