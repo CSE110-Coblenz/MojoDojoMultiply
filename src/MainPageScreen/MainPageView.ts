@@ -30,26 +30,6 @@ export class MainPageView implements View {
 	) {
 		this.group = new Konva.Group({ visible: false });
 
-        const text = new Konva.Text({
-            x: GAMECST.STAGE_WIDTH / 2,
-            y: GAMECST.STAGE_HEIGHT / 2,
-            text: "MAIN GAME",
-            fontSize: 100
-        });
-        text.offsetX(text.width() / 2);
-        text.offsetY(text.height() / 2);
-        this.group.add(text);
-
-        // Create 3 Konva.Image placeholders for timer (no image/source set here).
-        // Positions and sizes can be adjusted later by layout code.
-        for (let i = 0; i < 3; i++) {
-            // create an empty HTMLImageElement as placeholder (src will be set later by model/controller)
-            const placeholder = new Image();
-            const img = new Konva.Image({ image: placeholder as unknown as CanvasImageSource, x: 10 + i * 40, y: 10, width: 32, height: 48, listening: false });
-            this.timerImageNodes.push(img);
-            this.group.add(img);
-        }
-
 		//Stage background for Konva Group
 		const bg = new Konva.Rect({
 			x: 0,
@@ -74,8 +54,8 @@ export class MainPageView implements View {
 		this.scoreText.offsetX(this.scoreText.width() / 2);
 		this.group.add(this.scoreText);
 
-		//Pause Button that allows users to pause the game
-
+		//Group that holds the pause/play button
+		//The button allows the user to pause/play the gameplay 
 		const pausePlayButtonGroup = new Konva.Group({ 
 			visible: true,
 			x: 20,
@@ -83,6 +63,7 @@ export class MainPageView implements View {
 		});
 		this.group.add(pausePlayButtonGroup);
 
+		//The background for the button
 		const pausePlayBox = new Konva.Rect({
 			x: 0,
 			y: 0,
@@ -94,27 +75,34 @@ export class MainPageView implements View {
 		})
 		pausePlayButtonGroup.add(pausePlayBox);
 
+		const pauseLogo = new Konva.Group({visible: true});
+		pauseLogo.position({x: pausePlayBox.x() + 11, y: pausePlayBox.y() + 11});
+
 		const pauseLogo1 = new Konva.Rect({
-			x: pausePlayBox.x() + 11,
-			y: pausePlayBox.y() + 10,
+			x: 0,
+			y: 0,
 			width: 14,
 			height: 40,
 			fill: 'black',
 			cornerRadius: 4
 		});
-		pausePlayButtonGroup.add(pauseLogo1);
+		pauseLogo.add(pauseLogo1);
 
 		const pauseLogo2 = new Konva.Rect({
 			x: pauseLogo1.x() + pauseLogo1.width() + 10,
-			y: pausePlayBox.y() + 10,
+			y: 0,
 			width: 14,
 			height: 40,
 			fill: 'black',
 			cornerRadius: 4
 		});
-		pausePlayButtonGroup.add(pauseLogo2);
+		pauseLogo.add(pauseLogo2);
 
-		// white triangle (play symbol) centered inside the rounded background
+		pauseLogo.offsetX(pauseLogo.width() / 2);
+		pauseLogo.offsetY(pauseLogo.height() / 2);
+		pausePlayButtonGroup.add(pauseLogo);
+
+		// Logo that makes pause/play button play
 		const playLogo = new Konva.RegularPolygon({
 			x: 25,
 			y: 30,
@@ -124,30 +112,30 @@ export class MainPageView implements View {
 			rotation: 90,
 			visible: false
 		});
-		// playLogo.offsetX(playLogo.width());
-		// playLogo.offsetY(playLogo.height());	
 		pausePlayButtonGroup.add(playLogo);
 
-		pausePlayButtonGroup.on('click tap', () => playPauseGame(pauseLogo1.visible()));
+
+		pausePlayButtonGroup.on('mouseover', onAnswerHoverStart);
+		pausePlayButtonGroup.on('mouseout', onAnswerHoverEnd);
 		pausePlayButtonGroup.on('click tap', () => {
-			const showingPause = pauseLogo1.visible();
+			playPauseGame(pauseLogo1.visible())
+			const showingPause = pauseLogo.visible();
 			if (showingPause) {
 				// switch to play icon
-				pauseLogo1.visible(false);
-				pauseLogo2.visible(false);
+				pauseLogo.visible(false);
+				//pauseLogo2.visible(false);
 				playLogo.visible(true);
 			} else {
 				// switch to pause icon
-				pauseLogo1.visible(true);
-				pauseLogo2.visible(true);
+				pauseLogo.visible(true);
+				//pauseLogo2.visible(true);
 				playLogo.visible(false);
 			}
 			// call controller with whether game is now paused (play icon visible => paused)
 			playPauseGame(playLogo.visible());
 			pausePlayButtonGroup.getLayer()?.draw();
 		});
-		pausePlayButtonGroup.on('mouseover', onAnswerHoverStart);
-		pausePlayButtonGroup.on('mouseout', onAnswerHoverEnd);
+		
 
 
 		//Health bar that visualizes the health of the player's character
