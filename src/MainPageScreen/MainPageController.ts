@@ -1,6 +1,8 @@
 import { ScreenController, type ScreenSwitcher } from "../types";
 import { MainPageModel } from "./MainPageModel";
 import { MainPageView } from "./MainPageView";
+import { GAMECST } from "../constants";
+import {GlobalState} from "../storageManager"
 
 export class MainPageController extends ScreenController {
     private model: MainPageModel;
@@ -26,6 +28,32 @@ export class MainPageController extends ScreenController {
             () => this.handleAnswerHoverStart(),
             () => this.handleAnswerHoverEnd()
         );
+
+        this.setupGlobalStateListener();
+    }
+
+    /**
+     * function for activating listener for stored data change to trigger resync
+     */
+    setupGlobalStateListener(): void {
+        // Listen for changes made by other windows (automatic updates when saving)
+        window.addEventListener('storage', (event: StorageEvent) => {
+            // Check if the change was made to the same key
+            if (event.key === GAMECST.GLOBAL_DATA_KEY) {
+                // event.newValue holds the new JSON string
+                if (event.newValue) {
+                    try {
+                        const newState = JSON.parse(event.newValue) as GlobalState;
+                        
+                        // Update data with loaded data from JSON
+                        this.model.currentRound=newState.currentRound;
+                        
+                    } catch (e) {
+                        console.error("Failed to parse storage update:", e);
+                    }
+                }
+            }
+        });
     }
 
     //TODO: Create counter variable to announce what specific round player is on
@@ -140,13 +168,55 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * clears timer for new questions
+     * pauses question timer to be resumed later
      */
-    private clearQuestionTimer(): void {
+    private pauseQuestionTimer(): void {
         if (this.model.questionTimerId !== null) {
             clearInterval(this.model.questionTimerId);
             this.model.questionTimerId = null;
         }
+    }
+
+    /**
+     * resumes question timer after being paused
+     */
+    private resumeQuestionTimer(): void {
+        // if timer is already running, do nothing
+        if (this.model.questionTimerId !== null) return;
+
+        // if resume is called without calling start first
+        if (this.model.questionTimeRemaining <= 0) {
+            this.onQuestionTimeout();
+            return;
+        }
+
+        // Update UI with current remaining time
+        this.updateTimer(this.model.questionTimeRemaining);
+
+        // resume countdown
+        this.model.questionTimerId = window.setInterval(() => {
+            this.model.questionTimeRemaining--;
+            this.updateTimer(this.model.questionTimeRemaining);
+
+            if (this.model.questionTimeRemaining <= 0) {
+                this.onQuestionTimeout();
+            }
+        }, 1000);
+    }
+
+    /**
+     * clears timer for new questions
+     */
+    private clearQuestionTimer(): void {
+        // stop timer if running
+        if (this.model.questionTimerId !== null) {
+            clearInterval(this.model.questionTimerId);
+            this.model.questionTimerId = null;
+        }
+
+        // remove saved remaining time
+        this.model.questionTimeRemaining = 0;
+        this.updateTimer(this.model.questionTimeRemaining);
     }
 
     /**
@@ -411,16 +481,14 @@ export class MainPageController extends ScreenController {
      * Pause the game
      */
     pauseGame(): void {
-        this.clearQuestionTimer();
+        this.pauseQuestionTimer();
     }
 
     /**
      * Resume the game
      */
     resumeGame(): void {
-        if (!this.model.questionTimerId) {
-            this.startQuestionTimer();
-        }
+        this.resumeQuestionTimer();
     }
 
 

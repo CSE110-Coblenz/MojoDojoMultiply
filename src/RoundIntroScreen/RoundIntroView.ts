@@ -9,6 +9,7 @@ export class RoundIntroView {
     this.group = new Konva.Group({ visible: false });
 
     this.roundText = new Konva.Text({
+      //TODO: implement displaying saved round info from GameState
       text: "Round 1",
       x: 200,
       y: 150,
