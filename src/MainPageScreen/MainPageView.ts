@@ -24,6 +24,7 @@ export class MainPageView implements View {
 	// constructor for the interface Main page interface
 	constructor(
 		onAnswerClick: (answer: number) => void,
+		playPauseGame: (pauseGame: boolean) => void,
 		onAnswerHoverStart: () => void,
 		onAnswerHoverEnd: () => void
 	) {
@@ -62,16 +63,91 @@ export class MainPageView implements View {
 		// Score display (bottom-center). origin will be set to the center so
 		// the text remains centered as its content changes.
 		this.scoreText = new Konva.Text({
-			x: GAMECST.STAGE_WIDTH - 100,
-			y: 30,
+			x: GAMECST.STAGE_WIDTH - 80,
+			y: 20,
 			text: "Score: 0",
 			fontSize: 32,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: "black",
 		});
 		// make origin the visual center
-		this.scoreText.offsetY(this.scoreText.height() / 2);
+		this.scoreText.offsetX(this.scoreText.width() / 2);
 		this.group.add(this.scoreText);
+
+		//Pause Button that allows users to pause the game
+
+		const pausePlayButtonGroup = new Konva.Group({ 
+			visible: true,
+			x: 20,
+			y: 20
+		});
+		this.group.add(pausePlayButtonGroup);
+
+		const pausePlayBox = new Konva.Rect({
+			x: 0,
+			y: 0,
+			width: 60,
+			height: 60,
+			stroke: 'black',
+			strokeWidth: 4,
+			fill: 'grey'
+		})
+		pausePlayButtonGroup.add(pausePlayBox);
+
+		const pauseLogo1 = new Konva.Rect({
+			x: pausePlayBox.x() + 11,
+			y: pausePlayBox.y() + 10,
+			width: 14,
+			height: 40,
+			fill: 'black',
+			cornerRadius: 4
+		});
+		pausePlayButtonGroup.add(pauseLogo1);
+
+		const pauseLogo2 = new Konva.Rect({
+			x: pauseLogo1.x() + pauseLogo1.width() + 10,
+			y: pausePlayBox.y() + 10,
+			width: 14,
+			height: 40,
+			fill: 'black',
+			cornerRadius: 4
+		});
+		pausePlayButtonGroup.add(pauseLogo2);
+
+		// white triangle (play symbol) centered inside the rounded background
+		const playLogo = new Konva.RegularPolygon({
+			x: 25,
+			y: 30,
+			sides: 3,
+			radius: 25,
+			fill: 'black',
+			rotation: 90,
+			visible: false
+		});
+		// playLogo.offsetX(playLogo.width());
+		// playLogo.offsetY(playLogo.height());	
+		pausePlayButtonGroup.add(playLogo);
+
+		pausePlayButtonGroup.on('click tap', () => playPauseGame(pauseLogo1.visible()));
+		pausePlayButtonGroup.on('click tap', () => {
+			const showingPause = pauseLogo1.visible();
+			if (showingPause) {
+				// switch to play icon
+				pauseLogo1.visible(false);
+				pauseLogo2.visible(false);
+				playLogo.visible(true);
+			} else {
+				// switch to pause icon
+				pauseLogo1.visible(true);
+				pauseLogo2.visible(true);
+				playLogo.visible(false);
+			}
+			// call controller with whether game is now paused (play icon visible => paused)
+			playPauseGame(playLogo.visible());
+			pausePlayButtonGroup.getLayer()?.draw();
+		});
+		pausePlayButtonGroup.on('mouseover', onAnswerHoverStart);
+		pausePlayButtonGroup.on('mouseout', onAnswerHoverEnd);
 
 
 		//Health bar that visualizes the health of the player's character
@@ -156,8 +232,6 @@ export class MainPageView implements View {
 			// add to the fighting stage group
 			fightingStage.add(image);
 		});
-
-
 
 		// Create four answer squares in a 2x2 grid pattern in the center of the screen
 		const squareSize = 80;
@@ -334,6 +408,8 @@ export class MainPageView implements View {
 		[answer1Group, answer2Group, answer3Group, answer4Group].forEach((g, i) =>
 			g.add(this.answerTexts[i])
 		);
+
+
 	}
 
 	/**
@@ -342,12 +418,13 @@ export class MainPageView implements View {
 	setScoreText(scoreText: string): void {
 		this.scoreText.text(scoreText);
 		// update origin so the text remains centered as width/height change
-		this.scoreText.offsetX(this.scoreText.width() / 2);
-		this.scoreText.offsetY(this.scoreText.height() / 2);
+		// this.scoreText.offsetX(this.scoreText.width() / 2);
+		// this.scoreText.offsetY(this.scoreText.height() / 2);
 		// keep positioned at bottom-center
 		// this.scoreText.position({ x: GAMECST.STAGE_WIDTH / 2, y: GAMECST.STAGE_HEIGHT - 30 });
 		this.group.getLayer()?.draw();
 	}
+	
 
 	/**
 	 * Internal method to update timer text
