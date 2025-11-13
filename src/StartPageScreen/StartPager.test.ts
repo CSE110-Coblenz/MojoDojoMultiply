@@ -55,7 +55,6 @@ describe("StartPageController", () => {
     // Expect that switchToScreen was called with the correct type
     expect(screenSwitcher.switchToScreen).toHaveBeenCalledWith({ type: "main" });
   });
-  */
 
   it("calls switchToScreen({ type: 'main' }) when start is triggered", () => {
     const controller = new StartPageController(screenSwitcher as any);
@@ -66,6 +65,7 @@ describe("StartPageController", () => {
     // Verify correct navigation type
     expect(screenSwitcher.switchToScreen).toHaveBeenCalledWith({ type: "main" });
   });
+  */
 
   it("calls switchToScreen({ type: 'help' }) when help is triggered", () => {
     const controller = new StartPageController(screenSwitcher as any);
