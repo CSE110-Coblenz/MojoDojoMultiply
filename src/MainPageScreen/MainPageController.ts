@@ -140,13 +140,55 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * clears timer for new questions
+     * pauses question timer to be resumed later
      */
-    private clearQuestionTimer(): void {
+    private pauseQuestionTimer(): void {
         if (this.model.questionTimerId !== null) {
             clearInterval(this.model.questionTimerId);
             this.model.questionTimerId = null;
         }
+    }
+
+    /**
+     * resumes question timer after being paused
+     */
+    private resumeQuestionTimer(): void {
+        // if timer is already running, do nothing
+        if (this.model.questionTimerId !== null) return;
+
+        // if resume is called without calling start first
+        if (this.model.questionTimeRemaining <= 0) {
+            this.onQuestionTimeout();
+            return;
+        }
+
+        // Update UI with current remaining time
+        this.updateTimer(this.model.questionTimeRemaining);
+
+        // resume countdown
+        this.model.questionTimerId = window.setInterval(() => {
+            this.model.questionTimeRemaining--;
+            this.updateTimer(this.model.questionTimeRemaining);
+
+            if (this.model.questionTimeRemaining <= 0) {
+                this.onQuestionTimeout();
+            }
+        }, 1000);
+    }
+
+    /**
+     * clears timer for new questions
+     */
+    private clearQuestionTimer(): void {
+        // stop timer if running
+        if (this.model.questionTimerId !== null) {
+            clearInterval(this.model.questionTimerId);
+            this.model.questionTimerId = null;
+        }
+
+        // remove saved remaining time
+        this.model.questionTimeRemaining = 0;
+        this.updateTimer(this.model.questionTimeRemaining);
     }
 
     /**
@@ -411,16 +453,14 @@ export class MainPageController extends ScreenController {
      * Pause the game
      */
     pauseGame(): void {
-        this.clearQuestionTimer();
+        this.pauseQuestionTimer();
     }
 
     /**
      * Resume the game
      */
     resumeGame(): void {
-        if (!this.model.questionTimerId) {
-            this.startQuestionTimer();
-        }
+        this.resumeQuestionTimer();
     }
 
 
