@@ -3,6 +3,7 @@ import type { View } from "../types";
 import { STAGE_WIDTH } from "../constants";
 import { GAMECST } from "../constants.js";
 import { LeaderboardEntry } from "./ResultsPageModel";
+import { ResultsScreenController } from "./ResultsPageController";
 
 /**
  * ResultsScreenView - Renders the results screen
@@ -44,7 +45,7 @@ export class ResultsPageView implements View {
     this.finalScoreText.offsetX(this.finalScoreText.width() / 2);
     this.group.add(this.finalScoreText);
 
-    // Victor card + boxer image
+    // Victor card & boxer image
     this.loadStickFigure();
 
     // Leaderboard text
