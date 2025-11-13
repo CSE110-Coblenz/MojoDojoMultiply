@@ -435,10 +435,11 @@ export class MainPageController extends ScreenController {
         this.clickSound.play();
         this.clickSound.currentTime = 0;
 
+        // * game ending is handled in applyDamageAndAdvance
         // Check if game should end due to health
-        if (this.model.playerHealth <= 0 || this.model.opponentHealth <= 0) {
-            this.endGame();
-        }
+        // if (this.model.playerHealth <= 0 || this.model.opponentHealth <= 0) {
+        //     this.endGame();
+        // }
     }
 
     //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet
