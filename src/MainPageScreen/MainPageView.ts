@@ -34,7 +34,7 @@ export class MainPageView implements View {
 		onHoverStart: () => void,
 		onHoverEnd: () => void,
 		onStartClick: () => void,
-		onHelpClick: () => void
+		onHelpClick: () => void,
 	) {
 		this.group = new Konva.Group({ visible: false });
 
@@ -53,7 +53,7 @@ export class MainPageView implements View {
 		this.scoreText = new Konva.Text({
 			x: GAMECST.STAGE_WIDTH - 40,
 			y: 35,
-			text: "Score: 0",
+			text: "Score: 0000",
 			fontSize: 30,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR,

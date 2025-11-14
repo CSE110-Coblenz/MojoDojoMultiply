@@ -29,7 +29,7 @@ export class MainPageController extends ScreenController {
             () => this.handleHoverStart(),
             () => this.handleHoverEnd(),
             () => this.handleStartClick(),
-            () => this.handleHelpClick()
+            () => this.handleHelpClick(),
         );
 
         this.setupGlobalStateListener();
@@ -211,6 +211,7 @@ export class MainPageController extends ScreenController {
      * Switches the screen to the start page when the pause menu button is clicked
      */
     private handleStartClick(): void {
+        this.endGameEarly();
         this.screenSwitcher.switchToScreen({ type: "start" });
     }
 
@@ -521,15 +522,12 @@ export class MainPageController extends ScreenController {
     /**
      * End the game which for now just goes back to the start screen
      */
-    private endGame(): void {
+    private endGameEarly(): void {
         this.clearQuestionTimer();
-        this.model.currentRound += 1;
-
-        // Switch back to start screen
-        this.screenSwitcher.switchToScreen({
-            type: "roundIntro",
-            round: this.model.currentRound
-        });
+        this.model.score = 0;
+        this.model.playerHealth = this.model.maxHealth;
+        this.model.opponentHealth = this.model.maxHealth;
+        this.handlePausePlayGame();
     }
 
     /**
