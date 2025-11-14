@@ -1,5 +1,6 @@
 import { ScreenController, type ScreenSwitcher } from "../types";
 import { BonusLevelView } from "./BonusLevelView";
+import { BonusLevelModel } from "./BonusLevelModel";
 
 export class BonusLevelController extends ScreenController {
   private view: BonusLevelView;
