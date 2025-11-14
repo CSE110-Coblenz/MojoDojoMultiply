@@ -9,6 +9,7 @@ import { PracticeAreaController } from "./PracticeAreaScreen/PracticeAreaControl
 import { ResultsScreenController} from "./ResultsPageScreen/ResultsPageController";
 import { RoundIntroController } from "./RoundIntroScreen/RoundIntroController";
 import { RoundStatsController } from "./RoundStatsScreen/RoundStatsController";
+import { BonusLevelController } from "./BonusLevelScreen/BonusLevelController";
 
 class App implements ScreenSwitcher {
   private stage: Konva.Stage;
@@ -21,6 +22,7 @@ class App implements ScreenSwitcher {
   private resultsController: ResultsScreenController;
   private roundIntroController: RoundIntroController;
   private roundStatsController: RoundStatsController;
+  private bonusController: BonusLevelController;
 
   constructor(containerId: string) {
     this.stage = new Konva.Stage({
@@ -39,6 +41,7 @@ class App implements ScreenSwitcher {
     this.resultsController = new ResultsScreenController(this);
     this.roundIntroController = new RoundIntroController(this);
     this.roundStatsController = new RoundStatsController(this);
+    this.bonusController = new BonusLevelController(this);
 
     // Add screen groups to same layer
     this.layer.add(this.startController.getView().getGroup());
@@ -48,6 +51,7 @@ class App implements ScreenSwitcher {
     this.layer.add(this.resultsController.getView().getGroup());
     this.layer.add(this.roundIntroController.getView().getGroup());
     this.layer.add(this.roundStatsController.getView().getGroup());
+    this.layer.add(this.bonusController.getView().getGroup());
 
     this.layer.draw();
 
@@ -80,6 +84,9 @@ class App implements ScreenSwitcher {
         break;
       case "results":
         this.resultsController.show()
+        break;
+      case "bonus":
+        this.bonusController.show()
         break;
     }
   }
