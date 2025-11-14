@@ -18,14 +18,6 @@ export class HelpPageController extends ScreenController {
     }
 
     /**
-     * Handle leave button click
-     */
-    private handleLeaveClick(): void {
-        // TODO: Implement screen transition from helpScreen to start screen
-        this.screenSwitcher.switchToScreen({ type: "start" });
-    }
-
-    /**
      * Handle help to main game button
      */
     private handleStartGameClick(): void {
