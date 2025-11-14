@@ -12,21 +12,20 @@ export class StartPageView implements View {
     constructor(
         onStartClick: () => void,
         onHelpClick: () => void,
-        onPracticeClick: () => void
-        ) {
+        onPracticeClick: () => void,
+        onHoverStart: () => void,
+        onHoverEnd: () => void
+    ) {
         this.group = new Konva.Group({ visible: true });
 
         // Title text (part 1)
         const title1 = new Konva.Text({
-            x: STAGE_WIDTH / 2,
-			y: 150,
+            x: STAGE_WIDTH / 2 + 110,
+			y: 80,
             text: "Mojo Dojo",
-            fontSize: 48,
-            fontFamily: "Arial",
-            fill: GAMECST.HIGHLIGHT_COLOR,
-            stroke: "orange",
-            strokeWidth: 2,
-            align: "center",
+            fontSize: 100,
+            fontFamily: GAMECST.DEFAULT_FONT,
+            fill: 'black',
         });
         // Center the text using offsetX
         title1.offsetX(title1.width() / 2);
@@ -37,98 +36,137 @@ export class StartPageView implements View {
         //Want to make this an animation for it to slam onto "Mojo Dojo" (lower priority)
         const title2 = new Konva.Text({
             x: STAGE_WIDTH / 2 ,
-            y: 200,
+            y: title1.y() + title1.height() - 40,
             text: "MULTIPLY",
-            fontSize: 48,
-            fontFamily: "Arial",
+            fontSize: 180,
+            fontFamily: GAMECST.DEFAULT_FONT,
             fill: GAMECST.HIGHLIGHT_COLOR,
-            stroke: "orange",
-            strokeWidth: 2,
-            align: "center",
         });
         title2.offsetX(title2.width() / 2);
         this.group.add(title2);
 
+        //Constants for the sizes of the buttons
+        const buttonHeight = 60;
+        const buttonWidth = 250;
+        const buttonSpacing = 20;
 
+        //Group that contains the elements of the start button
         const startButtonGroup = new Konva.Group();
-        const startButton = new Konva.Rect({
-            x: STAGE_WIDTH / 2 - 100,
-            y: 275,
-            width: 200,
-            height: 60,
-            fill: GAMECST.HIGHLIGHT_COLOR,
-            cornerRadius: 10,
-            stroke: "orange",
-            strokeWidth: 3,
-        });
-        const startText = new Konva.Text({
-            x: STAGE_WIDTH / 2,
-            y: 290,
-            text: "START GAME",
-            fontSize: 24,
-            fontFamily: "Arial",
-            fill: "white",
-            align: "center",
-        });
-        startText.offsetX(startText.width() / 2);
-        startButtonGroup.add(startButton);
-        startButtonGroup.add(startText);
-        startButtonGroup.on("click", onStartClick);
         this.group.add(startButtonGroup);
 
-        //Help Button
-        const helpButtonGroup = new Konva.Group();
-        const helpButton = new Konva.Rect({
-            x: STAGE_WIDTH / 2 - 100,
-            y: 350,
-            width: 200,
-            height: 60,         
+        //Background and touch target for the start button
+        const startButton = new Konva.Rect({
+            x: STAGE_WIDTH / 2 ,
+            y: 330,
+            width: buttonWidth,
+            height: buttonHeight,
             fill: GAMECST.HIGHLIGHT_COLOR,
-            cornerRadius: 10,
-            stroke: "orange",
-            strokeWidth: 3,
+            stroke: 'black',
+            strokeWidth: 4,
         });
-        const helpText = new Konva.Text({
+        startButtonGroup.add(startButton);
+        //Center the origin point of the button
+        startButton.offsetX(startButton.width() / 2);
+
+        //Text for the start button telling the user what it does
+        const startText = new Konva.Text({
             x: STAGE_WIDTH / 2,
-            y: 365,
-            text: "HELP",
-            fontSize: 24,
-            fontFamily: "Arial",
-            fill: "white",
+            y: startButton.y() + startButton.height() / 2,
+            text: "START GAME",
+            fontSize: 35,
+            fontFamily: GAMECST.DEFAULT_FONT,
+            fill: "black",
             align: "center",
         });
-        helpText.offsetX(helpText.width() / 2);
-        helpButtonGroup.add(helpButton);
-        helpButtonGroup.add(helpText);
-        helpButtonGroup.on("click", onHelpClick); 
+        startButtonGroup.add(startText);
+        //Centering the origin of the text to its center
+        startText.offsetX(startText.width() / 2);
+        startText.offsetY(startText.height() / 2)
+        
+        //Adding click and functionalities to the button
+        startButtonGroup.on("click", onStartClick);
+        startButtonGroup.on("mouseover", onHoverStart);
+        startButtonGroup.on("mouseout", onHoverEnd);
+
+
+        //Help Button that takes the user to the help page
+        const helpButtonGroup = new Konva.Group();
         this.group.add(helpButtonGroup);
 
-        //Practice Button
-        const practiceButtonGroup = new Konva.Group();
-        const practiceButton = new Konva.Rect({
-            x: STAGE_WIDTH / 2 - 125,
-            y: 425,
-            width: 250,
-            height: 60,
-            fill: GAMECST.HIGHLIGHT_COLOR,
-            cornerRadius: 10,
-            stroke: "orange",
-            strokeWidth: 3,
-        });
-        const practiceText = new Konva.Text({
+        const helpButton = new Konva.Rect({
             x: STAGE_WIDTH / 2,
-            y: 440,
-            text: "PRACTICE ARENA",
-            fontSize: 24,
-            fontFamily: "Arial",
-            fill: "white",
+            y: startButton.y() + startButton.height() + buttonSpacing,
+            width: buttonWidth,
+            height: buttonHeight,         
+            fill: GAMECST.HIGHLIGHT_COLOR,
+            stroke: "black",
+            strokeWidth: 4,
+        });
+        helpButtonGroup.add(helpButton);
+        
+        //Centering the origin of the button in its center
+        helpButton.offsetX(helpButton.width() / 2)
+
+        //Text that tells the user what the help button does
+        const helpText = new Konva.Text({
+            x: STAGE_WIDTH / 2,
+            y: helpButton.y() + helpButton.height() / 2,
+            text: "HELP",
+            fontSize: 35,
+            fontFamily: GAMECST.DEFAULT_FONT,
+            fill: "black",
             align: "center",
         });
-        practiceText.offsetX(practiceText.width() / 2);
-        practiceButtonGroup.add(practiceButton);
-        practiceButtonGroup.add(practiceText);
-        practiceButtonGroup.on("click", onPracticeClick); 
+        helpButtonGroup.add(helpText);
+
+        //Center the origin of the button in its center
+        helpText.offsetX(helpText.width() / 2);
+        helpText.offsetY(helpText.height() / 2);
+
+        //Adding hover and click functionalities to the help button
+        helpButtonGroup.on("click", onHelpClick); 
+        helpButtonGroup.on("mouseover", onHoverStart);
+        helpButtonGroup.on("mouseout", onHoverEnd);
+        
+
+        //Practice Button that takes the user to the practice grounds
+        const practiceButtonGroup = new Konva.Group();
         this.group.add(practiceButtonGroup);
+
+        const practiceButton = new Konva.Rect({
+            x: STAGE_WIDTH / 2,
+            y: helpButton.y() + startButton.height() + buttonSpacing,
+            width: buttonWidth,
+            height: buttonHeight,
+            fill: GAMECST.HIGHLIGHT_COLOR,
+            stroke: "black",
+            strokeWidth: 4,
+        });
+        practiceButtonGroup.add(practiceButton);
+
+        //Center the origin of the button on the button itself
+        practiceButton.offsetX(practiceButton.width() / 2);
+
+        const practiceText = new Konva.Text({
+            x: STAGE_WIDTH / 2,
+            y: practiceButton.y() + practiceButton.height() / 2,
+            text: "PRACTICE ARENA",
+            fontSize: 35,
+            fontFamily: GAMECST.DEFAULT_FONT,
+            fill: "black",
+            align: "center",
+        });
+        practiceButtonGroup.add(practiceText);
+
+        //Center the origin of the button on itself
+        practiceText.offsetX(practiceText.width() / 2);
+        practiceText.offsetY(practiceText.height() / 2)
+        
+        //Adding click and hover functionalities to the practice button
+        practiceButtonGroup.on("click", onPracticeClick); 
+        practiceButtonGroup.on("mouseover", onHoverStart);
+        practiceButtonGroup.on("mouseout", onHoverEnd);
+        
     }
 
     /**
