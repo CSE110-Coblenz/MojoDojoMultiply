@@ -57,6 +57,8 @@ class App implements ScreenSwitcher {
   }
 
   switchToScreen(screen: Screen): void {
+    console.log("switchToScreen called ->", screen);
+    console.trace();
     this.startController.hide();
     this.mainController.hide();
     this.helpController.hide();
