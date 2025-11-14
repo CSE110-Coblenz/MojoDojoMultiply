@@ -1,6 +1,6 @@
 import Konva from "konva";
 import type { View } from "../types.js";
-import { GAMECST } from "../constants.js";
+import { DARK_COLOR, GAMECST } from "../constants.js";
 
 /**
  * MainPageView - Renders the main game screen
@@ -11,6 +11,7 @@ export class MainPageView implements View {
     private readonly timerImageNodes: Konva.Image[] = [];
 	private scoreText: Konva.Text;
 	private timerText: Konva.Text;
+	private roundText: Konva.Text;
 	private questionText: Konva.Text;
 	private answerTexts: Konva.Text[];
 	private playerHealthBar: Konva.Rect;
@@ -21,6 +22,7 @@ export class MainPageView implements View {
 	private opponentAvatar?: Konva.Image;
 	public pauseLogo?: Konva.Group;
 	public playLogo?: Konva.RegularPolygon;
+	public pauseMenu?: Konva.Group;
 
 	
 	// constructor for the interface Main page interface
@@ -38,23 +40,36 @@ export class MainPageView implements View {
 			y: 0,
 			width: GAMECST.STAGE_WIDTH,
 			height: GAMECST.STAGE_HEIGHT,
-			fill: "#FFFFC5"
+			fill: GAMECST.BCKGRD_COLOR
 		});
 		this.group.add(bg);
 
 		// Score display (bottom-center). origin will be set to the center so
 		// the text remains centered as its content changes.
 		this.scoreText = new Konva.Text({
-			x: GAMECST.STAGE_WIDTH - 80,
-			y: 20,
+			x: GAMECST.STAGE_WIDTH - 40,
+			y: 35,
 			text: "Score: 0",
-			fontSize: 32,
+			fontSize: 30,
 			fontFamily: GAMECST.DEFAULT_FONT,
-			fill: "black",
+			fill: GAMECST.DARK_COLOR,
 		});
 		// make origin the visual center
-		this.scoreText.offsetX(this.scoreText.width() / 2);
+		this.scoreText.offsetX(this.scoreText.width());
 		this.group.add(this.scoreText);
+
+		//TODO: Add function that changes the round number
+		this.roundText = new Konva.Text({
+			x: GAMECST.STAGE_WIDTH / 2,
+			Y: GAMECST.STAGE_HEIGHT - 30,
+			text: "ROUND 1",
+			fontSize: 40,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			fill: GAMECST.DARK_COLOR
+		});
+		this.roundText.offsetX(this.roundText.width() / 2);
+		this.roundText.offsetY(this.roundText.height());
+		this.group.add(this.roundText);
 
 		//Group that holds the pause/play button
 		//The button allows the user to pause/play the gameplay 
@@ -71,9 +86,9 @@ export class MainPageView implements View {
 			y: 0,
 			width: 60,
 			height: 60,
-			stroke: 'black',
+			stroke: GAMECST.DARK_COLOR,
 			strokeWidth: 4,
-			fill: 'grey'
+			fill: GAMECST.NEUTRAL_COLOR
 		})
 		pausePlayButtonGroup.add(pausePlayBox);
 
@@ -89,7 +104,7 @@ export class MainPageView implements View {
 			y: 0,
 			width: 14,
 			height: 40,
-			fill: 'black',
+			fill: GAMECST.DARK_COLOR,
 			cornerRadius: 4
 		});
 		this.pauseLogo.add(pauseLogo1);
@@ -100,7 +115,7 @@ export class MainPageView implements View {
 			y: 0,
 			width: 14,
 			height: 40,
-			fill: 'black',
+			fill: GAMECST.DARK_COLOR,
 			cornerRadius: 4
 		});
 		this.pauseLogo.add(pauseLogo2);
@@ -115,7 +130,7 @@ export class MainPageView implements View {
 			y: 30,
 			sides: 3,
 			radius: 25,
-			fill: 'black',
+			fill: GAMECST.DARK_COLOR,
 			rotation: 90,
 			visible: false
 		});
@@ -140,9 +155,9 @@ export class MainPageView implements View {
 			y: GAMECST.STAGE_HEIGHT * 2 / 3,
 			width: healthBarWidth,
 			height: 40,
-			stroke: 'black',
+			stroke: GAMECST.DARK_COLOR,
 			strokeWidth: 4,
-			fill: 'grey'
+			fill: GAMECST.NEUTRAL_COLOR
 		});
 		playerHealthGroup.add(playerBarBacking);
 
@@ -167,9 +182,9 @@ export class MainPageView implements View {
 			y: playerBarBacking.y(),
 			width: healthBarWidth,
 			height: 40,
-			stroke: 'black',
+			stroke: GAMECST.DARK_COLOR,
 			strokeWidth: 4,
-			fill: 'grey'
+			fill: GAMECST.NEUTRAL_COLOR
 		});
 		opponentHealthGroup.add(opponentBarBacking);
 
@@ -256,7 +271,7 @@ export class MainPageView implements View {
 			width: totalWidth,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
-			stroke: 'black',
+			stroke: GAMECST.DARK_COLOR,
 			strokeWidth: 4
 		});
 		questionGroup.add(questionBox);
@@ -272,7 +287,7 @@ export class MainPageView implements View {
 			width: squareSize,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
-			stroke: 'black',
+			stroke: GAMECST.DARK_COLOR,
 			strokeWidth: 4
 		});
 		answer1Group.add(answer1Box);
@@ -287,7 +302,7 @@ export class MainPageView implements View {
 			width: squareSize,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
-			stroke: 'black',
+			stroke: GAMECST.DARK_COLOR,
 			strokeWidth: 4
 		});
 		answer2Group.add(answer2Box);
@@ -302,7 +317,7 @@ export class MainPageView implements View {
 			width: squareSize,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
-			stroke: 'black',
+			stroke: GAMECST.DARK_COLOR,
 			strokeWidth: 4
 		});
 		answer3Group.add(answer3Box);
@@ -317,7 +332,7 @@ export class MainPageView implements View {
 			width: squareSize,
 			height: squareSize,
 			fill: GAMECST.HIGHLIGHT_COLOR,
-			stroke: 'black',
+			stroke: GAMECST.DARK_COLOR,
 			strokeWidth: 4
 		});
 		answer4Group.add(answer4Box);
@@ -329,7 +344,7 @@ export class MainPageView implements View {
 			text: ``,
 			fontSize: 30,
 			fontFamily: GAMECST.DEFAULT_FONT,
-			fill: 'Black'
+			fill: GAMECST.DARK_COLOR
 		});
 		// Center the question text within its box
 		questionGroup.add(this.questionText);
@@ -343,7 +358,7 @@ export class MainPageView implements View {
 				text: `${allAnswers[0]}`,
 				fontSize: 30,
 				fontFamily: GAMECST.DEFAULT_FONT,
-				fill: 'Black'
+				fill: GAMECST.DARK_COLOR
 			}),
 			//The answer in box 2 (upper-right corner)
 			new Konva.Text({
@@ -352,7 +367,7 @@ export class MainPageView implements View {
 				text: `${allAnswers[1]}`,
 				fontSize: 30,
 				fontFamily: GAMECST.DEFAULT_FONT,
-				fill: 'Black'
+				fill: GAMECST.DARK_COLOR
 			}),
 			//The answer in box 3 (lower-left corner)
 			new Konva.Text({
@@ -361,7 +376,7 @@ export class MainPageView implements View {
 				text: `${allAnswers[2]}`,
 				fontSize: 30,
 				fontFamily: GAMECST.DEFAULT_FONT,
-				fill: 'Black'
+				fill: GAMECST.DARK_COLOR
 			}),
 			//The answer in box 4 (lower-right corner)
 			new Konva.Text({
@@ -370,7 +385,7 @@ export class MainPageView implements View {
 				text: `${allAnswers[3]}`,
 				fontSize: 30,
 				fontFamily: GAMECST.DEFAULT_FONT,
-				fill: 'Black'
+				fill: GAMECST.DARK_COLOR
 			})
 		
 		];
@@ -398,7 +413,120 @@ export class MainPageView implements View {
 			g.add(this.answerTexts[i])
 		);
 
+		//Menu that appears when you pause the game
+		this.pauseMenu = new Konva.Group;
+		this.pauseMenu.position({x:20, y:100});
+		this.group.add(this.pauseMenu);
+		this.pauseMenu.visible(false);
 
+		//Background of the pause screen that prevents the clicking of game buttons
+		const pauseScreen = new Konva.Rect({
+			x: 0,
+			y: 0,
+			width: GAMECST.STAGE_WIDTH - 40,
+			height: GAMECST.STAGE_HEIGHT - 200,
+			fill: GAMECST.UNAVAIL_COLOR,
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 4,
+			opacity: 0.95
+		});
+		this.pauseMenu.add(pauseScreen);
+
+		//Text that tells the user the game is paused
+		const pauseScreenText = new Konva.Text({
+			x: pauseScreen.width() / 2,
+			y: pauseScreen.height() / 5,
+			text: "Game Paused",
+			fontSize: 60,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			fill: DARK_COLOR,
+		});
+		this.pauseMenu.add(pauseScreenText);
+
+		//Center and add the text to the group
+		pauseScreenText.offsetX(pauseScreenText.width() / 2);
+		pauseScreenText.offsetY(pauseScreenText.height() / 2);
+		this.pauseMenu.add(pauseScreenText);
+
+		//Group containing navigation elements of the pause menu
+		const pauseScreenOptions = new Konva.Group({
+			x: pauseScreen.width() / 2, 
+			y: pauseScreen.height() * 3 / 4
+		});
+		this.pauseMenu.add(pauseScreenOptions);
+
+		const pauseButtonWidth = 200;
+		const pauseButtonSpacing = 80;
+		const pauseButtonHeight = 50;
+		
+		//Center the button group with its size
+		pauseScreenOptions.offsetX(pauseButtonWidth + pauseButtonSpacing / 2);
+		pauseScreenOptions.offsetY(pauseButtonHeight / 2);
+
+		//Button that takes the user back to the start screen
+		//TODO: add navigation function to the button
+		const startPageButton = new Konva.Group({});
+		pauseScreenOptions.add(startPageButton);
+
+		//Background of the button that is the touch target
+		const startPageButtonBackground = new Konva.Rect({
+			x: 0,
+			y: 0,
+			width: 200,
+			height: 50,
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 4,
+			fill: GAMECST.HIGHLIGHT_COLOR,
+		});
+		startPageButton.add(startPageButtonBackground);
+
+		//Text for the start page button to tell the user what it does
+		const startPageText = new Konva.Text({
+			x: startPageButtonBackground.x() + startPageButtonBackground.width() / 2,
+			y: startPageButtonBackground.y() + startPageButtonBackground.height() / 2,
+			text: "Main Menu",
+			fontSize: 40,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			fill: DARK_COLOR,
+		})
+		startPageButton.add(startPageText);
+
+		//Center the button
+		startPageText.offsetX(startPageText.width() / 2);
+		startPageText.offsetY(startPageText.height() / 2);
+
+		//Button that takes the user back to the start screen
+		//TODO: add navigation function to the button
+		const helpPageButton = new Konva.Group({});
+		pauseScreenOptions.add(helpPageButton);
+
+		//Button that takes the user to the help screen
+		//TODO: add navigation function to the button
+		const helpPageButtonBackground = new Konva.Rect({
+			x: startPageButtonBackground.width() + 80,
+			y: 0,
+			width: 200,
+			height: 50,
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 4,
+			fill: GAMECST.HIGHLIGHT_COLOR,
+		});
+		helpPageButton.add(helpPageButtonBackground);
+		
+		//Text for the start page button to tell the user what it does
+		const helpPageText = new Konva.Text({
+			x: helpPageButtonBackground.x() + helpPageButtonBackground.width() / 2,
+			y: helpPageButtonBackground.y() + helpPageButtonBackground.height() / 2,
+			text: "Help Page",
+			fontSize: 40,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			fill: DARK_COLOR,
+		})
+		helpPageButton.add(helpPageText);
+
+		//Center the button
+		helpPageText.offsetX(helpPageText.width() / 2);
+		helpPageText.offsetY(helpPageText.height() / 2);
 	}
 
 	/**

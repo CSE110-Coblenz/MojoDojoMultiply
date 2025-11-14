@@ -82,7 +82,7 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * Generate a new question whiele setting up computer's response and their timing
+     * Generate a new question while setting up computer's response and their timing
      * @returns void
      */
     private generateNewQuestion(): void {
@@ -500,6 +500,7 @@ export class MainPageController extends ScreenController {
         this.model.gamePaused = true;
         this.view.pauseLogo?.visible(false);
         this.view.playLogo?.visible(true);
+        this.view.pauseMenu?.visible(true);
     }
 
     /**
@@ -510,6 +511,7 @@ export class MainPageController extends ScreenController {
         this.model.gamePaused = false;
         this.view.pauseLogo?.visible(true);
         this.view.playLogo?.visible(false);
+        this.view.pauseMenu?.visible(false);
     }
 
 
