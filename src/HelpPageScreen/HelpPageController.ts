@@ -11,8 +11,9 @@ export class HelpPageController extends ScreenController {
         super();
         this.screenSwitcher = screenSwitcher;
         this.view = new HelpPageView(
-            () => this.handleLeaveClick(),
-            () => this.handleStartClick()
+            () => this.handleMenuClick(),
+            () => this.handleStartGameClick(),
+            () => this.handleStartPracticeClick()
         );
     }
 
@@ -20,24 +21,36 @@ export class HelpPageController extends ScreenController {
      * Handle leave button click
      */
     private handleLeaveClick(): void {
-     // TODO: Implement screen transition from helpScreen to start screen
-     this.screenSwitcher.switchToScreen({ type: "start" });
+        // TODO: Implement screen transition from helpScreen to start screen
+        this.screenSwitcher.switchToScreen({ type: "start" });
     }
 
     /**
      * Handle help to main game button
      */
-    private handleStartClick(): void {
-     // TODO: Implement screen transition from helpScreen to mainGame
-     // TODO: Implement round incrementing
-     const state = getGlobalState();
-     const startRound = state.currentRound;
-     this.screenSwitcher.switchToScreen({ type: "main", round:startRound });
+    private handleStartGameClick(): void {
+        const state = getGlobalState();
+        const startRound = state.currentRound;
+        this.screenSwitcher.switchToScreen({ type: "roundIntro", round:startRound });
     }
 
-     /**
-         * Get the view
-         */
+    /**
+     * 
+     */
+    private handleMenuClick(): void {
+        this.screenSwitcher.switchToScreen({ type: "start"});
+    }
+
+    /**
+     * 
+     */
+    private handleStartPracticeClick(): void {
+        this.screenSwitcher.switchToScreen({ type: "practice"});
+    }
+
+    /**
+     * Get the view
+     */
     getView(): HelpPageView {
         return this.view;
     }
