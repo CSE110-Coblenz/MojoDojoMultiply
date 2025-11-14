@@ -31,8 +31,8 @@ export class MainPageView implements View {
 	constructor(
 		onAnswerClick: (answer: number) => void,
 		pauseResumeGame: () => void,
-		onAnswerHoverStart: () => void,
-		onAnswerHoverEnd: () => void,
+		onHoverStart: () => void,
+		onHoverEnd: () => void,
 		onStartClick: () => void,
 		onHelpClick: () => void
 	) {
@@ -141,8 +141,8 @@ export class MainPageView implements View {
 		pausePlayButtonGroup.add(this.playLogo);
 
 		//Adds the click mouse appearance when hovering
-		pausePlayButtonGroup.on('mouseover', onAnswerHoverStart);
-		pausePlayButtonGroup.on('mouseout', onAnswerHoverEnd);
+		pausePlayButtonGroup.on('mouseover', onHoverStart);
+		pausePlayButtonGroup.on('mouseout', onHoverEnd);
 
 		//Cycles between the play and pause logos when the button is clicked
 		pausePlayButtonGroup.on('click tap', () => { pauseResumeGame() });
@@ -398,21 +398,21 @@ export class MainPageView implements View {
 
 		// Attach click/hover handlers now that answerTexts exist
 		answer1Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[0].text())));
-		answer1Group.on('mouseover', onAnswerHoverStart);
-		answer1Group.on('mouseout', onAnswerHoverEnd);
+		answer1Group.on('mouseover', onHoverStart);
+		answer1Group.on('mouseout', onHoverEnd);
 
 
 		answer2Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[1].text())));
-		answer2Group.on('mouseover', onAnswerHoverStart);
-		answer2Group.on('mouseout', onAnswerHoverEnd);
+		answer2Group.on('mouseover', onHoverStart);
+		answer2Group.on('mouseout', onHoverEnd);
 
 		answer3Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[2].text())));
-		answer3Group.on('mouseover', onAnswerHoverStart);
-		answer3Group.on('mouseout', onAnswerHoverEnd);
+		answer3Group.on('mouseover', onHoverStart);
+		answer3Group.on('mouseout', onHoverEnd);
 
 		answer4Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[3].text())));
-		answer4Group.on('mouseover', onAnswerHoverStart);
-		answer4Group.on('mouseout', onAnswerHoverEnd);
+		answer4Group.on('mouseover', onHoverStart);
+		answer4Group.on('mouseout', onHoverEnd);
 
 		[answer1Group, answer2Group, answer3Group, answer4Group].forEach((g, i) =>
 			g.add(this.answerTexts[i])
@@ -550,13 +550,13 @@ export class MainPageView implements View {
 		helpPageText.offsetY(helpPageText.height() / 2);
 
 		//Add click hover appearance to the help button
-		helpPageButton.on('mouseover', onAnswerHoverStart);
-		helpPageButton.on('mouseout', onAnswerHoverEnd);
+		helpPageButton.on('mouseover', onHoverStart);
+		helpPageButton.on('mouseout', onHoverEnd);
 		helpPageButton.on('click', onHelpClick);
 
 		//Add click hover appearance to the help button
-		startPageButton.on('mouseover', onAnswerHoverStart);
-		startPageButton.on('mouseout', onAnswerHoverEnd);
+		startPageButton.on('mouseover', onHoverStart);
+		startPageButton.on('mouseout', onHoverEnd);
 		startPageButton.on('click', onStartClick);
 
 		//Cycles between the play and pause logos when the button is clicked

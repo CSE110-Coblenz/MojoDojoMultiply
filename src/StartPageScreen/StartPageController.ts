@@ -11,7 +11,9 @@ export class StartPageController extends ScreenController {
     this.view = new StartPageView(
       () => this.handleStartClick(),
       () => this.handleHelpClick(),
-      () => this.handlePracticeClick()
+      () => this.handlePracticeClick(),
+      () => this.onHoverStart(),
+      () => this.onHoverStop()
     );
   }
 
@@ -25,6 +27,13 @@ export class StartPageController extends ScreenController {
     this.screenSwitcher.switchToScreen({ type: "practice" });
   }
 
+  private onHoverStart(): void {
+    document.body.style.cursor = 'pointer';
+  }
+
+  private onHoverStop(): void {
+    document.body.style.cursor = 'default';
+  }
 
   getView(): StartPageView {
     return this.view;

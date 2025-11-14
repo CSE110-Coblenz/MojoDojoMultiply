@@ -26,8 +26,8 @@ export class MainPageController extends ScreenController {
         this.view = new MainPageView(
             (answer: number) => this.handleAnswerClick(answer),
             () => this.handlePausePlayGame(),
-            () => this.handleAnswerHoverStart(),
-            () => this.handleAnswerHoverEnd(),
+            () => this.handleHoverStart(),
+            () => this.handleHoverEnd(),
             () => this.handleStartClick(),
             () => this.handleHelpClick()
         );
@@ -390,18 +390,18 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * Handle hover start on answer squares
+     * Handle hover start on any clickable element
      * Changes the cursor to a pointer
      */
-    private handleAnswerHoverStart(): void {
+    private handleHoverStart(): void {
         document.body.style.cursor = 'pointer';
     }
 
     /**
-     * Handle hover end on answer squares
+     * Handle hover end on any clickable element
      * Resets the cursor to default
      */
-    private handleAnswerHoverEnd(): void {
+    private handleHoverEnd(): void {
         document.body.style.cursor = 'default';
     }
 
