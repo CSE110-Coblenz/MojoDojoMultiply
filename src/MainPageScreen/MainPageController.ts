@@ -96,8 +96,8 @@ export class MainPageController extends ScreenController {
         this.model.computerTime = 0;
         this.model.playerResponse = 0;
 
-        // 50% chance to get the correct answer
-        if (Math.random() < 0.5) {
+        // AI chance to get the correct answer
+        if (Math.random() < GAMECST.AI_ANSWER_CHANCE + GAMECST.AI_CHANCE_SCALE * this.model.currentRound) {
             this.model.computerResponse = this.model.correctAnswer;
         } else {
             // Pick a random wrong answer
