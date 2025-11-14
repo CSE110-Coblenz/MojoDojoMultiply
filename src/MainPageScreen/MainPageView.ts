@@ -19,35 +19,18 @@ export class MainPageView implements View {
 	private playerAvatar?: Konva.Image;
 	// Konva image for the opponent's avatar
 	private opponentAvatar?: Konva.Image;
+	public pauseLogo?: Konva.Group;
+	public playLogo?: Konva.RegularPolygon;
 
 	
 	// constructor for the interface Main page interface
 	constructor(
 		onAnswerClick: (answer: number) => void,
+		pauseResumeGame: () => void,
 		onAnswerHoverStart: () => void,
 		onAnswerHoverEnd: () => void
 	) {
 		this.group = new Konva.Group({ visible: false });
-
-        const text = new Konva.Text({
-            x: GAMECST.STAGE_WIDTH / 2,
-            y: GAMECST.STAGE_HEIGHT / 2,
-            text: "MAIN GAME",
-            fontSize: 100
-        });
-        text.offsetX(text.width() / 2);
-        text.offsetY(text.height() / 2);
-        this.group.add(text);
-
-        // Create 3 Konva.Image placeholders for timer (no image/source set here).
-        // Positions and sizes can be adjusted later by layout code.
-        for (let i = 0; i < 3; i++) {
-            // create an empty HTMLImageElement as placeholder (src will be set later by model/controller)
-            const placeholder = new Image();
-            const img = new Konva.Image({ image: placeholder as unknown as CanvasImageSource, x: 10 + i * 40, y: 10, width: 32, height: 48, listening: false });
-            this.timerImageNodes.push(img);
-            this.group.add(img);
-        }
 
 		//Stage background for Konva Group
 		const bg = new Konva.Rect({
@@ -62,16 +45,88 @@ export class MainPageView implements View {
 		// Score display (bottom-center). origin will be set to the center so
 		// the text remains centered as its content changes.
 		this.scoreText = new Konva.Text({
-			x: GAMECST.STAGE_WIDTH - 100,
-			y: 30,
+			x: GAMECST.STAGE_WIDTH - 80,
+			y: 20,
 			text: "Score: 0",
 			fontSize: 32,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: "black",
 		});
 		// make origin the visual center
-		this.scoreText.offsetY(this.scoreText.height() / 2);
+		this.scoreText.offsetX(this.scoreText.width() / 2);
 		this.group.add(this.scoreText);
+
+		//Group that holds the pause/play button
+		//The button allows the user to pause/play the gameplay 
+		const pausePlayButtonGroup = new Konva.Group({ 
+			visible: true,
+			x: 20,
+			y: 20
+		});
+		this.group.add(pausePlayButtonGroup);
+
+		//The background for the button
+		const pausePlayBox = new Konva.Rect({
+			x: 0,
+			y: 0,
+			width: 60,
+			height: 60,
+			stroke: 'black',
+			strokeWidth: 4,
+			fill: 'grey'
+		})
+		pausePlayButtonGroup.add(pausePlayBox);
+
+		//Group containing both elements of the pause logo
+		this.pauseLogo = new Konva.Group({visible: true});
+		pausePlayButtonGroup.add(this.pauseLogo);
+		//Change positioning of elements in pause group to be local to the group
+		this.pauseLogo.position({x: pausePlayBox.x() + 11, y: pausePlayBox.y() + 11});
+
+		//Left element of the pause logo
+		const pauseLogo1 = new Konva.Rect({
+			x: 0,
+			y: 0,
+			width: 14,
+			height: 40,
+			fill: 'black',
+			cornerRadius: 4
+		});
+		this.pauseLogo.add(pauseLogo1);
+
+		//Right element of the pause logo
+		const pauseLogo2 = new Konva.Rect({
+			x: pauseLogo1.x() + pauseLogo1.width() + 10,
+			y: 0,
+			width: 14,
+			height: 40,
+			fill: 'black',
+			cornerRadius: 4
+		});
+		this.pauseLogo.add(pauseLogo2);
+
+		//Center the pause logo in the button
+		this.pauseLogo.offsetX(this.pauseLogo.width() / 2);
+		this.pauseLogo.offsetY(this.pauseLogo.height() / 2);
+
+		// Logo that makes pause/play button play
+		this.playLogo = new Konva.RegularPolygon({
+			x: 25,
+			y: 30,
+			sides: 3,
+			radius: 25,
+			fill: 'black',
+			rotation: 90,
+			visible: false
+		});
+		pausePlayButtonGroup.add(this.playLogo);
+
+		//Adds the click mouse appearance when hovering
+		pausePlayButtonGroup.on('mouseover', onAnswerHoverStart);
+		pausePlayButtonGroup.on('mouseout', onAnswerHoverEnd);
+
+		//Cycles between the play and pause logos when the button is clicked
+		pausePlayButtonGroup.on('click tap', () => { pauseResumeGame() });
 
 
 		//Health bar that visualizes the health of the player's character
@@ -79,6 +134,7 @@ export class MainPageView implements View {
 		this.group.add(playerHealthGroup);
 		const healthBarWidth = 150;
 
+		//Background to visualize the full size of the health bar
 		const playerBarBacking = new Konva.Rect({
 			x: 80,
 			y: GAMECST.STAGE_HEIGHT * 2 / 3,
@@ -90,6 +146,7 @@ export class MainPageView implements View {
 		});
 		playerHealthGroup.add(playerBarBacking);
 
+		//Health bar that shrinks to model the health level of the player 
 		this.playerHealthBar = new Konva.Rect({
 			x: playerBarBacking.x() + 2,
 			y: playerBarBacking.y() + 2,
@@ -104,6 +161,7 @@ export class MainPageView implements View {
 		const opponentHealthGroup = new Konva.Group();
 		this.group.add(opponentHealthGroup);
 
+		//Background to visualize the full size of the health bar
 		const opponentBarBacking = new Konva.Rect({
 			x: 300,
 			y: playerBarBacking.y(),
@@ -115,6 +173,7 @@ export class MainPageView implements View {
 		});
 		opponentHealthGroup.add(opponentBarBacking);
 
+		//Health bar that shrinks to model the health level of the opponent
 		this.opponentHealthBar = new Konva.Rect({
 			x: opponentBarBacking.x() + 2,
 			y: opponentBarBacking.y() + 2,
@@ -128,6 +187,7 @@ export class MainPageView implements View {
 		// Initialize health bars to full
 		this.updateHealthBars(1, 1);
 
+		//Group that contains all the elements of the fight scene
 		const fightingStage = new Konva.Group();
 		this.group.add(fightingStage);
 
@@ -156,8 +216,6 @@ export class MainPageView implements View {
 			// add to the fighting stage group
 			fightingStage.add(image);
 		});
-
-
 
 		// Create four answer squares in a 2x2 grid pattern in the center of the screen
 		const squareSize = 80;
@@ -264,6 +322,7 @@ export class MainPageView implements View {
 		});
 		answer4Group.add(answer4Box);
 
+		//Text that states the what multiplication question is being asked of the user
 		this.questionText = new Konva.Text({
 			x: questionBox.x() + questionBox.width() / 2,
 			y: questionBox.y() + questionBox.height() / 2,
@@ -275,8 +334,9 @@ export class MainPageView implements View {
 		// Center the question text within its box
 		questionGroup.add(this.questionText);
 		
-
+		//Text that shows the user their options for answers to the questions
 		this.answerTexts = [
+			//The answer in box 1 (upper-left corner)
 			new Konva.Text({
 				x: answer1Box.x() + answer1Box.width() / 2,
 				y: answer1Box.y() + answer1Box.height() / 2,
@@ -285,6 +345,7 @@ export class MainPageView implements View {
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: 'Black'
 			}),
+			//The answer in box 2 (upper-right corner)
 			new Konva.Text({
 				x: answer2Box.x() + answer2Box.width() / 2,
 				y: answer2Box.y() + answer2Box.height() / 2,
@@ -293,6 +354,7 @@ export class MainPageView implements View {
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: 'Black'
 			}),
+			//The answer in box 3 (lower-left corner)
 			new Konva.Text({
 				x: answer3Box.x() + answer3Box.width() / 2,
 				y: answer3Box.y() + answer3Box.height() / 2,
@@ -301,6 +363,7 @@ export class MainPageView implements View {
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: 'Black'
 			}),
+			//The answer in box 4 (lower-right corner)
 			new Konva.Text({
 				x: answer4Box.x() + answer4Box.width() / 2,
 				y: answer4Box.y() + answer4Box.height() / 2,
@@ -334,6 +397,8 @@ export class MainPageView implements View {
 		[answer1Group, answer2Group, answer3Group, answer4Group].forEach((g, i) =>
 			g.add(this.answerTexts[i])
 		);
+
+
 	}
 
 	/**
@@ -342,12 +407,13 @@ export class MainPageView implements View {
 	setScoreText(scoreText: string): void {
 		this.scoreText.text(scoreText);
 		// update origin so the text remains centered as width/height change
-		this.scoreText.offsetX(this.scoreText.width() / 2);
-		this.scoreText.offsetY(this.scoreText.height() / 2);
+		// this.scoreText.offsetX(this.scoreText.width() / 2);
+		// this.scoreText.offsetY(this.scoreText.height() / 2);
 		// keep positioned at bottom-center
 		// this.scoreText.position({ x: GAMECST.STAGE_WIDTH / 2, y: GAMECST.STAGE_HEIGHT - 30 });
 		this.group.getLayer()?.draw();
 	}
+	
 
 	/**
 	 * Internal method to update timer text

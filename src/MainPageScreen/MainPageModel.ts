@@ -23,6 +23,7 @@ export class MainPageModel {
     roundScore = 0;
     roundCorrect = 0;
     roundTotal = 0;
+    gamePaused: boolean;
 
 
 
@@ -40,5 +41,6 @@ export class MainPageModel {
         this.computerResponse = 0;
         this.playerTime = 0;
         this.computerTime = 0;
+        this.gamePaused = false;
     }
 }
