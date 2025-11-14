@@ -294,40 +294,6 @@ export class MainPageController extends ScreenController {
         this.startQuestionTimer();
     }
 
-// OLD TIMER FUNCTIONALITY
-    // /**
-    //  * Start the timer
-    //  */
-    // private startTimer(callback: (timeLeft: number) => void): void {
-    //     if (!this.model.isTimerRunning) {
-    //         this.model.isTimerRunning = true;
-            
-    //         // Initial call to set initial state
-    //         callback(this.model.timeRemaining);
-            
-    //         this.model.timerInterval = globalThis.setInterval(() => {
-    //             if (this.model.timeRemaining > 0) {
-    //                 this.model.timeRemaining--;
-    //                 callback(this.model.timeRemaining);
-    //             } else {
-    //                 this.stopTimer();
-    //                 this.endGame();
-    //             }
-    //         }, 1000);
-    //     }
-    // }
-
-    // /**
-    //  * Stop the timer
-    //  */
-    // private stopTimer(): void {
-    //     if (this.model.timerInterval) {
-    //         globalThis.clearInterval(this.model.timerInterval);
-    //         this.model.timerInterval = null;
-    //         this.model.isTimerRunning = false;
-    //     }
-    // }
-
 
     /**
      * Update both player and opponent health bars in the view
