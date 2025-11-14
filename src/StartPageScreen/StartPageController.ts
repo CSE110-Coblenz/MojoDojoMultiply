@@ -34,7 +34,7 @@ export class StartPageController extends ScreenController {
    * Takes the user to the practice page by switching screens when the practice button is pressed
    */
   private handlePracticeClick(): void {
-    this.screenSwitcher.switchToScreen({ type: "practice" });
+    this.screenSwitcher.switchToScreen({ type: "bonus" }); // TODO CHANGED THIS
   }
 
   /**
