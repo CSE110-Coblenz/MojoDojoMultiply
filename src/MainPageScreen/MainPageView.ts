@@ -30,7 +30,9 @@ export class MainPageView implements View {
 		onAnswerClick: (answer: number) => void,
 		pauseResumeGame: () => void,
 		onAnswerHoverStart: () => void,
-		onAnswerHoverEnd: () => void
+		onAnswerHoverEnd: () => void,
+		onStartClick: () => void,
+		onHelpClick: () => void
 	) {
 		this.group = new Konva.Group({ visible: false });
 
@@ -531,10 +533,12 @@ export class MainPageView implements View {
 		//Add click hover appearance to the help button
 		helpPageButton.on('mouseover', onAnswerHoverStart);
 		helpPageButton.on('mouseout', onAnswerHoverEnd);
+		helpPageButton.on('click', onHelpClick);
 
 		//Add click hover appearance to the help button
 		startPageButton.on('mouseover', onAnswerHoverStart);
 		startPageButton.on('mouseout', onAnswerHoverEnd);
+		startPageButton.on('click', onStartClick);
 
 		//Cycles between the play and pause logos when the button is clicked
 		//startPageButton.on('click tap', () => { onStartPageClick() });

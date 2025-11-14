@@ -2,7 +2,7 @@ import { ScreenController, type ScreenSwitcher } from "../types";
 import { MainPageModel } from "./MainPageModel";
 import { MainPageView } from "./MainPageView";
 import { GAMECST } from "../constants";
-import {GlobalState} from "../storageManager"
+import { GlobalState } from "../storageManager"
 
 export class MainPageController extends ScreenController {
     private model: MainPageModel;
@@ -27,7 +27,9 @@ export class MainPageController extends ScreenController {
             (answer: number) => this.handleAnswerClick(answer),
             () => this.handlePausePlayGame(),
             () => this.handleAnswerHoverStart(),
-            () => this.handleAnswerHoverEnd()
+            () => this.handleAnswerHoverEnd(),
+            () => this.handleStartClick(),
+            () => this.handleHelpClick()
         );
 
         this.setupGlobalStateListener();
@@ -186,38 +188,53 @@ export class MainPageController extends ScreenController {
         if (this.model.questionTimerId !== null) return;
 
         // if resume is called without calling start first
-        if (this.model.questionTimeRemaining <= 0) {
-            this.onQuestionTimeout();
-            return;
-        }
+        if (this.model.questionTimeRemaining <= 0) {
+            this.onQuestionTimeout();
+            return;
+        }
 
-        // Update UI with current remaining time
-        this.updateTimer(this.model.questionTimeRemaining);
+        // Update UI with current remaining time
+        this.updateTimer(this.model.questionTimeRemaining);
 
-        // resume countdown
-        this.model.questionTimerId = window.setInterval(() => {
-            this.model.questionTimeRemaining--;
-            this.updateTimer(this.model.questionTimeRemaining);
+        // resume countdown
+        this.model.questionTimerId = window.setInterval(() => {
+            this.model.questionTimeRemaining--;
+            this.updateTimer(this.model.questionTimeRemaining);
 
-            if (this.model.questionTimeRemaining <= 0) {
-                this.onQuestionTimeout();
-            }
-        }, 1000);
+            if (this.model.questionTimeRemaining <= 0) {
+                this.onQuestionTimeout();
+            }
+        }, 1000);
     }
+
+    /**
+     * Switches the screen to the start page when the pause menu button is clicked
+     */
+    private handleStartClick(): void {
+        this.screenSwitcher.switchToScreen({ type: "start" });
+    }
+
+    /**
+     * Switches the screen to the start page when the pause menu button is clicked
+     */
+    private handleHelpClick(): void {
+        this.screenSwitcher.switchToScreen({ type: "help" });
+    }
+
 
     /**
      * clears timer for new questions
      */
     private clearQuestionTimer(): void {
         // stop timer if running
-        if (this.model.questionTimerId !== null) {
-            clearInterval(this.model.questionTimerId);
-            this.model.questionTimerId = null;
-        }
+        if (this.model.questionTimerId !== null) {
+            clearInterval(this.model.questionTimerId);
+            this.model.questionTimerId = null;
+        }
 
-        // remove saved remaining time
-        this.model.questionTimeRemaining = 0;
-        this.updateTimer(this.model.questionTimeRemaining);
+        // remove saved remaining time
+        this.model.questionTimeRemaining = 0;
+        this.updateTimer(this.model.questionTimeRemaining);
     }
 
     /**
