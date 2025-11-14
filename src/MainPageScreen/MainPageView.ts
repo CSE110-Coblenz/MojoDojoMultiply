@@ -20,6 +20,8 @@ export class MainPageView implements View {
 	private playerAvatar?: Konva.Image;
 	// Konva image for the opponent's avatar
 	private opponentAvatar?: Konva.Image;
+	// optional key handler for keyboard answer selection
+	private keyHandler?: (e: KeyboardEvent) => void;
 	public pauseLogo?: Konva.Group;
 	public playLogo?: Konva.RegularPolygon;
 	public pauseMenu?: Konva.Group;
@@ -399,6 +401,7 @@ export class MainPageView implements View {
 		answer1Group.on('mouseover', onAnswerHoverStart);
 		answer1Group.on('mouseout', onAnswerHoverEnd);
 
+
 		answer2Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[1].text())));
 		answer2Group.on('mouseover', onAnswerHoverStart);
 		answer2Group.on('mouseout', onAnswerHoverEnd);
@@ -414,6 +417,22 @@ export class MainPageView implements View {
 		[answer1Group, answer2Group, answer3Group, answer4Group].forEach((g, i) =>
 			g.add(this.answerTexts[i])
 		);
+
+		// Keyboard handler: map keys to answer boxes
+		// w -> answer 1, e -> answer 2, s -> answer 3, d -> answer 4
+		this.keyHandler = (ev: KeyboardEvent) => {
+			const key = ev.key.toLowerCase();
+			const mapping: Record<string, number> = { w: 0, e: 1, s: 2, d: 3 };
+			if (key in mapping) {
+				const idx = mapping[key];
+				const text = this.answerTexts[idx]?.text();
+				const val = parseInt(text);
+				if (!Number.isNaN(val)) {
+					onAnswerClick(val);
+					// optional: brief visual feedback could be added here
+				}
+			}
+		};
 
 		//Menu that appears when you pause the game
 		this.pauseMenu = new Konva.Group;
@@ -585,16 +604,26 @@ export class MainPageView implements View {
 
 
     show(): void {
-        this.group.visible(true);
-        this.group.getLayer()?.draw();
+		this.group.visible(true);
+		// register keyboard handler when view is shown
+		if (this.keyHandler) {
+			// remove any existing to avoid duplicates, then add
+			window.removeEventListener('keydown', this.keyHandler as EventListener);
+			window.addEventListener('keydown', this.keyHandler as EventListener);
+		}
+		this.group.getLayer()?.draw();
     }
 
 	/**
 	 * Hide the screen
 	 */
 	hide(): void {
-		this.group.visible(false);
-		this.group.getLayer()?.draw();
+	this.group.visible(false);
+	// unregister keyboard handler when view is hidden
+	if (this.keyHandler) {
+	    window.removeEventListener('keydown', this.keyHandler as EventListener);
+	}
+	this.group.getLayer()?.draw();
 	}
 
     getGroup(): Konva.Group {
