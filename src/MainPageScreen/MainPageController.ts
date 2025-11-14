@@ -229,13 +229,16 @@ export class MainPageController extends ScreenController {
         this.model.playerResponse = NaN;
         this.model.playerTime = Number.POSITIVE_INFINITY;
         const damages = this.damageCalculation();
-        this.applyDamagesAndAdvance(damages);
+        this.applyDamagesAndAdvance(damages, 0);
     }
 
     /**
      * handles damage, score, advancing rounds
+     * @param [playerDmg, oppDmg] tuple with damage that player and opponent will face
+     * @param questionPoints points that will be awarded 
+     * @returns void
      */
-    private applyDamagesAndAdvance([playerDmg, oppDmg]: number[]): void {
+    private applyDamagesAndAdvance([playerDmg, oppDmg]: number[], questionPoints: number = 0): void {
         // debugging to show cur round
         console.log("Current round: " + this.getCurrentRound());
 
@@ -247,17 +250,33 @@ export class MainPageController extends ScreenController {
             this.model.opponentHealth = Math.max(0, this.model.opponentHealth - oppDmg);
         }
 
-        // increments score by one if player gets answer right
-        // TODO: update scoring system
-        if (this.model.playerResponse === this.model.correctAnswer) {
-            this.model.score++;
-            this.model.roundScore++;
+
+        // TODO: Expand Stats
+        // increments stats (total answered, correct answers)
+        const playerCorrect = this.model.playerResponse === this.model.correctAnswer;
+        this.model.roundTotal++
+        if (playerCorrect) {
+            this.model.roundCorrect++;
+        }
+
+        // handles points
+        if (questionPoints > 0) {
+            this.model.score += questionPoints;
+            this.model.roundScore += questionPoints;
             this.updateScore(this.model.score);
         }
+
         this.updateHealthBars();
 
         // handles winning round
         if (this.model.opponentHealth <= 0) {
+            // gives bonus points if win w/ > 50% health
+            if (this.model.playerHealth > this.model.maxHealth / 2) {
+                this.model.score += 400;
+                this.model.roundScore += 400;
+                this.updateScore(400);
+            }
+
             this.clearQuestionTimer();
             this.screenSwitcher.switchToScreen({
                 type: "roundStats",
@@ -414,6 +433,7 @@ export class MainPageController extends ScreenController {
         // Record player's response and time
         this.model.playerResponse = selectedAnswer;
         this.model.playerTime = Date.now();
+        const timeLeftSeconds = this.model.questionTimeRemaining;
 
          // Debug logging
         //console.log('Question:', this.model.num1, 'x', this.model.num2, '=', this.model.correctAnswer);
@@ -426,20 +446,23 @@ export class MainPageController extends ScreenController {
         
         // Calculate damages based on both player and computer responses
         const damages = this.damageCalculation();
+        // Calculates points based on speed of answer
+        const questionPoints = this.pointsCalculation(timeLeftSeconds);
 
         // Stop timer
         this.clearQuestionTimer();
 
         // apply damage 
-        this.applyDamagesAndAdvance(damages);
+        this.applyDamagesAndAdvance(damages, questionPoints);
         // Play sound effects
         this.clickSound.play();
         this.clickSound.currentTime = 0;
 
+        // * game ending is handled in applyDamageAndAdvance
         // Check if game should end due to health
-        if (this.model.playerHealth <= 0 || this.model.opponentHealth <= 0) {
-            this.endGame();
-        }
+        // if (this.model.playerHealth <= 0 || this.model.opponentHealth <= 0) {
+        //     this.endGame();
+        // }
     }
 
     /**
@@ -478,6 +501,38 @@ export class MainPageController extends ScreenController {
             return [0, 0];
         }
         return [15, 0];
+    }
+
+    /**
+     * Calculates number of points, based off time remaining when answered. 
+     * @param timeLeftSeconds time remaining when player answered
+     * @returns number of points earned
+     */
+    //TODO: if points get too high, scale numbers back
+    private pointsCalculation(timeLeftSeconds: number): number {
+        const t = Math.max(0, timeLeftSeconds) * 10;
+
+        const playerCorrect = this.model.playerResponse === this.model.correctAnswer;
+        const opponentCorrect = this.model.computerResponse === this.model.correctAnswer;
+
+        if (playerCorrect && !opponentCorrect) {
+            return 15*t
+        }
+
+        if (playerCorrect && opponentCorrect) {
+            if (this.model.playerTime < this.model.computerTime) {
+                // player answers faster
+                return 10 * t;
+            } else if (this.model.playerTime > this.model.computerTime) {
+                // computer answers faster
+                return 2 * t;
+            } else {
+                // tie
+                return 5 * t;
+            }
+        }
+        // wrong
+        return 0
     }
 
     /**
