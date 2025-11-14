@@ -485,7 +485,7 @@ export class MainPageView implements View {
 			x: startPageButtonBackground.x() + startPageButtonBackground.width() / 2,
 			y: startPageButtonBackground.y() + startPageButtonBackground.height() / 2,
 			text: "Main Menu",
-			fontSize: 40,
+			fontSize: 35,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: DARK_COLOR,
 		})
@@ -518,7 +518,7 @@ export class MainPageView implements View {
 			x: helpPageButtonBackground.x() + helpPageButtonBackground.width() / 2,
 			y: helpPageButtonBackground.y() + helpPageButtonBackground.height() / 2,
 			text: "Help Page",
-			fontSize: 40,
+			fontSize: 35,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: DARK_COLOR,
 		})
@@ -527,6 +527,17 @@ export class MainPageView implements View {
 		//Center the button
 		helpPageText.offsetX(helpPageText.width() / 2);
 		helpPageText.offsetY(helpPageText.height() / 2);
+
+		//Add click hover appearance to the help button
+		helpPageButton.on('mouseover', onAnswerHoverStart);
+		helpPageButton.on('mouseout', onAnswerHoverEnd);
+
+		//Add click hover appearance to the help button
+		startPageButton.on('mouseover', onAnswerHoverStart);
+		startPageButton.on('mouseout', onAnswerHoverEnd);
+
+		//Cycles between the play and pause logos when the button is clicked
+		//startPageButton.on('click tap', () => { onStartPageClick() });
 	}
 
 	/**
