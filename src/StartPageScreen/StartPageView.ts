@@ -45,13 +45,16 @@ export class StartPageView implements View {
         title2.offsetX(title2.width() / 2);
         this.group.add(title2);
 
+        //Constants for the sizes of the buttons
         const buttonHeight = 60;
         const buttonWidth = 250;
         const buttonSpacing = 20;
 
-
+        //Group that contains the elements of the start button
         const startButtonGroup = new Konva.Group();
+        this.group.add(startButtonGroup);
 
+        //Background and touch target for the start button
         const startButton = new Konva.Rect({
             x: STAGE_WIDTH / 2 ,
             y: 330,
@@ -61,8 +64,11 @@ export class StartPageView implements View {
             stroke: 'black',
             strokeWidth: 4,
         });
+        startButtonGroup.add(startButton);
+        //Center the origin point of the button
         startButton.offsetX(startButton.width() / 2);
 
+        //Text for the start button telling the user what it does
         const startText = new Konva.Text({
             x: STAGE_WIDTH / 2,
             y: startButton.y() + startButton.height() / 2,
@@ -72,17 +78,21 @@ export class StartPageView implements View {
             fill: "black",
             align: "center",
         });
+        startButtonGroup.add(startText);
+        //Centering the origin of the text to its center
         startText.offsetX(startText.width() / 2);
         startText.offsetY(startText.height() / 2)
-        startButtonGroup.add(startButton);
-        startButtonGroup.add(startText);
+        
+        //Adding click and functionalities to the button
         startButtonGroup.on("click", onStartClick);
         startButtonGroup.on("mouseover", onHoverStart);
         startButtonGroup.on("mouseout", onHoverEnd);
-        this.group.add(startButtonGroup);
 
-        //Help Button
+
+        //Help Button that takes the user to the help page
         const helpButtonGroup = new Konva.Group();
+        this.group.add(helpButtonGroup);
+
         const helpButton = new Konva.Rect({
             x: STAGE_WIDTH / 2,
             y: startButton.y() + startButton.height() + buttonSpacing,
@@ -92,8 +102,12 @@ export class StartPageView implements View {
             stroke: "black",
             strokeWidth: 4,
         });
+        helpButtonGroup.add(helpButton);
+        
+        //Centering the origin of the button in its center
         helpButton.offsetX(helpButton.width() / 2)
 
+        //Text that tells the user what the help button does
         const helpText = new Konva.Text({
             x: STAGE_WIDTH / 2,
             y: helpButton.y() + helpButton.height() / 2,
@@ -103,17 +117,22 @@ export class StartPageView implements View {
             fill: "black",
             align: "center",
         });
+        helpButtonGroup.add(helpText);
+
+        //Center the origin of the button in its center
         helpText.offsetX(helpText.width() / 2);
         helpText.offsetY(helpText.height() / 2);
-        helpButtonGroup.add(helpButton);
-        helpButtonGroup.add(helpText);
+
+        //Adding hover and click functionalities to the help button
         helpButtonGroup.on("click", onHelpClick); 
         helpButtonGroup.on("mouseover", onHoverStart);
         helpButtonGroup.on("mouseout", onHoverEnd);
-        this.group.add(helpButtonGroup);
+        
 
-        //Practice Button
+        //Practice Button that takes the user to the practice grounds
         const practiceButtonGroup = new Konva.Group();
+        this.group.add(practiceButtonGroup);
+
         const practiceButton = new Konva.Rect({
             x: STAGE_WIDTH / 2,
             y: helpButton.y() + startButton.height() + buttonSpacing,
@@ -123,6 +142,9 @@ export class StartPageView implements View {
             stroke: "black",
             strokeWidth: 4,
         });
+        practiceButtonGroup.add(practiceButton);
+
+        //Center the origin of the button on the button itself
         practiceButton.offsetX(practiceButton.width() / 2);
 
         const practiceText = new Konva.Text({
@@ -134,14 +156,17 @@ export class StartPageView implements View {
             fill: "black",
             align: "center",
         });
+        practiceButtonGroup.add(practiceText);
+
+        //Center the origin of the button on itself
         practiceText.offsetX(practiceText.width() / 2);
         practiceText.offsetY(practiceText.height() / 2)
-        practiceButtonGroup.add(practiceButton);
-        practiceButtonGroup.add(practiceText);
+        
+        //Adding click and hover functionalities to the practice button
         practiceButtonGroup.on("click", onPracticeClick); 
         practiceButtonGroup.on("mouseover", onHoverStart);
         practiceButtonGroup.on("mouseout", onHoverEnd);
-        this.group.add(practiceButtonGroup);
+        
     }
 
     /**
