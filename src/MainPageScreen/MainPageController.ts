@@ -523,10 +523,12 @@ export class MainPageController extends ScreenController {
      */
     private endGame(): void {
         this.clearQuestionTimer();
+        this.model.currentRound += 1;
 
         // Switch back to start screen
         this.screenSwitcher.switchToScreen({
-            type: "start"
+            type: "roundIntro",
+            round: this.model.currentRound
         });
     }
 
