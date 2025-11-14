@@ -467,6 +467,35 @@ export class MainPageController extends ScreenController {
     }
 
     /**
+     * 
+     */
+    private pointsCalculation(timeLeftSeconds: number): number {
+        const t = Math.max(0, timeLeftSeconds) * 10;
+
+        const playerCorrect = this.model.playerResponse === this.model.correctAnswer;
+        const opponentCorrect = this.model.computerResponse === this.model.correctAnswer;
+
+        if (playerCorrect && !opponentCorrect) {
+            return 15*t
+        }
+
+        if (playerCorrect && opponentCorrect) {
+            if (this.model.playerTime < this.model.computerTime) {
+                // player answers faster
+                return 10 * t;
+            } else if (this.model.playerTime > this.model.computerTime) {
+                // computer answers faster
+                return 2 * t;
+            } else {
+                // tie
+                return 5 * t;
+            }
+        }
+        // wrong
+        return 0
+    }
+
+    /**
      * End the game which for now just goes back to the start screen
      */
     private endGame(): void {
