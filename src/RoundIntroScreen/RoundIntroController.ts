@@ -9,7 +9,14 @@ export class RoundIntroController extends ScreenController {
   constructor(screenSwitcher: ScreenSwitcher) {
     super();
     this.screenSwitcher = screenSwitcher;
-    this.view = new RoundIntroView(() => this.startRound())
+
+    this.view = new RoundIntroView(
+      () => this.startRound(),
+      () => this.returnStartPage(),
+      () => this.sendRound(),
+      () => this.handleHoverStart(),
+      () => this.handleHoverEnd()
+    )
   }
   
   setRound(round: number) {
@@ -19,6 +26,22 @@ export class RoundIntroController extends ScreenController {
   
   private startRound() {
     this.screenSwitcher.switchToScreen({type: "main", round: this.currentRound});
+  }
+
+  private returnStartPage() {
+    this.screenSwitcher.switchToScreen({type: "start"});
+  }
+
+  private sendRound() {
+    return this.currentRound.toString();
+  }
+
+  private handleHoverStart() {
+    document.body.style.cursor = 'pointer';
+  }
+
+  private handleHoverEnd() {
+    document.body.style.cursor = 'default';
   }
   getView(): RoundIntroView { return this.view; }
 }
