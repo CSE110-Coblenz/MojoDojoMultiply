@@ -10,7 +10,7 @@ export class RoundStatsController extends ScreenController {
     super();
     this.screenSwitcher = screenSwitcher;
     this.view = new RoundStatsView(() =>
-      this.screenSwitcher.switchToScreen({ type: "roundIntro", round: this.round + 1 })
+      this.screenSwitcher.switchToScreen({ type: "intro", round: this.round + 1 })
     );
   }
 
@@ -21,7 +21,7 @@ export class RoundStatsController extends ScreenController {
 
   private nextRound(): void {
     this.screenSwitcher.switchToScreen({
-      type: "roundIntro",
+      type: "intro",
       round: this.round + 1,
     });
   }

@@ -70,11 +70,11 @@ class App implements ScreenSwitcher {
       case "main": this.mainController.startGame(screen.round); break;
       case "help": this.helpController.show(); break;
       case "practice": this.practiceController.show(); break;
-      case "roundIntro":
+      case "intro":
         this.roundIntroController.setRound(screen.round);
         this.roundIntroController.show();
         break;
-      case "roundStats":
+      case "stats":
         this.roundStatsController.setRound(screen.round);
         this.roundStatsController.show();
         break;

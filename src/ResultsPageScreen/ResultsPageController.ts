@@ -55,7 +55,7 @@ export class ResultsScreenController extends ScreenController {
 	 * Handle play again button click
 	 */
 	private handleNextRoundClick(): void {
-		this.screenSwitcher.switchToScreen({ type: "roundIntro", round: 1 });
+		this.screenSwitcher.switchToScreen({ type: "intro", round: 1 });
 	}
 
 	/**

@@ -296,7 +296,7 @@ export class MainPageController extends ScreenController {
 
             this.clearQuestionTimer();
             this.screenSwitcher.switchToScreen({
-                type: "roundStats",
+                type: "stats",
                 round: this.model.currentRound
             });
             return;
@@ -527,7 +527,7 @@ export class MainPageController extends ScreenController {
 
         // Switch back to start screen
         this.screenSwitcher.switchToScreen({
-            type: "roundIntro",
+            type: "intro",
             round: this.model.currentRound
         });
     }
