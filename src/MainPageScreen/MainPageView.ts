@@ -24,9 +24,9 @@ export class MainPageView implements View {
 	private opponentAvatar?: Konva.Image;
 	// optional key handler for keyboard answer selection
 	private keyHandler?: (e: KeyboardEvent) => void;
-	public pauseLogo?: Konva.Group;
-	public playLogo?: Konva.RegularPolygon;
-	public pauseMenu?: Konva.Group;
+	private pauseLogo: Konva.Group;
+	private playLogo: Konva.RegularPolygon;
+	private pauseMenu: Konva.Group;
 
 	
 	// constructor for the interface Main page interface
@@ -679,9 +679,30 @@ export class MainPageView implements View {
 		this.correctAnswerText.visible(true);
 	}
 
+	/**
+	 * Internal function that shows the 'Incorrect' text when the user answers incorrectly
+	 */
 	incorrectAnswer(): void {
 		this.correctAnswerText.visible(false);
 		this.incorrectAnswerText.visible(true);
+	}
+
+	/**
+	 * Switches the play pause button to the play button config
+	 */
+	showPlayButton(): void {
+		this.pauseLogo.visible(false);
+		this.playLogo.visible(true);
+		this.pauseMenu.visible(true);
+	}
+
+	/**
+	 * Switches the play pause button to the play button config
+	 */
+	showPauseButton(): void {
+		this.playLogo.visible(false);
+		this.pauseLogo.visible(true);
+		this.pauseMenu.visible(false);
 	}
 
     /**

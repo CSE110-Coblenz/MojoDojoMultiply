@@ -544,9 +544,7 @@ export class MainPageController extends ScreenController {
     pauseGame(): void {
         this.pauseQuestionTimer();
         this.model.gamePaused = true;
-        this.view.pauseLogo?.visible(false);
-        this.view.playLogo?.visible(true);
-        this.view.pauseMenu?.visible(true);
+        this.view.showPlayButton();
     }
 
     /**
@@ -555,9 +553,7 @@ export class MainPageController extends ScreenController {
     resumeGame(): void {
         this.resumeQuestionTimer();
         this.model.gamePaused = false;
-        this.view.pauseLogo?.visible(true);
-        this.view.playLogo?.visible(false);
-        this.view.pauseMenu?.visible(false);
+        this.view.showPauseButton();
     }
 
 
