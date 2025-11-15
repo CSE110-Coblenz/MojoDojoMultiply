@@ -14,6 +14,8 @@ export class PracticeAreaView implements View {
 	private roundText: Konva.Text;
 	private questionText: Konva.Text;
 	private answerTexts: Konva.Text[];
+	private correctAnswerText: Konva.Text;
+	private incorrectAnswerText: Konva.Text;
 	//private playerHealthBar: Konva.Rect;
 	//private opponentHealthBar: Konva.Rect;
 	// Konva image for the player's avatar
@@ -252,7 +254,7 @@ export class PracticeAreaView implements View {
 		const gameQuestAnsGroup = new Konva.Group();
 
 		//Set the position of the entire group
-		gameQuestAnsGroup.position({ x: GAMECST.STAGE_WIDTH * 2 / 3, y: GAMECST.STAGE_HEIGHT / 4, });
+		gameQuestAnsGroup.position({ x: GAMECST.STAGE_WIDTH * 2 / 3, y: GAMECST.STAGE_HEIGHT / 6, });
 		this.group.add(gameQuestAnsGroup);
 
 		//Group that holds the question text and the question box
@@ -355,6 +357,38 @@ export class PracticeAreaView implements View {
 		});
 		// Center the question text within its box
 		questionGroup.add(this.questionText);
+
+		//Text that tells the user they answered correctly
+		this.correctAnswerText = new Konva.Text({
+			x: totalWidth / 2,
+			y: answer3Box.y() + answer3Box.width() + spacing,
+			text: "Correct!",
+			fill: "green",
+			fontSize: 40,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			visible: false
+		});
+	
+		gameQuestAnsGroup.add(this.correctAnswerText);
+
+		//Center the origin point of the text
+		this.correctAnswerText.offsetX(this.correctAnswerText.width() / 2);
+
+		//Text that tells the user they answered correctly
+		this.incorrectAnswerText = new Konva.Text({
+			x: totalWidth / 2,
+			y: answer3Box.y() + answer3Box.width() + spacing,
+			text: "Incorrect",
+			fill: "red",
+			fontSize: 40,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			visible: false
+		});
+	
+		gameQuestAnsGroup.add(this.incorrectAnswerText);
+
+		//Center the origin point of the text
+		this.incorrectAnswerText.offsetX(this.incorrectAnswerText.width() / 2);
 		
 		//Text that shows the user their options for answers to the questions
 		this.answerTexts = [
@@ -603,6 +637,22 @@ export class PracticeAreaView implements View {
 			text.offsetY(text.height() / 2);
 		});
 		this.group.getLayer()?.draw();
+	}
+
+	/**
+	 * Internal function that shows the 'Correct!' text when the user answers correctly
+	 */
+	correctAnswer(): void {
+		this.incorrectAnswerText.visible(false);
+		this.correctAnswerText.visible(true);
+	}
+
+	/**
+	 * Internal function that shows the 'Incorrect' text when the user answers incorrectly
+	 */
+	incorrectAnswer(): void {
+		this.correctAnswerText.visible(false);
+		this.incorrectAnswerText.visible(true);
 	}
 
 
