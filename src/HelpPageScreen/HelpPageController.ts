@@ -23,7 +23,7 @@ export class HelpPageController extends ScreenController {
     private handleStartGameClick(): void {
         const state = getGlobalState();
         const startRound = state.currentRound;
-        this.screenSwitcher.switchToScreen({ type: "roundIntro", round:startRound });
+        this.screenSwitcher.switchToScreen({ type: "intro", round:startRound });
     }
 
     /**
