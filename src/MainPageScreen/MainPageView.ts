@@ -51,28 +51,29 @@ export class MainPageView implements View {
 		// Score display (bottom-center). origin will be set to the center so
 		// the text remains centered as its content changes.
 		this.scoreText = new Konva.Text({
-			x: GAMECST.STAGE_WIDTH - 40,
-			y: 35,
-			text: "Score: 0",
-			fontSize: 30,
+			x: GAMECST.STAGE_WIDTH / 2,
+			Y: GAMECST.STAGE_HEIGHT - 30,
+			text: "Score: 00000",
+			fontSize: 40,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR,
 		});
 		// make origin the visual center
-		this.scoreText.offsetX(this.scoreText.width());
+		this.scoreText.offsetX(this.scoreText.width() / 2);
+		this.scoreText.offsetY(this.scoreText.height());
 		this.group.add(this.scoreText);
 
 		//TODO: Add function that changes the round number
 		this.roundText = new Konva.Text({
-			x: GAMECST.STAGE_WIDTH / 2,
-			Y: GAMECST.STAGE_HEIGHT - 30,
+			x: GAMECST.STAGE_WIDTH - 40,
+			y: 35,
 			text: "ROUND 1",
-			fontSize: 40,
+			fontSize: 30,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR
 		});
-		this.roundText.offsetX(this.roundText.width() / 2);
-		this.roundText.offsetY(this.roundText.height());
+		this.roundText.offsetX(this.roundText.width());
+		this.roundText.offsetY(this.roundText.height() / 2);
 		this.group.add(this.roundText);
 
 		//Group that holds the pause/play button
