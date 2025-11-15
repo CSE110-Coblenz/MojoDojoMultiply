@@ -14,6 +14,8 @@ export class MainPageView implements View {
 	private roundText: Konva.Text;
 	private questionText: Konva.Text;
 	private answerTexts: Konva.Text[];
+	private correctAnswerText: Konva.Text;
+	private incorrectAnswerText: Konva.Text;
 	private playerHealthBar: Konva.Rect;
 	private opponentHealthBar: Konva.Rect;
 	// Konva image for the player's avatar
@@ -398,7 +400,7 @@ export class MainPageView implements View {
 		//TODO: add hide and show functionality to this text
 
 		//Text that tells the user they answered correctly
-		const correctAnswerText = new Konva.Text({
+		this.correctAnswerText = new Konva.Text({
 			x: totalWidth / 2,
 			y: answer3Box.y() + answer3Box.width() + spacing,
 			text: "Correct!",
@@ -408,13 +410,13 @@ export class MainPageView implements View {
 			visible: false
 		});
 	
-		gameQuestAnsGroup.add(correctAnswerText);
+		gameQuestAnsGroup.add(this.correctAnswerText);
 
 		//Center the origin point of the text
-		correctAnswerText.offsetX(correctAnswerText.width() / 2);
+		this.correctAnswerText.offsetX(this.correctAnswerText.width() / 2);
 
 		//Text that tells the user they answered correctly
-		const incorrectAnswerText = new Konva.Text({
+		this.incorrectAnswerText = new Konva.Text({
 			x: totalWidth / 2,
 			y: answer3Box.y() + answer3Box.width() + spacing,
 			text: "Incorrect",
@@ -424,10 +426,10 @@ export class MainPageView implements View {
 			visible: false
 		});
 	
-		gameQuestAnsGroup.add(incorrectAnswerText);
+		gameQuestAnsGroup.add(this.incorrectAnswerText);
 
 		//Center the origin point of the text
-		incorrectAnswerText.offsetX(incorrectAnswerText.width() / 2);
+		this.incorrectAnswerText.offsetX(this.incorrectAnswerText.width() / 2);
 
 		// Attach click/hover handlers now that answerTexts exist
 		answer1Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[0].text())));
@@ -668,6 +670,19 @@ export class MainPageView implements View {
     getTimerImageNodes(): Konva.Image[] {
         return this.timerImageNodes;
     }
+
+	/**
+	 * Internal function that shows the 'Correct!' text when the user answers correctly
+	 */
+	correctAnswer(): void {
+		this.incorrectAnswerText.visible(false);
+		this.correctAnswerText.visible(true);
+	}
+
+	incorrectAnswer(): void {
+		this.correctAnswerText.visible(false);
+		this.incorrectAnswerText.visible(true);
+	}
 
     /**
      * Update the health bars with new percentage values

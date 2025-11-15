@@ -426,6 +426,12 @@ export class MainPageController extends ScreenController {
 
         // Store current question's correct answer
         const currentCorrectAnswer = this.model.correctAnswer;
+
+        if (this.model.playerResponse == this.model.correctAnswer) {
+            this.view.correctAnswer();
+        } else {
+            this.view.incorrectAnswer();
+        }
         
         // Calculate damages based on both player and computer responses
         const damages = this.damageCalculation();
