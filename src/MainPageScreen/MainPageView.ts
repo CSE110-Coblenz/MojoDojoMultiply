@@ -249,7 +249,7 @@ export class MainPageView implements View {
 		const gameQuestAnsGroup = new Konva.Group();
 
 		//Set the position of the entire group
-		gameQuestAnsGroup.position({ x: GAMECST.STAGE_WIDTH * 2 / 3, y: GAMECST.STAGE_HEIGHT / 4, });
+		gameQuestAnsGroup.position({ x: GAMECST.STAGE_WIDTH * 2 / 3, y: GAMECST.STAGE_HEIGHT / 5, });
 		this.group.add(gameQuestAnsGroup);
 
 		//Group that holds the question text and the question box
@@ -393,8 +393,40 @@ export class MainPageView implements View {
 			})
 		
 		];
+
+		//TODO: add hide and show functionality to this text
+
+		//Text that tells the user they answered correctly
+		const correctAnswerText = new Konva.Text({
+			x: totalWidth / 2,
+			y: answer3Box.y() + answer3Box.width() + spacing,
+			text: "Correct!",
+			fill: "green",
+			fontSize: 40,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			visible: false
+		});
 	
+		gameQuestAnsGroup.add(correctAnswerText);
+
+		//Center the origin point of the text
+		correctAnswerText.offsetX(correctAnswerText.width() / 2);
+
+		//Text that tells the user they answered correctly
+		const incorrectAnswerText = new Konva.Text({
+			x: totalWidth / 2,
+			y: answer3Box.y() + answer3Box.width() + spacing,
+			text: "Incorrect",
+			fill: "red",
+			fontSize: 40,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			visible: false
+		});
 	
+		gameQuestAnsGroup.add(incorrectAnswerText);
+
+		//Center the origin point of the text
+		incorrectAnswerText.offsetX(incorrectAnswerText.width() / 2);
 
 		// Attach click/hover handlers now that answerTexts exist
 		answer1Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[0].text())));
@@ -517,12 +549,10 @@ export class MainPageView implements View {
 		startPageText.offsetY(startPageText.height() / 2);
 
 		//Button that takes the user back to the start screen
-		//TODO: add navigation function to the button
 		const helpPageButton = new Konva.Group({});
 		pauseScreenOptions.add(helpPageButton);
 
 		//Button that takes the user to the help screen
-		//TODO: add navigation function to the button
 		const helpPageButtonBackground = new Konva.Rect({
 			x: startPageButtonBackground.width() + 80,
 			y: 0,
