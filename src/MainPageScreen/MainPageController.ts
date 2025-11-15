@@ -211,6 +211,7 @@ export class MainPageController extends ScreenController {
      * Switches the screen to the start page when the pause menu button is clicked
      */
     private handleStartClick(): void {
+        this.endGameEarly();
         this.screenSwitcher.switchToScreen({ type: "start" });
     }
 
@@ -560,8 +561,12 @@ export class MainPageController extends ScreenController {
     /**
      * Exit the game
      */
-    exitGame(): void {
+    endGameEarly(): void {
         this.clearQuestionTimer();
+        this.model.score = 0;
+        this.model.playerHealth = this.model.maxHealth;
+        this.model.opponentHealth = this.model.maxHealth;
+        this.resumeGame();
     }
 
     /**
