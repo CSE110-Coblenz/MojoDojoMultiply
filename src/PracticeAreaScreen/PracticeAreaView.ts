@@ -14,7 +14,7 @@ export class PracticeAreaView implements View {
 	private roundText: Konva.Text;
 	private questionText: Konva.Text;
 	private answerTexts: Konva.Text[];
-	private playerHealthBar: Konva.Rect;
+	//private playerHealthBar: Konva.Rect;
 	//private opponentHealthBar: Konva.Rect;
 	// Konva image for the player's avatar
 	private playerAvatar?: Konva.Image;
@@ -44,7 +44,7 @@ export class PracticeAreaView implements View {
 			y: 0,
 			width: GAMECST.STAGE_WIDTH,
 			height: GAMECST.STAGE_HEIGHT,
-			fill: "#B8E2F2"
+			fill: "#D8E9FA"
 		});
 		this.group.add(bg);
 
@@ -151,33 +151,33 @@ export class PracticeAreaView implements View {
 		pausePlayButtonGroup.on('click tap', () => { pauseResumeGame() });
 
 
-		//Health bar that visualizes the health of the player's character
-		const playerHealthGroup = new Konva.Group();
-		this.group.add(playerHealthGroup);
-		const healthBarWidth = 150;
+		// //Health bar that visualizes the health of the player's character
+		// const playerHealthGroup = new Konva.Group();
+		// this.group.add(playerHealthGroup);
+		// const healthBarWidth = 150;
 
-		//Background to visualize the full size of the health bar
-		const playerBarBacking = new Konva.Rect({
-			x: 80,
-			y: GAMECST.STAGE_HEIGHT * 2 / 3,
-			width: healthBarWidth,
-			height: 40,
-			stroke: GAMECST.DARK_COLOR,
-			strokeWidth: 4,
-			fill: GAMECST.NEUTRAL_COLOR
-		});
-		playerHealthGroup.add(playerBarBacking);
+		// //Background to visualize the full size of the health bar
+		// const playerBarBacking = new Konva.Rect({
+		// 	x: 80,
+		// 	y: GAMECST.STAGE_HEIGHT * 2 / 3,
+		// 	width: healthBarWidth,
+		// 	height: 40,
+		// 	stroke: GAMECST.DARK_COLOR,
+		// 	strokeWidth: 4,
+		// 	fill: GAMECST.NEUTRAL_COLOR
+		// });
+		// playerHealthGroup.add(playerBarBacking);
 
-		//Health bar that shrinks to model the health level of the player 
-		this.playerHealthBar = new Konva.Rect({
-			x: playerBarBacking.x() + 2,
-			y: playerBarBacking.y() + 2,
-			width: healthBarWidth - 4,
-			height: 36,
-			strokeEnabled: false,
-			fill: GAMECST.ALERT_COLOR
-		});
-		playerHealthGroup.add(this.playerHealthBar);
+		// //Health bar that shrinks to model the health level of the player 
+		// this.playerHealthBar = new Konva.Rect({
+		// 	x: playerBarBacking.x() + 2,
+		// 	y: playerBarBacking.y() + 2,
+		// 	width: healthBarWidth - 4,
+		// 	height: 36,
+		// 	strokeEnabled: false,
+		// 	fill: GAMECST.ALERT_COLOR
+		// });
+		// playerHealthGroup.add(this.playerHealthBar);
 
 		// //Health bar that visualizes the health of the opponent's character
 		// const opponentHealthGroup = new Konva.Group();
@@ -649,7 +649,7 @@ export class PracticeAreaView implements View {
      */
     updateHealthBars(playerHealthPercent: number, opponentHealthPercent: number): void {
         const healthBarWidth = 150;
-        this.playerHealthBar.width((healthBarWidth - 4) * playerHealthPercent);
+        //this.playerHealthBar.width((healthBarWidth - 4) * playerHealthPercent);
         //this.opponentHealthBar.width((healthBarWidth - 4) * opponentHealthPercent);
         this.group.getLayer()?.draw();
     }
