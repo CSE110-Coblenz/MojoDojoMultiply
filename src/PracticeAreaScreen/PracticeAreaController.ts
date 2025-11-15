@@ -29,7 +29,7 @@ export class PracticeAreaController extends ScreenController {
             () => this.handleHoverStart(),
             () => this.handleHoverEnd(),
             () => this.handleStartClick(),
-            () => this.handleHelpClick()
+            () => this.handleGameClick()
         );
 
         this.setupGlobalStateListener();
@@ -61,19 +61,19 @@ export class PracticeAreaController extends ScreenController {
 
     //TODO: Create counter variable to announce what specific round player is on
 
-    /**
-     * Update score display in view
-     */
-    updateScore(score: number): void {
-        this.view.setScoreText(`Score: ${score}`);
-    }
+    // /**
+    //  * Update score display in view
+    //  */
+    // updateScore(score: number): void {
+    //     this.view.setScoreText(`Score: ${score}`);
+    // }
 
-    /**
-     * Update timer display in view
-     */
-    updateTimer(timeRemaining: number): void {
-        this.view.setTimerText(`Time: ${timeRemaining}`);
-    }
+    // /**
+    //  * Update timer display in view
+    //  */
+    // updateTimer(timeRemaining: number): void {
+    //     this.view.setTimerText(`Time: ${timeRemaining}`);
+    // }
 
     /**
      * Update question display in view
@@ -126,7 +126,7 @@ export class PracticeAreaController extends ScreenController {
         this.resetForRound(round);
 
         // Update view with initial state
-        this.updateScore(this.model.score);
+        //this.updateScore(this.model.score);
         
         // Generate first question
         this.generateNewQuestion();
@@ -135,8 +135,8 @@ export class PracticeAreaController extends ScreenController {
         // Show the view after initial setup
         this.view.show();
 
-        // Start timer
-        this.startQuestionTimer();
+        // // Start timer
+        // this.startQuestionTimer();
     }
 
     /**
@@ -152,60 +152,60 @@ export class PracticeAreaController extends ScreenController {
         this.updateHealthBars();
     }
 
-    /**
-     * new per-question timer
-     */
-    private startQuestionTimer(): void {
-        this.clearQuestionTimer();
-        this.model.questionTimeRemaining = 30;
-        this.updateTimer(this.model.questionTimeRemaining);
+    // /**
+    //  * new per-question timer
+    //  */
+    // private startQuestionTimer(): void {
+    //     this.clearQuestionTimer();
+    //     this.model.questionTimeRemaining = 30;
+    //     this.updateTimer(this.model.questionTimeRemaining);
 
-        this.model.questionTimerId = window.setInterval(() => {
-            this.model.questionTimeRemaining--;
-            this.updateTimer(this.model.questionTimeRemaining);
+    //     this.model.questionTimerId = window.setInterval(() => {
+    //         this.model.questionTimeRemaining--;
+    //         this.updateTimer(this.model.questionTimeRemaining);
 
-            if (this.model.questionTimeRemaining <= 0) {
-                this.onQuestionTimeout();
-            }
-        }, 1000);
-    }
+    //         if (this.model.questionTimeRemaining <= 0) {
+    //             this.onQuestionTimeout();
+    //         }
+    //     }, 1000);
+    // }
 
-    /**
-     * pauses question timer to be resumed later
-     */
-    private pauseQuestionTimer(): void {
-        if (this.model.questionTimerId !== null) {
-            clearInterval(this.model.questionTimerId);
-            this.model.questionTimerId = null;
-        }
-    }
+    // /**
+    //  * pauses question timer to be resumed later
+    //  */
+    // private pauseQuestionTimer(): void {
+    //     if (this.model.questionTimerId !== null) {
+    //         clearInterval(this.model.questionTimerId);
+    //         this.model.questionTimerId = null;
+    //     }
+    // }
 
-    /**
-     * resumes question timer after being paused
-     */
-    private resumeQuestionTimer(): void {
-        // if timer is already running, do nothing
-        if (this.model.questionTimerId !== null) return;
+    // /**
+    //  * resumes question timer after being paused
+    //  */
+    // private resumeQuestionTimer(): void {
+    //     // if timer is already running, do nothing
+    //     if (this.model.questionTimerId !== null) return;
 
-        // if resume is called without calling start first
-        if (this.model.questionTimeRemaining <= 0) {
-            this.onQuestionTimeout();
-            return;
-        }
+    //     // if resume is called without calling start first
+    //     if (this.model.questionTimeRemaining <= 0) {
+    //         this.onQuestionTimeout();
+    //         return;
+    //     }
 
-        // Update UI with current remaining time
-        this.updateTimer(this.model.questionTimeRemaining);
+    //     // Update UI with current remaining time
+    //     this.updateTimer(this.model.questionTimeRemaining);
 
-        // resume countdown
-        this.model.questionTimerId = window.setInterval(() => {
-            this.model.questionTimeRemaining--;
-            this.updateTimer(this.model.questionTimeRemaining);
+    //     // resume countdown
+    //     this.model.questionTimerId = window.setInterval(() => {
+    //         this.model.questionTimeRemaining--;
+    //         this.updateTimer(this.model.questionTimeRemaining);
 
-            if (this.model.questionTimeRemaining <= 0) {
-                this.onQuestionTimeout();
-            }
-        }, 1000);
-    }
+    //         if (this.model.questionTimeRemaining <= 0) {
+    //             this.onQuestionTimeout();
+    //         }
+    //     }, 1000);
+    // }
 
     /**
      * Switches the screen to the start page when the pause menu button is clicked
@@ -217,37 +217,37 @@ export class PracticeAreaController extends ScreenController {
     /**
      * Switches the screen to the start page when the pause menu button is clicked
      */
-    private handleHelpClick(): void {
-        this.screenSwitcher.switchToScreen({ type: "help" });
+    private handleGameClick(): void {
+        this.screenSwitcher.switchToScreen({ type: "main", round: 1 });
     }
 
 
-    /**
-     * clears timer for new questions
-     */
-    private clearQuestionTimer(): void {
-        // stop timer if running
-        if (this.model.questionTimerId !== null) {
-            clearInterval(this.model.questionTimerId);
-            this.model.questionTimerId = null;
-        }
+    // /**
+    //  * clears timer for new questions
+    //  */
+    // private clearQuestionTimer(): void {
+    //     // stop timer if running
+    //     if (this.model.questionTimerId !== null) {
+    //         clearInterval(this.model.questionTimerId);
+    //         this.model.questionTimerId = null;
+    //     }
 
-        // remove saved remaining time
-        this.model.questionTimeRemaining = 0;
-        this.updateTimer(this.model.questionTimeRemaining);
-    }
+    //     // remove saved remaining time
+    //     this.model.questionTimeRemaining = 0;
+    //     this.updateTimer(this.model.questionTimeRemaining);
+    // }
 
-    /**
-     * when time runs out, its as if player got answer wrong
-     * Reset game state by setting model properties to default values
-     */
-    private onQuestionTimeout(): void {
-        this.clearQuestionTimer();
-        this.model.playerResponse = NaN;
-        this.model.playerTime = Number.POSITIVE_INFINITY;
-        const damages = this.damageCalculation();
-        this.applyDamagesAndAdvance(damages, 0);
-    }
+    // /**
+    //  * when time runs out, its as if player got answer wrong
+    //  * Reset game state by setting model properties to default values
+    //  */
+    // private onQuestionTimeout(): void {
+    //     this.clearQuestionTimer();
+    //     this.model.playerResponse = NaN;
+    //     this.model.playerTime = Number.POSITIVE_INFINITY;
+    //     const damages = this.damageCalculation();
+    //     this.applyDamagesAndAdvance(damages, 0);
+    // }
 
     /**
      * handles damage, score, advancing rounds
@@ -280,7 +280,7 @@ export class PracticeAreaController extends ScreenController {
         if (questionPoints > 0) {
             this.model.score += questionPoints;
             this.model.roundScore += questionPoints;
-            this.updateScore(this.model.score);
+            //this.updateScore(this.model.score);
         }
 
         this.updateHealthBars();
@@ -291,10 +291,10 @@ export class PracticeAreaController extends ScreenController {
             if (this.model.playerHealth > this.model.maxHealth / 2) {
                 this.model.score += 400;
                 this.model.roundScore += 400;
-                this.updateScore(400);
+                //this.updateScore(400);
             }
 
-            this.clearQuestionTimer();
+            //this.clearQuestionTimer();
             this.screenSwitcher.switchToScreen({
                 type: "stats",
                 round: this.model.currentRound
@@ -303,14 +303,14 @@ export class PracticeAreaController extends ScreenController {
         }
         // handles losing round
         if (this.model.playerHealth <= 0) {
-            this.clearQuestionTimer();
+            //this.clearQuestionTimer();
             this.screenSwitcher.switchToScreen( {type: "results"});
             return;
         }
 
         this.generateNewQuestion();
         this.updateQuestion();
-        this.startQuestionTimer();
+        //this.startQuestionTimer();
     }
 
 
@@ -433,7 +433,7 @@ export class PracticeAreaController extends ScreenController {
         const questionPoints = this.pointsCalculation(timeLeftSeconds);
 
         // Stop timer
-        this.clearQuestionTimer();
+       // this.clearQuestionTimer();
 
         // apply damage 
         this.applyDamagesAndAdvance(damages, questionPoints);
@@ -522,7 +522,7 @@ export class PracticeAreaController extends ScreenController {
      * End the game which for now just goes back to the start screen
      */
     private endGame(): void {
-        this.clearQuestionTimer();
+        //this.clearQuestionTimer();
         this.model.currentRound += 1;
 
         // Switch back to start screen
@@ -536,7 +536,7 @@ export class PracticeAreaController extends ScreenController {
      * Pause the game
      */
     pauseGame(): void {
-        this.pauseQuestionTimer();
+        //this.pauseQuestionTimer();
         this.model.gamePaused = true;
         this.view.pauseLogo?.visible(false);
         this.view.playLogo?.visible(true);
@@ -547,7 +547,7 @@ export class PracticeAreaController extends ScreenController {
      * Resume the game
      */
     resumeGame(): void {
-        this.resumeQuestionTimer();
+        //this.resumeQuestionTimer();
         this.model.gamePaused = false;
         this.view.pauseLogo?.visible(true);
         this.view.playLogo?.visible(false);
@@ -559,7 +559,7 @@ export class PracticeAreaController extends ScreenController {
      * Exit the game
      */
     exitGame(): void {
-        this.clearQuestionTimer();
+        //this.clearQuestionTimer();
     }
 
     /**

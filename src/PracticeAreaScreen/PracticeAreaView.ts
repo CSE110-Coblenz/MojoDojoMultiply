@@ -3,19 +3,19 @@ import type { View } from "../types.js";
 import { GAMECST } from "../constants.js";
 
 /**
- * MainPageView - Renders the main game screen
+ * gamePageView - Renders the main game screen
  */
 export class PracticeAreaView implements View {
 	private group: Konva.Group;
     // Konva.Image placeholders for timer digits (minute, tens, ones)
     private readonly timerImageNodes: Konva.Image[] = [];
-	private scoreText: Konva.Text;
+	//private scoreText: Konva.Text;
 	private timerText: Konva.Text;
 	private roundText: Konva.Text;
 	private questionText: Konva.Text;
 	private answerTexts: Konva.Text[];
 	private playerHealthBar: Konva.Rect;
-	private opponentHealthBar: Konva.Rect;
+	//private opponentHealthBar: Konva.Rect;
 	// Konva image for the player's avatar
 	private playerAvatar?: Konva.Image;
 	// Konva image for the opponent's avatar
@@ -34,7 +34,7 @@ export class PracticeAreaView implements View {
 		onHoverStart: () => void,
 		onHoverEnd: () => void,
 		onStartClick: () => void,
-		onHelpClick: () => void
+		onGameClick: () => void
 	) {
 		this.group = new Konva.Group({ visible: false });
 
@@ -44,35 +44,38 @@ export class PracticeAreaView implements View {
 			y: 0,
 			width: GAMECST.STAGE_WIDTH,
 			height: GAMECST.STAGE_HEIGHT,
-			fill: GAMECST.BCKGRD_COLOR
+			fill: "#B8E2F2"
 		});
 		this.group.add(bg);
 
+		/*
 		// Score display (bottom-center). origin will be set to the center so
 		// the text remains centered as its content changes.
 		this.scoreText = new Konva.Text({
-			x: GAMECST.STAGE_WIDTH - 40,
-			y: 35,
-			text: "Score: 0",
-			fontSize: 30,
+			x: GAMECST.STAGE_WIDTH / 2,
+			y: GAMECST.STAGE_HEIGHT - 20,
+			text: "Score: -- ",
+			fontSize: 40,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR,
 		});
 		// make origin the visual center
-		this.scoreText.offsetX(this.scoreText.width());
+		this.scoreText.offsetX(this.scoreText.width() / 2);
+		this.scoreText.offsetY(this.scoreText.height());
 		this.group.add(this.scoreText);
+		*/
 
 		//TODO: Add function that changes the round number
 		this.roundText = new Konva.Text({
-			x: GAMECST.STAGE_WIDTH / 2,
-			Y: GAMECST.STAGE_HEIGHT - 30,
-			text: "ROUND 1",
-			fontSize: 40,
+			x: GAMECST.STAGE_WIDTH - 40,
+			Y: 30,
+			text: "Practice Round",
+			fontSize: 35,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR
 		});
-		this.roundText.offsetX(this.roundText.width() / 2);
-		this.roundText.offsetY(this.roundText.height());
+		this.roundText.offsetX(this.roundText.width());
+		//this.roundText.offsetY(this.roundText.height());
 		this.group.add(this.roundText);
 
 		//Group that holds the pause/play button
@@ -176,32 +179,32 @@ export class PracticeAreaView implements View {
 		});
 		playerHealthGroup.add(this.playerHealthBar);
 
-		//Health bar that visualizes the health of the opponent's character
-		const opponentHealthGroup = new Konva.Group();
-		this.group.add(opponentHealthGroup);
+		// //Health bar that visualizes the health of the opponent's character
+		// const opponentHealthGroup = new Konva.Group();
+		// this.group.add(opponentHealthGroup);
 
-		//Background to visualize the full size of the health bar
-		const opponentBarBacking = new Konva.Rect({
-			x: 300,
-			y: playerBarBacking.y(),
-			width: healthBarWidth,
-			height: 40,
-			stroke: GAMECST.DARK_COLOR,
-			strokeWidth: 4,
-			fill: GAMECST.NEUTRAL_COLOR
-		});
-		opponentHealthGroup.add(opponentBarBacking);
+		// //Background to visualize the full size of the health bar
+		// const opponentBarBacking = new Konva.Rect({
+		// 	x: 300,
+		// 	y: playerBarBacking.y(),
+		// 	width: healthBarWidth,
+		// 	height: 40,
+		// 	stroke: GAMECST.DARK_COLOR,
+		// 	strokeWidth: 4,
+		// 	fill: GAMECST.NEUTRAL_COLOR
+		// });
+		// opponentHealthGroup.add(opponentBarBacking);
 
-		//Health bar that shrinks to model the health level of the opponent
-		this.opponentHealthBar = new Konva.Rect({
-			x: opponentBarBacking.x() + 2,
-			y: opponentBarBacking.y() + 2,
-			width: healthBarWidth - 4,
-			height: 36,
-			strokeEnabled: false,
-			fill: GAMECST.ALERT_COLOR
-		});
-		opponentHealthGroup.add(this.opponentHealthBar);
+		// //Health bar that shrinks to model the health level of the opponent
+		// this.opponentHealthBar = new Konva.Rect({
+		// 	x: opponentBarBacking.x() + 2,
+		// 	y: opponentBarBacking.y() + 2,
+		// 	width: healthBarWidth - 4,
+		// 	height: 36,
+		// 	strokeEnabled: false,
+		// 	fill: GAMECST.ALERT_COLOR
+		// });
+		// opponentHealthGroup.add(this.opponentHealthBar);
 
 		// Initialize health bars to full
 		this.updateHealthBars(1, 1);
@@ -223,18 +226,18 @@ export class PracticeAreaView implements View {
 			fightingStage.add(image);
 		});
 
-		// load boxer image and store it on the instance so other code can access it
-		Konva.Image.fromURL('/boxer2.png', (image) => {
-			// keep a reference to the Konva.Image node
-			this.opponentAvatar = image;
+		// // load boxer image and store it on the instance so other code can access it
+		// Konva.Image.fromURL('/boxer2.png', (image) => {
+		// 	// keep a reference to the Konva.Image node
+		// 	this.opponentAvatar = image;
 
-			// set desired scale and position (adjust values as needed)
-			image.scale({ x: 0.3, y: 0.3 });
-			image.position({ x: 300, y: GAMECST.STAGE_HEIGHT / 3 });
+		// 	// set desired scale and position (adjust values as needed)
+		// 	image.scale({ x: 0.3, y: 0.3 });
+		// 	image.position({ x: 300, y: GAMECST.STAGE_HEIGHT / 3 });
 
-			// add to the fighting stage group
-			fightingStage.add(image);
-		});
+		// 	// add to the fighting stage group
+		// 	fightingStage.add(image);
+		// });
 
 		// Create four answer squares in a 2x2 grid pattern in the center of the screen
 		const squareSize = 80;
@@ -260,7 +263,7 @@ export class PracticeAreaView implements View {
 		this.timerText = new Konva.Text({
 			x: totalWidth / 2,
 			y: 0,
-			text: "Time: 60",
+			text: "Time: --- ",
 			fontSize: 32,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.ALERT_COLOR,
@@ -470,24 +473,24 @@ export class PracticeAreaView implements View {
 		this.pauseMenu.add(pauseScreenText);
 
 		//Group containing navigation elements of the pause menu
-		const pauseScreenOptions = new Konva.Group({
-			x: pauseScreen.width() / 2, 
-			y: pauseScreen.height() * 3 / 4
+		const navigationOptions = new Konva.Group({
+			x: GAMECST.STAGE_WIDTH / 2, 
+			y: GAMECST.STAGE_HEIGHT - 35
 		});
-		this.pauseMenu.add(pauseScreenOptions);
+		this.group.add(navigationOptions);
 
 		const pauseButtonWidth = 200;
 		const pauseButtonSpacing = 80;
 		const pauseButtonHeight = 50;
 		
 		//Center the button group with its size
-		pauseScreenOptions.offsetX(pauseButtonWidth + pauseButtonSpacing / 2);
-		pauseScreenOptions.offsetY(pauseButtonHeight / 2);
+		navigationOptions.offsetX(pauseButtonWidth + pauseButtonSpacing / 2);
+		navigationOptions.offsetY(pauseButtonHeight);
 
 		//Button that takes the user back to the start screen
 		//TODO: add navigation function to the button
 		const startPageButton = new Konva.Group({});
-		pauseScreenOptions.add(startPageButton);
+		navigationOptions.add(startPageButton);
 
 		//Background of the button that is the touch target
 		const startPageButtonBackground = new Konva.Rect({
@@ -518,12 +521,12 @@ export class PracticeAreaView implements View {
 
 		//Button that takes the user back to the start screen
 		//TODO: add navigation function to the button
-		const helpPageButton = new Konva.Group({});
-		pauseScreenOptions.add(helpPageButton);
+		const gamePageButton = new Konva.Group({});
+		navigationOptions.add(gamePageButton);
 
 		//Button that takes the user to the help screen
 		//TODO: add navigation function to the button
-		const helpPageButtonBackground = new Konva.Rect({
+		const gamePageButtonBackground = new Konva.Rect({
 			x: startPageButtonBackground.width() + 80,
 			y: 0,
 			width: 200,
@@ -532,27 +535,27 @@ export class PracticeAreaView implements View {
 			strokeWidth: 4,
 			fill: GAMECST.HIGHLIGHT_COLOR,
 		});
-		helpPageButton.add(helpPageButtonBackground);
+		gamePageButton.add(gamePageButtonBackground);
 		
 		//Text for the start page button to tell the user what it does
-		const helpPageText = new Konva.Text({
-			x: helpPageButtonBackground.x() + helpPageButtonBackground.width() / 2,
-			y: helpPageButtonBackground.y() + helpPageButtonBackground.height() / 2,
-			text: "Help Page",
+		const gamePageText = new Konva.Text({
+			x: gamePageButtonBackground.x() + gamePageButtonBackground.width() / 2,
+			y: gamePageButtonBackground.y() + gamePageButtonBackground.height() / 2,
+			text: "Start Game",
 			fontSize: 35,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR,
 		})
-		helpPageButton.add(helpPageText);
+		gamePageButton.add(gamePageText);
 
 		//Center the button
-		helpPageText.offsetX(helpPageText.width() / 2);
-		helpPageText.offsetY(helpPageText.height() / 2);
+		gamePageText.offsetX(gamePageText.width() / 2);
+		gamePageText.offsetY(gamePageText.height() / 2);
 
 		//Add click hover appearance to the help button
-		helpPageButton.on('mouseover', onHoverStart);
-		helpPageButton.on('mouseout', onHoverEnd);
-		helpPageButton.on('click', onHelpClick);
+		gamePageButton.on('mouseover', onHoverStart);
+		gamePageButton.on('mouseout', onHoverEnd);
+		gamePageButton.on('click', onGameClick);
 
 		//Add click hover appearance to the help button
 		startPageButton.on('mouseover', onHoverStart);
@@ -563,9 +566,8 @@ export class PracticeAreaView implements View {
 		//startPageButton.on('click tap', () => { onStartPageClick() });
 	}
 
-	/**
-	 * Internal method to update score text
-	 */
+	/*
+	
 	setScoreText(scoreText: string): void {
 		this.scoreText.text(scoreText);
 		// update origin so the text remains centered as width/height change
@@ -575,15 +577,16 @@ export class PracticeAreaView implements View {
 		// this.scoreText.position({ x: GAMECST.STAGE_WIDTH / 2, y: GAMECST.STAGE_HEIGHT - 30 });
 		this.group.getLayer()?.draw();
 	}
+	*/
 	
 
-	/**
-	 * Internal method to update timer text
-	 */
-	setTimerText(timerText: string): void {
-		this.timerText.text(timerText);
-		this.group.getLayer()?.draw();
-	}
+	// /**
+	//  * Internal method to update timer text
+	//  */
+	// setTimerText(timerText: string): void {
+	// 	this.timerText.text(timerText);
+	// 	this.group.getLayer()?.draw();
+	// }
 
 	/**
 	 * Internal method to update question display
@@ -647,7 +650,7 @@ export class PracticeAreaView implements View {
     updateHealthBars(playerHealthPercent: number, opponentHealthPercent: number): void {
         const healthBarWidth = 150;
         this.playerHealthBar.width((healthBarWidth - 4) * playerHealthPercent);
-        this.opponentHealthBar.width((healthBarWidth - 4) * opponentHealthPercent);
+        //this.opponentHealthBar.width((healthBarWidth - 4) * opponentHealthPercent);
         this.group.getLayer()?.draw();
     }
 }

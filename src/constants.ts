@@ -3,9 +3,9 @@ export const STAGE_WIDTH = 800;
 export const STAGE_HEIGHT = 600;
 
 //Standard game colors
-export const BCKGRD_COLOR = "#FFFFDD";
-export const HIGHLIGHT_COLOR = "#FD754D";
-export const ALERT_COLOR = "#F94449";
+export const BCKGRD_COLOR = "#FFB290";
+export const HIGHLIGHT_COLOR = "#FF9B78";
+export const ALERT_COLOR = "#FF8561";
 export const UNAVAIL_COLOR = "grey";
 export const DARK_COLOR = "black";
 export const NEUTRAL_COLOR = "grey";
