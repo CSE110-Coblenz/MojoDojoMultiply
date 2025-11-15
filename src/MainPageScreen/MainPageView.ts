@@ -14,6 +14,8 @@ export class MainPageView implements View {
 	private roundText: Konva.Text;
 	private questionText: Konva.Text;
 	private answerTexts: Konva.Text[];
+	private correctAnswerText: Konva.Text;
+	private incorrectAnswerText: Konva.Text;
 	private playerHealthBar: Konva.Rect;
 	private opponentHealthBar: Konva.Rect;
 	// Konva image for the player's avatar
@@ -22,9 +24,9 @@ export class MainPageView implements View {
 	private opponentAvatar?: Konva.Image;
 	// optional key handler for keyboard answer selection
 	private keyHandler?: (e: KeyboardEvent) => void;
-	public pauseLogo?: Konva.Group;
-	public playLogo?: Konva.RegularPolygon;
-	public pauseMenu?: Konva.Group;
+	private pauseLogo: Konva.Group;
+	private playLogo: Konva.RegularPolygon;
+	private pauseMenu: Konva.Group;
 
 	
 	// constructor for the interface Main page interface
@@ -51,28 +53,29 @@ export class MainPageView implements View {
 		// Score display (bottom-center). origin will be set to the center so
 		// the text remains centered as its content changes.
 		this.scoreText = new Konva.Text({
-			x: GAMECST.STAGE_WIDTH - 40,
-			y: 35,
-			text: "Score: 0",
-			fontSize: 30,
+			x: GAMECST.STAGE_WIDTH / 2,
+			Y: GAMECST.STAGE_HEIGHT - 30,
+			text: "Score: 00000",
+			fontSize: 40,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR,
 		});
 		// make origin the visual center
-		this.scoreText.offsetX(this.scoreText.width());
+		this.scoreText.offsetX(this.scoreText.width() / 2);
+		this.scoreText.offsetY(this.scoreText.height());
 		this.group.add(this.scoreText);
 
 		//TODO: Add function that changes the round number
 		this.roundText = new Konva.Text({
-			x: GAMECST.STAGE_WIDTH / 2,
-			Y: GAMECST.STAGE_HEIGHT - 30,
+			x: GAMECST.STAGE_WIDTH - 40,
+			y: 35,
 			text: "ROUND 1",
-			fontSize: 40,
+			fontSize: 30,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR
 		});
-		this.roundText.offsetX(this.roundText.width() / 2);
-		this.roundText.offsetY(this.roundText.height());
+		this.roundText.offsetX(this.roundText.width());
+		this.roundText.offsetY(this.roundText.height() / 2);
 		this.group.add(this.roundText);
 
 		//Group that holds the pause/play button
@@ -249,7 +252,7 @@ export class MainPageView implements View {
 		const gameQuestAnsGroup = new Konva.Group();
 
 		//Set the position of the entire group
-		gameQuestAnsGroup.position({ x: GAMECST.STAGE_WIDTH * 2 / 3, y: GAMECST.STAGE_HEIGHT / 4, });
+		gameQuestAnsGroup.position({ x: GAMECST.STAGE_WIDTH * 2 / 3, y: GAMECST.STAGE_HEIGHT / 5, });
 		this.group.add(gameQuestAnsGroup);
 
 		//Group that holds the question text and the question box
@@ -393,8 +396,40 @@ export class MainPageView implements View {
 			})
 		
 		];
+
+		//TODO: add hide and show functionality to this text
+
+		//Text that tells the user they answered correctly
+		this.correctAnswerText = new Konva.Text({
+			x: totalWidth / 2,
+			y: answer3Box.y() + answer3Box.width() + spacing,
+			text: "Correct!",
+			fill: "green",
+			fontSize: 40,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			visible: false
+		});
 	
+		gameQuestAnsGroup.add(this.correctAnswerText);
+
+		//Center the origin point of the text
+		this.correctAnswerText.offsetX(this.correctAnswerText.width() / 2);
+
+		//Text that tells the user they answered correctly
+		this.incorrectAnswerText = new Konva.Text({
+			x: totalWidth / 2,
+			y: answer3Box.y() + answer3Box.width() + spacing,
+			text: "Incorrect",
+			fill: "red",
+			fontSize: 40,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			visible: false
+		});
 	
+		gameQuestAnsGroup.add(this.incorrectAnswerText);
+
+		//Center the origin point of the text
+		this.incorrectAnswerText.offsetX(this.incorrectAnswerText.width() / 2);
 
 		// Attach click/hover handlers now that answerTexts exist
 		answer1Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[0].text())));
@@ -517,12 +552,10 @@ export class MainPageView implements View {
 		startPageText.offsetY(startPageText.height() / 2);
 
 		//Button that takes the user back to the start screen
-		//TODO: add navigation function to the button
 		const helpPageButton = new Konva.Group({});
 		pauseScreenOptions.add(helpPageButton);
 
 		//Button that takes the user to the help screen
-		//TODO: add navigation function to the button
 		const helpPageButtonBackground = new Konva.Rect({
 			x: startPageButtonBackground.width() + 80,
 			y: 0,
@@ -637,6 +670,40 @@ export class MainPageView implements View {
     getTimerImageNodes(): Konva.Image[] {
         return this.timerImageNodes;
     }
+
+	/**
+	 * Internal function that shows the 'Correct!' text when the user answers correctly
+	 */
+	correctAnswer(): void {
+		this.incorrectAnswerText.visible(false);
+		this.correctAnswerText.visible(true);
+	}
+
+	/**
+	 * Internal function that shows the 'Incorrect' text when the user answers incorrectly
+	 */
+	incorrectAnswer(): void {
+		this.correctAnswerText.visible(false);
+		this.incorrectAnswerText.visible(true);
+	}
+
+	/**
+	 * Switches the play pause button to the play button config
+	 */
+	showPlayButton(): void {
+		this.pauseLogo.visible(false);
+		this.playLogo.visible(true);
+		this.pauseMenu.visible(true);
+	}
+
+	/**
+	 * Switches the play pause button to the play button config
+	 */
+	showPauseButton(): void {
+		this.playLogo.visible(false);
+		this.pauseLogo.visible(true);
+		this.pauseMenu.visible(false);
+	}
 
     /**
      * Update the health bars with new percentage values
