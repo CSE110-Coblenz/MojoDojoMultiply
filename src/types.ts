@@ -11,9 +11,9 @@ export type Screen =
   | { type: "main"; round: number }
   | { type: "help" }
   | { type: "practice" }
-  | { type: "roundIntro"; round: number }
+  | { type: "intro"; round: number }
   | { type: "results" }
-  | { type: "roundStats"; round: number; };
+  | { type: "stats"; round: number; };
 
 
 export abstract class ScreenController {

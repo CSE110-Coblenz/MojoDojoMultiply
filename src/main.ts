@@ -59,6 +59,7 @@ class App implements ScreenSwitcher {
   switchToScreen(screen: Screen): void {
     console.log("switchToScreen called ->", screen);
     console.trace();
+    document.body.style.cursor = "default";
     this.startController.hide();
     this.mainController.hide();
     this.helpController.hide();
@@ -72,11 +73,11 @@ class App implements ScreenSwitcher {
       case "main": this.mainController.startGame(screen.round); break;
       case "help": this.helpController.show(); break;
       case "practice": this.practiceController.show(); break;
-      case "roundIntro":
+      case "intro":
         this.roundIntroController.setRound(screen.round);
         this.roundIntroController.show();
         break;
-      case "roundStats":
+      case "stats":
         this.roundStatsController.setRound(screen.round);
         this.roundStatsController.show();
         break;

@@ -1,6 +1,6 @@
 import Konva from "konva";
 import type { View } from "../types";
-import { STAGE_WIDTH , STAGE_HEIGHT } from "../constants";
+import { GAMECST } from "../constants";
 
 type Handler = () => void;
 
@@ -12,25 +12,26 @@ export class HelpPageView implements View {
 
     // The ? For the constructor values makes it so the value is optional, both buttons do not have to be clicked
     /** TODO: Change constructor to proper Back and Start buttons */
-    constructor(onBack?: Handler, onStart?: Handler) {
+    constructor(
+        onMenu: () => void, 
+        onGame: () => void,
+        onPractice: () => void
+    ) {
         this.group = new Konva.Group({ visible: false });
 
         // Title text
         const title = new Konva.Text({
-            x: STAGE_WIDTH * 0.08,
-            y: STAGE_HEIGHT * 0.12,
+            x: GAMECST.STAGE_WIDTH * 0.08,
+            y: GAMECST.STAGE_HEIGHT * 0.12,
             text: "How to Play",
             fontSize: 48,
-            fontFamily: "Arial",
-            fill: "yellow",
-            stroke: "orange",
-            strokeWidth: 2,
-            align: "left",
+            fontFamily: GAMECST.DEFAULT_FONT,
+            fill: GAMECST.DARK_COLOR,
         });
         this.group.add(title);
 
-        const leftMargin = STAGE_WIDTH * 0.08;
-        const startY = STAGE_HEIGHT * 0.25; //starting Y for first line
+        const leftMargin = GAMECST.STAGE_WIDTH * 0.08;
+        const startY = GAMECST.STAGE_HEIGHT * 0.25; //starting Y for first line
         const lineSpacing = 60; // pixel gap in between lines
 
         //Editable instruction text array
@@ -45,64 +46,139 @@ export class HelpPageView implements View {
         instructions.forEach((text, i) => {
             const t = new Konva.Text({
                 text,
-                fontFamily: "Arial",
+                fontFamily: GAMECST.DEFAULT_FONT,
                 fontSize: 24,
                 fill: "black",
                 x: leftMargin,
                 y: startY + i * lineSpacing,
-                align: "left",
             });
             this.group.add(t);
         })
 
-        // Back Button
-        const back = new Konva.Text({
-            text: "← Back",
-            fontFamily: "Arial",
-            fontSize: 24,
-            fill: "white",
-            x: STAGE_WIDTH * 0.05,
-            y: STAGE_HEIGHT * 0.05,
-            listening: true,
-        });
-        back.on("mouseenter", () => (document.body.style.cursor = "pointer"));
-        back.on("mouseleave", () => (document.body.style.cursor = "default"));
-        back.on("click", () => onBack?.());
-        this.group.add(back);
+        // // Back Button
+        // const back = new Konva.Text({
+        //     text: "← Back",
+        //     fontFamily: "Arial",
+        //     fontSize: 24,
+        //     fill: "white",
+        //     x: GAMECST.STAGE_WIDTH * 0.05,
+        //     y: GAMECST.STAGE_HEIGHT * 0.05,
+        //     listening: true,
+        // });
+        // back.on("mouseenter", () => (document.body.style.cursor = "pointer"));
+        // back.on("mouseleave", () => (document.body.style.cursor = "default"));
+        // back.on("click", () => onBack?.());
+        // this.group.add(back);
+
+        const helpNavigationOptions = new Konva.Group();
+        this.group.add(helpNavigationOptions);
+
+        helpNavigationOptions.position({x: 40, y: GAMECST.STAGE_HEIGHT * 3 / 4});
+        
 
         //Start Training Button
-        const BTN_W = 260;
-        const BTN_H = 60;
-        const btnRect = new Konva.Rect({
-            x: STAGE_WIDTH / 2 - BTN_W / 2,
-            y: STAGE_HEIGHT - 100,
-            width: BTN_W,
-            height: BTN_H,
-            fill: "yellow",
-            cornerRadius: 12,
-            stroke: "orange",
-            strokeWidth: 3,
-        });
-        const btnText = new Konva.Text({
-            x: btnRect.x() + BTN_W / 2,
-            y: btnRect.y() + BTN_H / 2,
-            text: "Start Game",
-            fontSize: 24,
-            fontFamily: "Arial",
-            fill: "black",
-            align: "center",
-        });
-        
-        //GetClientRect gets the full x and y which includes any shadow or stoke later added, is more precise
-        const { width: bW, height: bH } = btnText.getClientRect();
-        btnText.offset({ x: bW / 2, y: bH / 2});
+        const buttonWidth = 220;
+        const buttonHeight = 60;
+        const spacing = 25;
 
-        const btnGroup = new Konva.Group({listening : true});
-        btnGroup.add(btnRect, btnText);
-        btnGroup.on("mouseenter", () => (document.body.style.cursor = "pointer"));
-        btnGroup.on("mouseleave", () => (document.body.style.cursor = "default"));
-        btnGroup.on("click", () => onStart?.());
-        this.group.add(btnGroup);
+        //Center the origin point of the Konva Group to its visual center
+        //helpNavigationOptions.offsetX((buttonWidth * 3 + spacing * 2) / 2);
+
+        //Button that allows the user to move into the training grounds from the help page
+        const startTrainButton = new Konva.Group({});
+        helpNavigationOptions.add(startTrainButton);
+
+        const startTrainButtonBackground = new Konva.Rect({
+            x: 0,
+            y: 0,
+            width: buttonWidth,
+            height: buttonHeight,
+            fill: GAMECST.HIGHLIGHT_COLOR,
+            stroke: GAMECST.DARK_COLOR,
+            strokeWidth: 4,
+        });
+        startTrainButton.add(startTrainButtonBackground);
+
+        //Text telling the user what the button does
+        const startTrainButtonText = new Konva.Text({
+            x: startTrainButtonBackground.x() + buttonWidth / 2,
+            y: startTrainButtonBackground.y() + buttonHeight / 2,
+            text: "Start Training",
+            fontSize: 35,
+            fontFamily: GAMECST.DEFAULT_FONT,
+            fill: "black",
+        });
+        startTrainButton.add(startTrainButtonText);
+        
+        startTrainButtonText.offset({ x: startTrainButtonText.width() / 2, y: startTrainButtonText.height() / 2});
+
+        startTrainButton.on("mouseenter", () => (document.body.style.cursor = "pointer"));
+        startTrainButton.on("mouseleave", () => (document.body.style.cursor = "default"));
+        startTrainButton.on("click", onPractice);
+
+        //Button that allows the user to move into the main game from the help page
+        const startGameButton = new Konva.Group({});
+        helpNavigationOptions.add(startGameButton);
+
+        const startGameButtonBackground = new Konva.Rect({
+            x: startTrainButton.x() + buttonWidth + spacing,
+            y: 0,
+            width: buttonWidth,
+            height: buttonHeight,
+            fill: GAMECST.HIGHLIGHT_COLOR,
+            stroke: GAMECST.DARK_COLOR,
+            strokeWidth: 4,
+        });
+        startGameButton.add(startGameButtonBackground);
+
+        //Text telling the user what the button does
+        const startGameButtonText = new Konva.Text({
+            x: startGameButtonBackground.x() + buttonWidth / 2,
+            y: startGameButtonBackground.y() + buttonHeight / 2,
+            text: "Start Game",
+            fontSize: 35,
+            fontFamily: GAMECST.DEFAULT_FONT,
+            fill: "black",
+        });
+        startGameButton.add(startGameButtonText);
+        
+        startGameButtonText.offset({ x: startGameButtonText.width() / 2, y: startGameButtonText.height() / 2});
+
+        startGameButton.on("mouseenter", () => (document.body.style.cursor = "pointer"));
+        startGameButton.on("mouseleave", () => (document.body.style.cursor = "default"));
+        startGameButton.on("click", onGame);
+
+        //Button that allows the user to move back to the main menu from the help page
+        const startPageButton = new Konva.Group({});
+        helpNavigationOptions.add(startPageButton);
+
+        const startPageButtonBackground = new Konva.Rect({
+            x: startGameButtonBackground.x() + buttonWidth + spacing,
+            y: 0,
+            width: buttonWidth,
+            height: buttonHeight,
+            fill: GAMECST.HIGHLIGHT_COLOR,
+            stroke: GAMECST.DARK_COLOR,
+            strokeWidth: 4,
+        });
+        startPageButton.add(startPageButtonBackground);
+
+        //Text telling the user what the button does
+        const startPageButtonText = new Konva.Text({
+            x: startPageButtonBackground.x() + buttonWidth / 2,
+            y: startPageButtonBackground.y() + buttonHeight / 2,
+            text: "Main Menu",
+            fontSize: 35,
+            fontFamily: GAMECST.DEFAULT_FONT,
+            fill: "black",
+        });
+        startPageButton.add(startPageButtonText);
+        
+        startPageButtonText.offset({ x: startPageButtonText.width() / 2, y: startPageButtonText.height() / 2});
+
+        startPageButton.on("mouseenter", () => (document.body.style.cursor = "pointer"));
+        startPageButton.on("mouseleave", () => (document.body.style.cursor = "default"));
+        startPageButton.on("click", onMenu);
     }
 
     /**
