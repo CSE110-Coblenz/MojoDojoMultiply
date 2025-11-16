@@ -68,6 +68,7 @@ class App implements ScreenSwitcher {
     this.resultsController.hide();
     this.roundIntroController.hide();
     this.roundStatsController.hide();
+    this.bonusController.hide();
 
     switch (screen.type) {
       case "start": this.startController.show(); break;
