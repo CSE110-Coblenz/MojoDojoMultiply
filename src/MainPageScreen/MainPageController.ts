@@ -36,7 +36,8 @@ export class MainPageController extends ScreenController {
             () => this.handleHoverStart(),
             () => this.handleHoverEnd(),
             () => this.handleStartClick(),
-            () => this.handleHelpClick()
+            () => this.handleHelpClick(),
+            () => this.endGame(false)
         );
 
         this.setupGlobalStateListener();
