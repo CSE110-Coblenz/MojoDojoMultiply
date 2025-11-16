@@ -27,7 +27,7 @@ export class StartPageController extends ScreenController {
    * Takes the user to the help page by switching screens when the help button is pressed
    */
   private handleHelpClick(): void {
-    this.screenSwitcher.switchToScreen({ type: "help" });
+    this.screenSwitcher.switchToScreen({ type: "help", fromGame: false });
   }
 
   /**

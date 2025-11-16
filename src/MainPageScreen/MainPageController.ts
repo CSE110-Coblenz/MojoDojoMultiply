@@ -5,13 +5,20 @@ import { GAMECST } from "../constants";
 import { GlobalState } from "../storageManager"
 
 export class MainPageController extends ScreenController {
+    // Static reference to the most recently constructed MainPageController.
+    // This allows other controllers/screens to call MainPageController.endGameEarly()
+    // without needing a direct reference to the instance.
+    private static currentInstance: MainPageController | null = null;
     private model: MainPageModel;
     private view: MainPageView;
     private screenSwitcher: ScreenSwitcher;
     private clickSound: HTMLAudioElement;
+    private playerLost: boolean = false;
 
     constructor(screenSwitcher: ScreenSwitcher) {
         super();
+        // register this instance as the active controller
+        MainPageController.currentInstance = this;
         this.screenSwitcher = screenSwitcher;
 
         this.model = new MainPageModel();
@@ -33,6 +40,18 @@ export class MainPageController extends ScreenController {
         );
 
         this.setupGlobalStateListener();
+    }
+
+    /**
+     * Static wrapper so other modules can request the active MainPageController
+     * to end the game early without having a direct instance reference.
+     */
+    static endGameEarly(): void {
+        if (MainPageController.currentInstance) {
+            MainPageController.currentInstance.endGameEarly();
+        } else {
+            console.warn("MainPageController.endGameEarly() called but no controller instance is available.");
+        }
     }
 
     /**
@@ -219,7 +238,7 @@ export class MainPageController extends ScreenController {
      * Switches the screen to the start page when the pause menu button is clicked
      */
     private handleHelpClick(): void {
-        this.screenSwitcher.switchToScreen({ type: "help" });
+        this.screenSwitcher.switchToScreen({ type: "help", fromGame: true });
     }
 
 
@@ -530,8 +549,13 @@ export class MainPageController extends ScreenController {
      */
     private endGame(): void {
         this.clearQuestionTimer();
-        this.model.currentRound += 1;
 
+        //Switch to the stats page if the player looses or the results page if the player wins
+        if(this.playerLost) {
+            this.screenSwitcher.switchToScreen({ type: "stats", round: this.model.currentRound });
+        } else {
+            this.screenSwitcher.switchToScreen({ type: "results" });
+        }
         // Switch back to start screen
         this.screenSwitcher.switchToScreen({
             type: "intro",
@@ -566,6 +590,7 @@ export class MainPageController extends ScreenController {
         this.model.score = 0;
         this.model.playerHealth = this.model.maxHealth;
         this.model.opponentHealth = this.model.maxHealth;
+        this.view.hideCorrectIncorrect();
         this.resumeGame();
     }
 

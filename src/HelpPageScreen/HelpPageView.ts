@@ -9,6 +9,8 @@ type Handler = () => void;
  */
 export class HelpPageView implements View {
     private group: Konva.Group;
+    private startGameButtonText: Konva.Text;
+    private resumeGameButtonText: Konva.Text;
 
     // The ? For the constructor values makes it so the value is optional, both buttons do not have to be clicked
     /** TODO: Change constructor to proper Back and Start buttons */
@@ -132,7 +134,7 @@ export class HelpPageView implements View {
         startGameButton.add(startGameButtonBackground);
 
         //Text telling the user what the button does
-        const startGameButtonText = new Konva.Text({
+        this.startGameButtonText = new Konva.Text({
             x: startGameButtonBackground.x() + buttonWidth / 2,
             y: startGameButtonBackground.y() + buttonHeight / 2,
             text: "Start Game",
@@ -140,9 +142,25 @@ export class HelpPageView implements View {
             fontFamily: GAMECST.DEFAULT_FONT,
             fill: "black",
         });
-        startGameButton.add(startGameButtonText);
+        startGameButton.add(this.startGameButtonText);
+
+        //Center the origin point of the text
+        this.startGameButtonText.offset({ x: this.startGameButtonText.width() / 2, y: this.startGameButtonText.height() / 2});
+
+        //Alternative text that is shown when the user is returning to the game rather than starting it
+        this.resumeGameButtonText = new Konva.Text({
+            x: startGameButtonBackground.x() + buttonWidth / 2,
+            y: startGameButtonBackground.y() + buttonHeight / 2,
+            text: "Resume Game",
+            fontSize: 35,
+            fontFamily: GAMECST.DEFAULT_FONT,
+            fill: "black",
+            visible: false
+        });
+        startGameButton.add(this.resumeGameButtonText);
         
-        startGameButtonText.offset({ x: startGameButtonText.width() / 2, y: startGameButtonText.height() / 2});
+        //Center the origin point of the text
+        this.resumeGameButtonText.offset({ x: this.startGameButtonText.width() / 2, y: this.startGameButtonText.height() / 2});
 
         startGameButton.on("mouseenter", () => (document.body.style.cursor = "pointer"));
         startGameButton.on("mouseleave", () => (document.body.style.cursor = "default"));
@@ -179,6 +197,24 @@ export class HelpPageView implements View {
         startPageButton.on("mouseenter", () => (document.body.style.cursor = "pointer"));
         startPageButton.on("mouseleave", () => (document.body.style.cursor = "default"));
         startPageButton.on("click", onMenu);
+    }
+
+    /**
+     * Shows the resume game text on the game button instead of the start game text
+     * if the user is coming to the help page from the game
+     */
+    showReturnButtonText(): void {
+        this.startGameButtonText.hide();
+        this.resumeGameButtonText.show();
+    }
+
+    /**
+     * Shows the resume game text on the game button instead of the start game text
+     * if the user is coming to the help page from the game
+     */
+    showStartButtonText(): void {
+        this.startGameButtonText.show();
+        this.resumeGameButtonText.hide();
     }
 
     /**
