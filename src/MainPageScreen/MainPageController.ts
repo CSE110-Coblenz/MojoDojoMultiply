@@ -266,7 +266,9 @@ export class MainPageController extends ScreenController {
         this.model.playerResponse = NaN;
         this.model.playerTime = Number.POSITIVE_INFINITY;
         const damages = this.damageCalculation();
-        this.applyDamagesAndAdvance(damages, 0);
+        this.applyDamages(damages);
+        this.updatePoints(0);
+        this.advanceGame();
     }
 
     /**
@@ -275,19 +277,38 @@ export class MainPageController extends ScreenController {
      * @param questionPoints points that will be awarded 
      * @returns void
      */
-    private applyDamagesAndAdvance([playerDmg, oppDmg]: number[], questionPoints: number = 0): void {
+    private applyDamages([playerDmg, oppDmg]: number[]): void {
         // debugging to show cur round
         console.log("Current round: " + this.getCurrentRound());
 
-        // deals damage to player and opponet 
+        // deals damage to player and opponent 
         if (playerDmg > 0) {
             this.model.playerHealth = Math.max(0, this.model.playerHealth - playerDmg);
         }
         if (oppDmg > 0) {
             this.model.opponentHealth = Math.max(0, this.model.opponentHealth - oppDmg);
         }
+        
+        //Records the stats at the end of each question
+        this.recordStats();
 
+        //Changes the health bars to reflect damage done
+        this.updateHealthBars();
 
+        // ends game when the players run out of health
+        if (this.model.opponentHealth <= 0) {
+            this.endGame(false);
+            return;
+        } else if (this.model.playerHealth <= 0) {
+            this.endGame(true);
+            return;
+        }
+    }
+
+    /**
+     * records statistics from each question that will be used to show the user personal bests later in the game
+     */
+    private recordStats() {
         // TODO: Expand Stats
         // increments stats (total answered, correct answers)
         const playerCorrect = this.model.playerResponse === this.model.correctAnswer;
@@ -295,39 +316,24 @@ export class MainPageController extends ScreenController {
         if (playerCorrect) {
             this.model.roundCorrect++;
         }
+    }
 
+    /**
+     * 
+     */
+    private updatePoints( questionPoints: number = 0 ) {
         // handles points
         if (questionPoints > 0) {
             this.model.score += questionPoints;
             this.model.roundScore += questionPoints;
             this.updateScore(this.model.score);
         }
+    }
 
-        this.updateHealthBars();
-
-        // handles winning round
-        if (this.model.opponentHealth <= 0) {
-            // gives bonus points if win w/ > 50% health
-            if (this.model.playerHealth > this.model.maxHealth / 2) {
-                this.model.score += 400;
-                this.model.roundScore += 400;
-                this.updateScore(400);
-            }
-
-            this.clearQuestionTimer();
-            this.screenSwitcher.switchToScreen({
-                type: "stats",
-                round: this.model.currentRound
-            });
-            return;
-        }
-        // handles losing round
-        if (this.model.playerHealth <= 0) {
-            this.clearQuestionTimer();
-            this.screenSwitcher.switchToScreen( {type: "results"});
-            return;
-        }
-
+    /**
+     * Generates new questions, displays the new questions, and resets the timer.
+     */
+    private advanceGame() {
         this.generateNewQuestion();
         this.updateQuestion();
         this.startQuestionTimer();
@@ -462,7 +468,9 @@ export class MainPageController extends ScreenController {
         this.clearQuestionTimer();
 
         // apply damage 
-        this.applyDamagesAndAdvance(damages, questionPoints);
+        this.applyDamages(damages);
+        this.updatePoints(questionPoints);
+        this.advanceGame();
         // Play sound effects
         this.clickSound.play();
         this.clickSound.currentTime = 0;
@@ -547,13 +555,22 @@ export class MainPageController extends ScreenController {
     /**
      * End the game which for now just goes back to the start screen
      */
-    private endGame(): void {
+    private endGame(playerLost: boolean): void {
         this.clearQuestionTimer();
+        this.model.currentRound += 1;
+        this.view.hideCorrectIncorrect();
 
         //Switch to the stats page if the player looses or the results page if the player wins
-        if(this.playerLost) {
+        if(playerLost) {
             this.screenSwitcher.switchToScreen({ type: "stats", round: this.model.currentRound });
         } else {
+            // gives bonus points if win w/ > 50% health
+            if (this.model.playerHealth > this.model.maxHealth / 2) {
+                this.model.score += 400;
+                this.model.roundScore += 400;
+                this.updateScore(400);
+            }
+
             this.screenSwitcher.switchToScreen({ type: "results" });
         }
         // Switch back to start screen
