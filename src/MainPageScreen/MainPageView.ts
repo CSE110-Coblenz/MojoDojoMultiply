@@ -36,7 +36,8 @@ export class MainPageView implements View {
 		onHoverStart: () => void,
 		onHoverEnd: () => void,
 		onStartClick: () => void,
-		onHelpClick: () => void
+		onHelpClick: () => void,
+		onSkipAhead: () => void
 	) {
 		this.group = new Konva.Group({ visible: false });
 
@@ -282,6 +283,9 @@ export class MainPageView implements View {
 			strokeWidth: 4
 		});
 		questionGroup.add(questionBox);
+
+		//Secret skip ahead a round functionality for testing (I cant do any more times tables...)
+		questionBox.on('dblclick', onSkipAhead);
 
 		// Answer 1 (top-left)
 		const answer1Group = new Konva.Group();
