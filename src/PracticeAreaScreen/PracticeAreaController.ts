@@ -59,22 +59,6 @@ export class PracticeAreaController extends ScreenController {
         });
     }
 
-    //TODO: Create counter variable to announce what specific round player is on
-
-    // /**
-    //  * Update score display in view
-    //  */
-    // updateScore(score: number): void {
-    //     this.view.setScoreText(`Score: ${score}`);
-    // }
-
-    // /**
-    //  * Update timer display in view
-    //  */
-    // updateTimer(timeRemaining: number): void {
-    //     this.view.setTimerText(`Time: ${timeRemaining}`);
-    // }
-
     /**
      * Update question display in view
      */
@@ -124,9 +108,6 @@ export class PracticeAreaController extends ScreenController {
     startGame(round: number = this.model.currentRound): void {
         // Reset game state
         this.resetForRound(round);
-
-        // Update view with initial state
-        //this.updateScore(this.model.score);
         
         // Generate first question
         this.generateNewQuestion();
@@ -135,8 +116,6 @@ export class PracticeAreaController extends ScreenController {
         // Show the view after initial setup
         this.view.show();
 
-        // // Start timer
-        // this.startQuestionTimer();
     }
 
     /**
@@ -149,63 +128,7 @@ export class PracticeAreaController extends ScreenController {
         this.model.roundCorrect = 0;
         this.model.roundScore = 0;
         this.model.roundTotal = 0;
-        this.updateHealthBars();
     }
-
-    // /**
-    //  * new per-question timer
-    //  */
-    // private startQuestionTimer(): void {
-    //     this.clearQuestionTimer();
-    //     this.model.questionTimeRemaining = 30;
-    //     this.updateTimer(this.model.questionTimeRemaining);
-
-    //     this.model.questionTimerId = window.setInterval(() => {
-    //         this.model.questionTimeRemaining--;
-    //         this.updateTimer(this.model.questionTimeRemaining);
-
-    //         if (this.model.questionTimeRemaining <= 0) {
-    //             this.onQuestionTimeout();
-    //         }
-    //     }, 1000);
-    // }
-
-    // /**
-    //  * pauses question timer to be resumed later
-    //  */
-    // private pauseQuestionTimer(): void {
-    //     if (this.model.questionTimerId !== null) {
-    //         clearInterval(this.model.questionTimerId);
-    //         this.model.questionTimerId = null;
-    //     }
-    // }
-
-    // /**
-    //  * resumes question timer after being paused
-    //  */
-    // private resumeQuestionTimer(): void {
-    //     // if timer is already running, do nothing
-    //     if (this.model.questionTimerId !== null) return;
-
-    //     // if resume is called without calling start first
-    //     if (this.model.questionTimeRemaining <= 0) {
-    //         this.onQuestionTimeout();
-    //         return;
-    //     }
-
-    //     // Update UI with current remaining time
-    //     this.updateTimer(this.model.questionTimeRemaining);
-
-    //     // resume countdown
-    //     this.model.questionTimerId = window.setInterval(() => {
-    //         this.model.questionTimeRemaining--;
-    //         this.updateTimer(this.model.questionTimeRemaining);
-
-    //         if (this.model.questionTimeRemaining <= 0) {
-    //             this.onQuestionTimeout();
-    //         }
-    //     }, 1000);
-    // }
 
     /**
      * Switches the screen to the start page when the pause menu button is clicked
@@ -222,126 +145,13 @@ export class PracticeAreaController extends ScreenController {
     }
 
 
-    // /**
-    //  * clears timer for new questions
-    //  */
-    // private clearQuestionTimer(): void {
-    //     // stop timer if running
-    //     if (this.model.questionTimerId !== null) {
-    //         clearInterval(this.model.questionTimerId);
-    //         this.model.questionTimerId = null;
-    //     }
-
-    //     // remove saved remaining time
-    //     this.model.questionTimeRemaining = 0;
-    //     this.updateTimer(this.model.questionTimeRemaining);
-    // }
-
-    // /**
-    //  * when time runs out, its as if player got answer wrong
-    //  * Reset game state by setting model properties to default values
-    //  */
-    // private onQuestionTimeout(): void {
-    //     this.clearQuestionTimer();
-    //     this.model.playerResponse = NaN;
-    //     this.model.playerTime = Number.POSITIVE_INFINITY;
-    //     const damages = this.damageCalculation();
-    //     this.applyDamagesAndAdvance(damages, 0);
-    // }
-
     /**
-     * handles damage, score, advancing rounds
-     * @param [playerDmg, oppDmg] tuple with damage that player and opponent will face
-     * @param questionPoints points that will be awarded 
-     * @returns void
+     * Generates new questions, displays the new questions, and resets the timer.
      */
-    private applyDamagesAndAdvance([playerDmg, oppDmg]: number[], questionPoints: number = 0): void {
-        // debugging to show cur round
-        console.log("Current round: " + this.getCurrentRound());
-
-        // deals damage to player and opponet 
-        if (playerDmg > 0) {
-            this.model.playerHealth = Math.max(0, this.model.playerHealth - playerDmg);
-        }
-        if (oppDmg > 0) {
-            this.model.opponentHealth = Math.max(0, this.model.opponentHealth - oppDmg);
-        }
-
-
-        // TODO: Expand Stats
-        // increments stats (total answered, correct answers)
-        const playerCorrect = this.model.playerResponse === this.model.correctAnswer;
-        this.model.roundTotal++
-        if (playerCorrect) {
-            this.model.roundCorrect++;
-        }
-
-        // handles points
-        if (questionPoints > 0) {
-            this.model.score += questionPoints;
-            this.model.roundScore += questionPoints;
-            //this.updateScore(this.model.score);
-        }
-
-        this.updateHealthBars();
-
-        // handles winning round
-        if (this.model.opponentHealth <= 0) {
-            // gives bonus points if win w/ > 50% health
-            if (this.model.playerHealth > this.model.maxHealth / 2) {
-                this.model.score += 400;
-                this.model.roundScore += 400;
-                //this.updateScore(400);
-            }
-
-            //this.clearQuestionTimer();
-            this.screenSwitcher.switchToScreen({
-                type: "stats",
-                round: this.model.currentRound
-            });
-            return;
-        }
-        // handles losing round
-        if (this.model.playerHealth <= 0) {
-            //this.clearQuestionTimer();
-            this.screenSwitcher.switchToScreen( {type: "results"});
-            return;
-        }
-
+    private advanceGame() {
         this.generateNewQuestion();
         this.updateQuestion();
-        //this.startQuestionTimer();
-    }
-
-
-    /**
-     * Update both player and opponent health bars in the view
-     */
-    private updateHealthBars(): void {
-        this.view.updateHealthBars(
-            this.model.playerHealth / this.model.maxHealth,
-            this.model.opponentHealth / this.model.maxHealth
-        );
-    }
-
-    /**
-     * Update player's health and health bar
-     * @param newHealth new health value for the player after a question is answered
-     * @returns void
-     */
-    updatePlayerHealth(newHealth: number): void {
-        this.model.playerHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
-        this.updateHealthBars();
-    }
-
-    /**
-     * Update opponent's health and health bar
-     * @param newHealth new health value for the opponent after a question is answered
-     * @returns void
-     */
-    updateOpponentHealth(newHealth: number): void {
-        this.model.opponentHealth = Math.max(0, Math.min(newHealth, this.model.maxHealth));
-        this.updateHealthBars();
+        // this.startQuestionTimer();
     }
 
     /**
@@ -351,12 +161,7 @@ export class PracticeAreaController extends ScreenController {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    /**
-     * returns current round number
-     */
-    getCurrentRound(): number {
-        return this.model.currentRound;
-    }
+
     /**
      * Generate wrong answers for multiple choice
      * Generate wrong answers for multiple choice, ensuring they don't match the correct answer
@@ -418,12 +223,6 @@ export class PracticeAreaController extends ScreenController {
         this.model.playerTime = Date.now();
         const timeLeftSeconds = this.model.questionTimeRemaining;
 
-         // Debug logging
-        //console.log('Question:', this.model.num1, 'x', this.model.num2, '=', this.model.correctAnswer);
-        //console.log('Player clicked:', selectedAnswer);
-        //console.log('Player response value:', this.model.playerResponse);
-        //console.log('Computer response value:', this.model.computerResponse);
-
         // Store current question's correct answer
         const currentCorrectAnswer = this.model.correctAnswer;
 
@@ -433,26 +232,13 @@ export class PracticeAreaController extends ScreenController {
         } else {
             this.view.incorrectAnswer();
         }
-        
-        // Calculate damages based on both player and computer responses
-        const damages = this.damageCalculation();
-        // Calculates points based on speed of answer
-        const questionPoints = this.pointsCalculation(timeLeftSeconds);
 
-        // Stop timer
-       // this.clearQuestionTimer();
 
-        // apply damage 
-        this.applyDamagesAndAdvance(damages, questionPoints);
+        this.advanceGame();
         // Play sound effects
         this.clickSound.play();
         this.clickSound.currentTime = 0;
 
-        // * game ending is handled in applyDamageAndAdvance
-        // Check if game should end due to health
-        // if (this.model.playerHealth <= 0 || this.model.opponentHealth <= 0) {
-        //     this.endGame();
-        // }
     }
 
     /**
@@ -469,74 +255,25 @@ export class PracticeAreaController extends ScreenController {
     }
 
 
-    //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet
-    //TODO: switch screen at the end of each round to the results
-    private resultsScreen(): void {
-        this.screenSwitcher.switchToScreen({ type: "results"});
-    }
-
-    /**
-     * Returns negative value when player takes damage, positive when opponent takes damage
-     * Takes no parameters but uses model properties determined by the handle click function to determine damages
-     * @returns [playerDamage, opponentDamage]
-     */
-    private damageCalculation(): number[] {
-        if(this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse != this.model.correctAnswer){
-            return [0, 15];
-        }else if (this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse == this.model.correctAnswer && this.model.playerTime < this.model.computerTime){
-            return [0, 10];
-        }else if (this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse == this.model.correctAnswer){
-            return [5, 5];
-        }else if (this.model.playerResponse != this.model.correctAnswer && this.model.computerResponse != this.model.correctAnswer){
-            return [0, 0];
-        }
-        return [15, 0];
-    }
-
-    /**
-     * Calculates number of points, based off time remaining when answered. 
-     * @param timeLeftSeconds time remaining when player answered
-     * @returns number of points earned
-     */
-    //TODO: if points get too high, scale numbers back
-    private pointsCalculation(timeLeftSeconds: number): number {
-        const t = Math.max(0, timeLeftSeconds) * 10;
-
-        const playerCorrect = this.model.playerResponse === this.model.correctAnswer;
-        const opponentCorrect = this.model.computerResponse === this.model.correctAnswer;
-
-        if (playerCorrect && !opponentCorrect) {
-            return 15*t
-        }
-
-        if (playerCorrect && opponentCorrect) {
-            if (this.model.playerTime < this.model.computerTime) {
-                // player answers faster
-                return 10 * t;
-            } else if (this.model.playerTime > this.model.computerTime) {
-                // computer answers faster
-                return 2 * t;
-            } else {
-                // tie
-                return 5 * t;
-            }
-        }
-        // wrong
-        return 0
-    }
-
     /**
      * End the game which for now just goes back to the start screen
      */
-    private endGame(): void {
-        //this.clearQuestionTimer();
+    private endGame(playerLost: boolean): void {
         this.model.currentRound += 1;
+        this.view.hideCorrectIncorrect();
 
-        // Switch back to start screen
-        this.screenSwitcher.switchToScreen({
-            type: "intro",
-            round: this.model.currentRound
-        });
+        //Switch to the stats page if the player looses or the results page if the player wins
+        if(playerLost) {
+            this.screenSwitcher.switchToScreen({ type: "results" });
+        } else {
+            // // gives bonus points if win w/ > 50% health
+            // if (this.model.playerHealth > this.model.maxHealth / 2) {
+            //     this.model.score += 400;
+            //     this.model.roundScore += 400;
+            //     this.updateScore(400);
+            // }
+            this.screenSwitcher.switchToScreen({ type: "stats", round: this.model.currentRound });
+        }
     }
 
     /**
@@ -561,12 +298,12 @@ export class PracticeAreaController extends ScreenController {
         this.view.pauseMenu?.visible(false);
     }
 
-
     /**
      * Exit the game
      */
-    exitGame(): void {
-        //this.clearQuestionTimer();
+    endGameEarly(): void {
+        this.view.hideCorrectIncorrect();
+        this.resumeGame();
     }
 
     /**
