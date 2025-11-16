@@ -18,6 +18,7 @@ export class MainPageView implements View {
 	private incorrectAnswerText: Konva.Text;
 	private playerHealthBar: Konva.Rect;
 	private opponentHealthBar: Konva.Rect;
+	private muteLogoSlash: Konva.Line;
 	// Konva image for the player's avatar
 	private playerAvatar?: Konva.Image;
 	// Konva image for the opponent's avatar
@@ -37,7 +38,8 @@ export class MainPageView implements View {
 		onHoverEnd: () => void,
 		onStartClick: () => void,
 		onHelpClick: () => void,
-		onSkipAhead: () => void
+		onSkipAhead: () => void,
+		onMuteClick: () => void
 	) {
 		this.group = new Konva.Group({ visible: false });
 
@@ -150,6 +152,92 @@ export class MainPageView implements View {
 
 		//Cycles between the play and pause logos when the button is clicked
 		pausePlayButtonGroup.on('click tap', () => { pauseResumeGame() });
+
+		const muteButton = new Konva.Group({
+			visible: true,
+			x: pausePlayButtonGroup.x() + pausePlayBox.width() + 20,
+			y: 20
+		});
+		this.group.add(muteButton);
+
+		//The background for the button
+		const muteBox = new Konva.Rect({
+			x: 0,
+			y: 0,
+			width: 60,
+			height: 60,
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 4,
+			fill: GAMECST.NEUTRAL_COLOR
+		})
+		muteButton.add(muteBox);
+
+		const muteLogo = new Konva.Group({ visible: true });
+		// position the logo inside the 60x60 button with a small inset
+		muteLogo.position({ x: muteBox.x() + 6, y: muteBox.y() + 6 });
+
+		// speaker wedge (filled polygon)
+		const speaker = new Konva.Line({
+			points: [
+				0, 12,  // left top
+				10, 12, // inner top
+				22, 0,  // tip top
+				22, 48, // tip bottom
+				10, 36, // inner bottom
+				0, 36   // left bottom
+			],
+			closed: true,
+			fill: GAMECST.DARK_COLOR
+		});
+		muteLogo.add(speaker);
+
+		// sound waves using arcs (stroked, rounded)
+		const wave1 = new Konva.Arc({
+			x: 16,
+			y: 24,
+			innerRadius: 15,
+			outerRadius: 19,
+			angle: 90,
+			rotation: -45,
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 3,
+			lineCap: 'round',
+			fill: GAMECST.DARK_COLOR
+		});
+		const wave2 = new Konva.Arc({
+			x: 22,
+			y: 24,
+			innerRadius: 21,
+			outerRadius: 25,
+			angle: 90,
+			rotation: -45,
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 3,
+			lineCap: 'round',
+			fill: GAMECST.DARK_COLOR
+		});
+		muteLogo.add(wave1, wave2);
+
+		// add the composed logo to the button
+		muteButton.add(muteLogo);
+
+		this.muteLogoSlash = new Konva.Line({
+			points: [2, 2, 46, 46], // diagonal from top-left to bottom-right (backslash)
+			stroke: GAMECST.ALERT_COLOR,
+			strokeWidth: 8,
+			lineCap: 'round',
+			lineJoin: 'round',
+			visible: false
+		});
+		muteLogo.add(this.muteLogoSlash);
+
+		//Adds the click mouse appearance when hovering
+		muteButton.on('mouseover', onHoverStart);
+		muteButton.on('mouseout', onHoverEnd);
+
+		//Cycles between the play and pause logos when the button is clicked
+		muteButton.on('click tap', () => { onMuteClick() });
+
 
 
 		//Health bar that visualizes the health of the player's character
@@ -722,6 +810,20 @@ export class MainPageView implements View {
 		this.playLogo.visible(false);
 		this.pauseLogo.visible(true);
 		this.pauseMenu.visible(false);
+	}
+
+	/**
+	 * 
+	 */
+	showMute(): void {
+		this.muteLogoSlash.visible(true);
+	}
+
+	/**
+	 * 
+	 */
+	showUnmute(): void {
+		this.muteLogoSlash.visible(false);
 	}
 
     /**

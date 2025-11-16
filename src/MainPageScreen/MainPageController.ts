@@ -15,6 +15,7 @@ export class MainPageController extends ScreenController {
     private screenSwitcher: ScreenSwitcher;
     private clickSound: HTMLAudioElement;
     private playerLost: boolean = false;
+    private isMuted: boolean = false;
 
     constructor(screenSwitcher: ScreenSwitcher) {
         super();
@@ -38,7 +39,8 @@ export class MainPageController extends ScreenController {
             () => this.handleHoverEnd(),
             () => this.handleStartClick(),
             () => this.handleHelpClick(),
-            () => this.endGame(false)
+            () => this.endGame(false),
+            () => this.handleMuteClick()
         );
 
         this.setupGlobalStateListener();
@@ -552,7 +554,7 @@ export class MainPageController extends ScreenController {
         this.updatePoints(questionPoints);
         this.advanceGame();
         // Play sound effects
-        this.clickSound.play();
+        if(!this.isMuted) this.clickSound.play();
         this.clickSound.currentTime = 0;
 
         // * game ending is handled in applyDamageAndAdvance
@@ -573,6 +575,25 @@ export class MainPageController extends ScreenController {
         } else {
             this.pauseGame();
         }
+    }
+
+    /**
+     * 
+     */
+    private handleMuteClick() {
+        if (this.isMuted == true) {
+            this.view.showUnmute();
+            this.isMuted = false;
+        } else {
+            this.view.showMute();
+            this.isMuted = true;
+        }
+    }
+
+    //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet
+    //TODO: switch screen at the end of each round to the results
+    private resultsScreen(): void {
+        this.screenSwitcher.switchToScreen({ type: "results"});
     }
 
     /**
