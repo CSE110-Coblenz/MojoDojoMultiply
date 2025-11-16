@@ -688,6 +688,14 @@ export class MainPageView implements View {
 	}
 
 	/**
+	 * Hides both the correct and incorrect texts at the end of the game
+	 */
+	hideCorrectIncorrect(): void {
+		this.correctAnswerText.visible(false);
+		this.incorrectAnswerText.visible(false);
+	}
+
+	/**
 	 * Switches the play pause button to the play button config
 	 */
 	showPlayButton(): void {
