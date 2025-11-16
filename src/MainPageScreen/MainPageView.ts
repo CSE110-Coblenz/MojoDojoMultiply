@@ -619,6 +619,13 @@ export class MainPageView implements View {
 	}
 
 	/**
+	 * Sets the round number text to be the current round
+	 */
+	setRoundNumber(round: number) {
+		this.roundText.text("Round " + round);
+	}
+
+	/**
 	 * Internal method to update question display
 	 */
 	setQuestionDisplay(questionText: string, answers: (string | number)[]): void {
@@ -651,12 +658,12 @@ export class MainPageView implements View {
 	 * Hide the screen
 	 */
 	hide(): void {
-	this.group.visible(false);
-	// unregister keyboard handler when view is hidden
-	if (this.keyHandler) {
-	    window.removeEventListener('keydown', this.keyHandler as EventListener);
-	}
-	this.group.getLayer()?.draw();
+		this.group.visible(false);
+		// unregister keyboard handler when view is hidden
+		if (this.keyHandler) {
+			window.removeEventListener('keydown', this.keyHandler as EventListener);
+		}
+		this.group.getLayer()?.draw();
 	}
 
     getGroup(): Konva.Group {

@@ -146,6 +146,9 @@ export class MainPageController extends ScreenController {
 
         // Update view with initial state
         this.updateScore(this.model.score);
+
+        // Set the correct round number
+        this.view.setRoundNumber(this.model.currentRound);
         
         // Generate first question
         this.generateNewQuestion();
@@ -562,7 +565,7 @@ export class MainPageController extends ScreenController {
 
         //Switch to the stats page if the player looses or the results page if the player wins
         if(playerLost) {
-            this.screenSwitcher.switchToScreen({ type: "stats", round: this.model.currentRound });
+            this.screenSwitcher.switchToScreen({ type: "results" });
         } else {
             // gives bonus points if win w/ > 50% health
             if (this.model.playerHealth > this.model.maxHealth / 2) {
@@ -570,14 +573,8 @@ export class MainPageController extends ScreenController {
                 this.model.roundScore += 400;
                 this.updateScore(400);
             }
-
-            this.screenSwitcher.switchToScreen({ type: "results" });
+            this.screenSwitcher.switchToScreen({ type: "stats", round: this.model.currentRound });
         }
-        // Switch back to start screen
-        this.screenSwitcher.switchToScreen({
-            type: "intro",
-            round: this.model.currentRound
-        });
     }
 
     /**
