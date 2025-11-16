@@ -134,6 +134,7 @@ export class PracticeAreaController extends ScreenController {
      * Switches the screen to the start page when the pause menu button is clicked
      */
     private handleStartClick(): void {
+        this.endGameEarly();
         this.screenSwitcher.switchToScreen({ type: "start" });
     }
 
@@ -141,6 +142,7 @@ export class PracticeAreaController extends ScreenController {
      * Switches the screen to the start page when the pause menu button is clicked
      */
     private handleGameClick(): void {
+        this.endGameEarly();
         this.screenSwitcher.switchToScreen({ type: "main", round: 1 });
     }
 
