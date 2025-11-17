@@ -16,6 +16,9 @@ export class RoundIntroView {
     onHoverStart: () => void,
     onHoverEnd: () => void
   ) {
+    const width = GAMECST.STAGE_WIDTH;
+    const height = GAMECST.STAGE_HEIGHT;
+
     this.group = new Konva.Group({ visible: false });
 
     // mute state from MainPage mute button (via localStorage)
@@ -28,44 +31,87 @@ export class RoundIntroView {
 
     //Text that tells the user what round they are about to start
     this.roundText = new Konva.Text({
-      x: GAMECST.STAGE_WIDTH / 2,
-      y: GAMECST.STAGE_HEIGHT / 3,
+      x: width * 0.04,
+      y: height * 0.04,
       fontFamily: GAMECST.DEFAULT_FONT,
-      fontSize: 80,
-      fill: "black",
+      fontSize: 36,
+      fill: GAMECST.DARK_COLOR,
+      text: "ROUND 1",
     });
     this.group.add(this.roundText);
-    //Centers the origin of the button
-    this.roundText.offsetX(this.roundText.width() / 2);
 
+    //Villian area
+    this.villainBox = new Konva.Group({
+      x: width * 0.03,
+      y: height * 0.10,
+    });
+    this.group.add(this.villainBox);
+
+    const villainImgObj = new Image();
+
+    villainImgObj.src = "/Opponent_Intro.png";
+    villainImgObj.onload = () => {
+      const villainImage = new Konva.Image({
+        image: villainImgObj,
+        width: width * 0.33,
+        height: width * 0.33,  
+      });
+      this.villainBox.add(villainImage);
+      this.group.getLayer()?.draw();
+    };
+
+    // Hero Image 
+    this.heroBox = new Konva.Group({
+      x: width * 0.65,
+      y: height * 0.40,
+    });
+    this.group.add(this.heroBox);
+
+    const heroImgObj = new Image();
+    heroImgObj.src = "/Player_Intro.png";  
+    heroImgObj.onload = () => {
+      const heroImage = new Konva.Image({
+        image: heroImgObj,
+        width: width * 0.30,
+        height: width * 0.30 * 1.45, 
+      });
+      this.heroBox.add(heroImage);
+      this.group.getLayer()?.draw();
+    };
+
+    // START BUTTON (center of diagonal)
     //Button that allows the user to go the game page
-    this.nextButton = new Konva.Group({});
+     const midX = width / 2;
+    const midY = height / 2;
+
+    this.nextButton = new Konva.Group({
+      x: midX,
+      y: midY,
+    });
     this.group.add(this.nextButton);
 
-    //Background for the game page button
     const nextButtonBackground = new Konva.Rect({
-      x: GAMECST.STAGE_WIDTH / 2,
-      y: GAMECST.STAGE_HEIGHT * 2 / 3,
+      x: -100,
+      y: -30,
       width: 200,
       height: 60,
       stroke: "black",
-      strokeWidth: 4,
-      fill: GAMECST.HIGHLIGHT_COLOR
+      strokeWidth: 3,
+      fill: GAMECST.HIGHLIGHT_COLOR,
     });
     this.nextButton.add(nextButtonBackground);
 
-    //Centers the origin point of the button
-    nextButtonBackground.offsetX(nextButtonBackground.width() / 2);
-    nextButtonBackground.offsetY(nextButtonBackground.height() / 2);
-
-    //Text that tells the user what the game page button does
     const nextButtonText = new Konva.Text({
-      text: "Start!",
-      x: nextButtonBackground.x(),
-      y: nextButtonBackground.y(),
-      fontSize: 36,
+      text: "Start",
+      x: -100,
+      y: -30,
+      width: 200,
+      height: 60,
+      fontSize: 32,
       fontFamily: GAMECST.DEFAULT_FONT,
       fill: "black",
+      align: "center",
+      verticalAlign: "middle",
     });
     this.nextButton.add(nextButtonText);
 
@@ -85,52 +131,54 @@ export class RoundIntroView {
     this.backButton = new Konva.Group({});
     this.group.add(this.backButton);
 
-    //Background and touch target for the start page button
     const backButtonBackground = new Konva.Rect({
-      x: GAMECST.STAGE_WIDTH / 2,
-      y: nextButtonBackground.x() + nextButtonBackground.height() + 20,
-      width: 200,
-      height: 60,
+      x: 0,
+      y: 0,
+      width: 180,
+      height: 50,
       stroke: "black",
-      strokeWidth: 4,
-      fill: GAMECST.HIGHLIGHT_COLOR
+      strokeWidth: 2,
+      fill: GAMECST.HIGHLIGHT_COLOR,
     });
     this.backButton.add(backButtonBackground);
 
-    //Centers the origin of the button
-    backButtonBackground.offsetX(backButtonBackground.width() / 2);
-    backButtonBackground.offsetY(backButtonBackground.height() / 2);
-
-    //Text that tells the user what the start page button does
     const backButtonText = new Konva.Text({
       text: "Main Menu",
-      x: backButtonBackground.x(),
-      y: backButtonBackground.y(),
-      fontSize: 36,
+      x: 0,
+      y: 0,
+      width: 180,
+      height: 50,
+      fontSize: 24,
       fontFamily: GAMECST.DEFAULT_FONT,
       fill: "black",
+      align: "center",
+      verticalAlign: "middle",
     });
     this.backButton.add(backButtonText);
 
-    //Centers the origin of the button
-    backButtonText.offsetX(backButtonText.width() / 2);
-    backButtonText.offsetY(backButtonText.height() / 2);
-
-    //Adds hover and click functionality to the start page button
     this.backButton.on("click", onBack);
-    this.backButton.on("mouseover", onHoverStart);
-    this.backButton.on("mouseout", onHoverEnd);
-
+    this.backButton.on("mouseover", () => {
+      onHoverStart();
+      document.body.style.cursor = "pointer";
+    });
+    this.backButton.on("mouseout", () => {
+      onHoverEnd();
+      document.body.style.cursor = "default";
+    });
   }
 
-  /**
-   * Changes the round text to reflect what round the user is about to start
-   * 
-   * @param text 
-  */
   setRound(text: string): void {
     this.roundText.text(text);
-    this.roundText.offsetX(this.roundText.width() / 2);
+    this.group.getLayer()?.draw();
+  }
+
+  getGroup(): Konva.Group {
+    return this.group;
+  }
+
+  show(): void {
+    this.group.show();
+    this.group.moveToTop();
     this.group.getLayer()?.draw();
   }
 
