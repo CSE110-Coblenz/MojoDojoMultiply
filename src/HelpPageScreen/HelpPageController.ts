@@ -2,10 +2,12 @@ import { ScreenController } from "../types";
 import type { ScreenSwitcher} from "../types";
 import { HelpPageView } from "./HelpPageView";
 import { getGlobalState } from "../storageManager";
+import { MainPageController } from "../MainPageScreen/MainPageController";
 
 export class HelpPageController extends ScreenController {
     private view: HelpPageView;
     private screenSwitcher: ScreenSwitcher;
+    private gameWasPrevious: boolean = false;
 
     constructor(screenSwitcher: ScreenSwitcher) {
         super();
@@ -15,6 +17,18 @@ export class HelpPageController extends ScreenController {
             () => this.handleStartGameClick(),
             () => this.handleStartPracticeClick()
         );
+    }
+
+    /**
+     * 
+     */
+    gamePrev(gamePrev: boolean): void {
+        this.gameWasPrevious = gamePrev;
+        if(gamePrev) {
+            this.view.showReturnButtonText();
+        } else {
+            this.view.showStartButtonText();
+        }
     }
 
     /**
@@ -30,6 +44,7 @@ export class HelpPageController extends ScreenController {
      * 
      */
     private handleMenuClick(): void {
+        if(this.gameWasPrevious) MainPageController.endGameEarly();
         this.screenSwitcher.switchToScreen({ type: "start"});
     }
 
@@ -37,6 +52,7 @@ export class HelpPageController extends ScreenController {
      * 
      */
     private handleStartPracticeClick(): void {
+        if(this.gameWasPrevious) MainPageController.endGameEarly();
         this.screenSwitcher.switchToScreen({ type: "practice"});
     }
 

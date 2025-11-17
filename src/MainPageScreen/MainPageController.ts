@@ -5,13 +5,20 @@ import { GAMECST } from "../constants";
 import { GlobalState } from "../storageManager"
 
 export class MainPageController extends ScreenController {
+    // Static reference to the most recently constructed MainPageController.
+    // This allows other controllers/screens to call MainPageController.endGameEarly()
+    // without needing a direct reference to the instance.
+    private static currentInstance: MainPageController | null = null;
     private model: MainPageModel;
     private view: MainPageView;
     private screenSwitcher: ScreenSwitcher;
     private clickSound: HTMLAudioElement;
+    private playerLost: boolean = false;
 
     constructor(screenSwitcher: ScreenSwitcher) {
         super();
+        // register this instance as the active controller
+        MainPageController.currentInstance = this;
         this.screenSwitcher = screenSwitcher;
 
         this.model = new MainPageModel();
@@ -29,10 +36,23 @@ export class MainPageController extends ScreenController {
             () => this.handleHoverStart(),
             () => this.handleHoverEnd(),
             () => this.handleStartClick(),
-            () => this.handleHelpClick()
+            () => this.handleHelpClick(),
+            () => this.endGame(false)
         );
 
         this.setupGlobalStateListener();
+    }
+
+    /**
+     * Static wrapper so other modules can request the active MainPageController
+     * to end the game early without having a direct instance reference.
+     */
+    static endGameEarly(): void {
+        if (MainPageController.currentInstance) {
+            MainPageController.currentInstance.endGameEarly();
+        } else {
+            console.warn("MainPageController.endGameEarly() called but no controller instance is available.");
+        }
     }
 
     /**
@@ -127,6 +147,9 @@ export class MainPageController extends ScreenController {
 
         // Update view with initial state
         this.updateScore(this.model.score);
+
+        // Set the correct round number
+        this.view.setRoundNumber(this.model.currentRound);
         
         // Generate first question
         this.generateNewQuestion();
@@ -219,7 +242,7 @@ export class MainPageController extends ScreenController {
      * Switches the screen to the start page when the pause menu button is clicked
      */
     private handleHelpClick(): void {
-        this.screenSwitcher.switchToScreen({ type: "help" });
+        this.screenSwitcher.switchToScreen({ type: "help", fromGame: true });
     }
 
 
@@ -247,7 +270,9 @@ export class MainPageController extends ScreenController {
         this.model.playerResponse = NaN;
         this.model.playerTime = Number.POSITIVE_INFINITY;
         const damages = this.damageCalculation();
-        this.applyDamagesAndAdvance(damages, 0);
+        this.applyDamages(damages);
+        this.updatePoints(0);
+        this.advanceGame();
     }
 
     /**
@@ -256,19 +281,38 @@ export class MainPageController extends ScreenController {
      * @param questionPoints points that will be awarded 
      * @returns void
      */
-    private applyDamagesAndAdvance([playerDmg, oppDmg]: number[], questionPoints: number = 0): void {
+    private applyDamages([playerDmg, oppDmg]: number[]): void {
         // debugging to show cur round
         console.log("Current round: " + this.getCurrentRound());
 
-        // deals damage to player and opponet 
+        // deals damage to player and opponent 
         if (playerDmg > 0) {
             this.model.playerHealth = Math.max(0, this.model.playerHealth - playerDmg);
         }
         if (oppDmg > 0) {
             this.model.opponentHealth = Math.max(0, this.model.opponentHealth - oppDmg);
         }
+        
+        //Records the stats at the end of each question
+        this.recordStats();
 
+        //Changes the health bars to reflect damage done
+        this.updateHealthBars();
 
+        // ends game when the players run out of health
+        if (this.model.opponentHealth <= 0) {
+            this.endGame(false);
+            return;
+        } else if (this.model.playerHealth <= 0) {
+            this.endGame(true);
+            return;
+        }
+    }
+
+    /**
+     * records statistics from each question that will be used to show the user personal bests later in the game
+     */
+    private recordStats() {
         // TODO: Expand Stats
         // increments stats (total answered, correct answers)
         const playerCorrect = this.model.playerResponse === this.model.correctAnswer;
@@ -276,39 +320,24 @@ export class MainPageController extends ScreenController {
         if (playerCorrect) {
             this.model.roundCorrect++;
         }
+    }
 
+    /**
+     * 
+     */
+    private updatePoints( questionPoints: number = 0 ) {
         // handles points
         if (questionPoints > 0) {
             this.model.score += questionPoints;
             this.model.roundScore += questionPoints;
             this.updateScore(this.model.score);
         }
+    }
 
-        this.updateHealthBars();
-
-        // handles winning round
-        if (this.model.opponentHealth <= 0) {
-            // gives bonus points if win w/ > 50% health
-            if (this.model.playerHealth > this.model.maxHealth / 2) {
-                this.model.score += 400;
-                this.model.roundScore += 400;
-                this.updateScore(400);
-            }
-
-            this.clearQuestionTimer();
-            this.screenSwitcher.switchToScreen({
-                type: "stats",
-                round: this.model.currentRound
-            });
-            return;
-        }
-        // handles losing round
-        if (this.model.playerHealth <= 0) {
-            this.clearQuestionTimer();
-            this.screenSwitcher.switchToScreen( {type: "results"});
-            return;
-        }
-
+    /**
+     * Generates new questions, displays the new questions, and resets the timer.
+     */
+    private advanceGame() {
         this.generateNewQuestion();
         this.updateQuestion();
         this.startQuestionTimer();
@@ -443,7 +472,9 @@ export class MainPageController extends ScreenController {
         this.clearQuestionTimer();
 
         // apply damage 
-        this.applyDamagesAndAdvance(damages, questionPoints);
+        this.applyDamages(damages);
+        this.updatePoints(questionPoints);
+        this.advanceGame();
         // Play sound effects
         this.clickSound.play();
         this.clickSound.currentTime = 0;
@@ -528,15 +559,23 @@ export class MainPageController extends ScreenController {
     /**
      * End the game which for now just goes back to the start screen
      */
-    private endGame(): void {
+    private endGame(playerLost: boolean): void {
         this.clearQuestionTimer();
         this.model.currentRound += 1;
+        this.view.hideCorrectIncorrect();
 
-        // Switch back to start screen
-        this.screenSwitcher.switchToScreen({
-            type: "intro",
-            round: this.model.currentRound
-        });
+        //Switch to the stats page if the player looses or the results page if the player wins
+        if(playerLost) {
+            this.screenSwitcher.switchToScreen({ type: "results" });
+        } else {
+            // gives bonus points if win w/ > 50% health
+            if (this.model.playerHealth > this.model.maxHealth / 2) {
+                this.model.score += 400;
+                this.model.roundScore += 400;
+                this.updateScore(400);
+            }
+            this.screenSwitcher.switchToScreen({ type: "stats", round: this.model.currentRound });
+        }
     }
 
     /**
@@ -566,6 +605,7 @@ export class MainPageController extends ScreenController {
         this.model.score = 0;
         this.model.playerHealth = this.model.maxHealth;
         this.model.opponentHealth = this.model.maxHealth;
+        this.view.hideCorrectIncorrect();
         this.resumeGame();
     }
 

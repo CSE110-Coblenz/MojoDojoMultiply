@@ -68,7 +68,10 @@ class App implements ScreenSwitcher {
     switch (screen.type) {
       case "start": this.startController.show(); break;
       case "main": this.mainController.startGame(screen.round); break;
-      case "help": this.helpController.show(); break;
+      case "help": 
+        this.helpController.gamePrev(screen.fromGame);
+        this.helpController.show(); 
+        break;
       case "practice": this.practiceController.show(); break;
       case "intro":
         this.roundIntroController.setRound(screen.round);

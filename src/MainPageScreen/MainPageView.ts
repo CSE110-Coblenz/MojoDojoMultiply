@@ -36,7 +36,8 @@ export class MainPageView implements View {
 		onHoverStart: () => void,
 		onHoverEnd: () => void,
 		onStartClick: () => void,
-		onHelpClick: () => void
+		onHelpClick: () => void,
+		onSkipAhead: () => void
 	) {
 		this.group = new Konva.Group({ visible: false });
 
@@ -282,6 +283,9 @@ export class MainPageView implements View {
 			strokeWidth: 4
 		});
 		questionGroup.add(questionBox);
+
+		//Secret skip ahead a round functionality for testing (I cant do any more times tables...)
+		questionBox.on('dblclick', onSkipAhead);
 
 		// Answer 1 (top-left)
 		const answer1Group = new Konva.Group();
@@ -619,6 +623,13 @@ export class MainPageView implements View {
 	}
 
 	/**
+	 * Sets the round number text to be the current round
+	 */
+	setRoundNumber(round: number) {
+		this.roundText.text("Round " + round);
+	}
+
+	/**
 	 * Internal method to update question display
 	 */
 	setQuestionDisplay(questionText: string, answers: (string | number)[]): void {
@@ -651,12 +662,12 @@ export class MainPageView implements View {
 	 * Hide the screen
 	 */
 	hide(): void {
-	this.group.visible(false);
-	// unregister keyboard handler when view is hidden
-	if (this.keyHandler) {
-	    window.removeEventListener('keydown', this.keyHandler as EventListener);
-	}
-	this.group.getLayer()?.draw();
+		this.group.visible(false);
+		// unregister keyboard handler when view is hidden
+		if (this.keyHandler) {
+			window.removeEventListener('keydown', this.keyHandler as EventListener);
+		}
+		this.group.getLayer()?.draw();
 	}
 
     getGroup(): Konva.Group {
@@ -685,6 +696,14 @@ export class MainPageView implements View {
 	incorrectAnswer(): void {
 		this.correctAnswerText.visible(false);
 		this.incorrectAnswerText.visible(true);
+	}
+
+	/**
+	 * Hides both the correct and incorrect texts at the end of the game
+	 */
+	hideCorrectIncorrect(): void {
+		this.correctAnswerText.visible(false);
+		this.incorrectAnswerText.visible(false);
 	}
 
 	/**
