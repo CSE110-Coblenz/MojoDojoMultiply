@@ -3,6 +3,7 @@ import { MainPageModel } from "./MainPageModel";
 import { MainPageView } from "./MainPageView";
 import { GAMECST } from "../constants";
 import { GlobalState } from "../storageManager"
+import { RoundStatsModel } from "../RoundStatsScreen/RoundStatsModel";
 
 export class MainPageController extends ScreenController {
     private model: MainPageModel;
@@ -59,7 +60,53 @@ export class MainPageController extends ScreenController {
         });
     }
 
-    //TODO: Create counter variable to announce what specific round player is on
+    private readonly ROUND_HISTORY_KEY = "MojoDojoRoundStats";
+
+    /**
+    * Save the completed round’s stats into localStorage.
+    */
+    private saveRoundStats(): void {
+        const raw = localStorage.getItem(this.ROUND_HISTORY_KEY);
+        let history: {
+            round: number;
+            points: number;
+            correct: number;
+            total: number;
+            timestamp: string;
+        }[] = [];
+
+        if (raw) {
+            try {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    history = parsed;
+                }
+            } catch (e) {
+                console.error("Error parsing round history, resetting.", e);
+            }
+        }
+
+        const entry = {
+            round: this.model.currentRound,
+            points: this.model.roundScore,
+            correct: this.model.roundCorrect,
+            total: this.model.roundTotal,
+            timestamp: new Date().toLocaleString(),
+        };
+
+        history.push(entry);
+
+        if (history.length > 5) {
+            history = history.slice(history.length - 20);
+        }
+
+        try {
+            localStorage.setItem(this.ROUND_HISTORY_KEY, JSON.stringify(history));
+        } catch (e) {
+            console.error("Error saving round history.", e);
+        }
+    }
+
 
     /**
      * Update score display in view
@@ -292,8 +339,9 @@ export class MainPageController extends ScreenController {
             if (this.model.playerHealth > this.model.maxHealth / 2) {
                 this.model.score += 400;
                 this.model.roundScore += 400;
-                this.updateScore(400);
+                this.updateScore(this.model.score);
             }
+            this.saveRoundStats();
 
             this.clearQuestionTimer();
             this.screenSwitcher.switchToScreen({
@@ -524,6 +572,7 @@ export class MainPageController extends ScreenController {
         // wrong
         return 0
     }
+
 
     /**
      * End the game which for now just goes back to the start screen

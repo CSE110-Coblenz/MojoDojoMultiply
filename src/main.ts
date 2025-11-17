@@ -75,7 +75,7 @@ class App implements ScreenSwitcher {
         this.roundIntroController.show();
         break;
       case "stats":
-        this.roundStatsController.setRound(screen.round);
+        //this.roundStatsController.setRound(screen.round);
         this.roundStatsController.show();
         break;
       case "results":

@@ -1,32 +1,79 @@
 import { ScreenController, type ScreenSwitcher } from "../types";
-import { RoundStatsView } from "./RoundStatsView";
+import { RoundStatsView, type RoundStatsEntry } from "./RoundStatsView";
 
 export class RoundStatsController extends ScreenController {
   private screenSwitcher: ScreenSwitcher;
   private view: RoundStatsView;
-  private round = 1;
+  private readonly HISTORY_KEY = "MojoDojoRoundStats";
 
   constructor(screenSwitcher: ScreenSwitcher) {
     super();
     this.screenSwitcher = screenSwitcher;
-    this.view = new RoundStatsView(() =>
-      this.screenSwitcher.switchToScreen({ type: "intro", round: this.round + 1 })
+
+    this.view = new RoundStatsView(
+      () => this.handleNextRoundButton(),
+      () => this.handleMenuButton()
     );
   }
 
-  setRound(round: number): void {
-    this.round = round;
-    this.view.setTitle(`Round ${round} Complete! (stats go below)`);
+  private loadHistory(): RoundStatsEntry[] {
+    const raw = localStorage.getItem(this.HISTORY_KEY);
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed as RoundStatsEntry[];
+      }
+    } catch (e) {
+      console.error("Error parsing round history:", e);
+    }
+    return [];
   }
 
-  private nextRound(): void {
+  private handleNextRoundButton(): void {
+    // if we have history, use last round + 1, else start at 1
+    const history = this.loadHistory();
+    const lastRound =
+      history.length > 0 ? history[history.length - 1].round : 1;
+
     this.screenSwitcher.switchToScreen({
       type: "intro",
-      round: this.round + 1,
+      round: lastRound + 1,
     });
   }
 
-  show(): void { this.view.show(); }
-  hide(): void { this.view.hide(); }
-  getView(): RoundStatsView { return this.view; }
+  private handleMenuButton(): void {
+    this.screenSwitcher.switchToScreen({ type: "start" });
+  }
+
+  show(): void {
+    const history = this.loadHistory();
+
+    if (history.length > 0) {
+      const latest = history[history.length - 1];
+
+      this.view.setRound(latest.round);
+      this.view.updateFinalRoundStats(
+        latest.points,
+        latest.correct,
+        latest.total
+      );
+      this.view.updateLeaderboard(history);
+    } else {
+      // fallback: no history yet
+      this.view.setRound(1);
+      this.view.updateFinalRoundStats(0, 0, 0);
+      this.view.updateLeaderboard([]);
+    }
+
+    this.view.show();
+  }
+
+  hide(): void {
+    this.view.hide();
+  }
+
+  getView(): RoundStatsView {
+    return this.view;
+  }
 }
