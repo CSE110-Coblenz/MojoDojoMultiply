@@ -7,6 +7,11 @@ export class RoundIntroView {
   private nextButton: Konva.Group;
   private backButton: Konva.Group;
 
+  private background: Konva.Rect;
+  private diagonalLine: Konva.Line;
+  private villainBox: Konva.Group;
+  private heroBox: Konva.Group;
+
   constructor(
     onNext: () => void,
     onBack: () => void,
@@ -17,6 +22,29 @@ export class RoundIntroView {
     const height = GAMECST.STAGE_HEIGHT;
 
     this.group = new Konva.Group({ visible: false });
+
+    //Set up the background
+    this.background = new Konva.Rect({
+      x: 0,
+      y: 0,
+      width,
+      height,
+      fill: "#2e2a2aff",
+      opacity: 0.9,
+      stroke: GAMECST.DARK_COLOR,
+      strokeWidth: 8
+    });
+    this.group.add(this.background);
+
+    //Diagonal line from bottom-left to top-right
+    this.diagonalLine = new Konva.Line({
+      points: [
+        0, height, width, 0
+      ],
+      stroke: GAMECST.DARK_COLOR,
+      strokeWidth: 4,
+    });
+    this.group.add(this.diagonalLine);
 
     //Text that tells the user what round they are about to start
     this.roundText = new Konva.Text({
@@ -104,17 +132,21 @@ export class RoundIntroView {
     });
     this.nextButton.add(nextButtonText);
 
-    //Centers the origin of the button
-    nextButtonText.offsetX(nextButtonText.width() / 2);
-    nextButtonText.offsetY(nextButtonText.height() / 2);
-
-    //Adds click and hover functionalities to the game button
     this.nextButton.on("click", onNext);
-    this.nextButton.on("mouseover", onHoverStart);
-    this.nextButton.on("mouseout", onHoverEnd);
+    this.nextButton.on("mouseover", () => {
+      onHoverStart();
+      document.body.style.cursor = "pointer";
+    });
+    this.nextButton.on("mouseout", () => {
+      onHoverEnd();
+      document.body.style.cursor = "default";
+    });
 
-    //Button that allows the user to return to the start page
-    this.backButton = new Konva.Group({});
+    // ----- BACK button -----
+    this.backButton = new Konva.Group({
+      x: width * 0.04,
+      y: height * 0.85,
+    });
     this.group.add(this.backButton);
 
     const backButtonBackground = new Konva.Rect({
