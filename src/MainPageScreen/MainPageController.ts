@@ -625,6 +625,8 @@ export class MainPageController extends ScreenController {
         this.model.currentRound += 1;
         this.view.hideCorrectIncorrect();
 
+        this.saveRoundStats();
+
         //Switch to the stats page if the player looses or the results page if the player wins
         if(playerLost) {
             this.screenSwitcher.switchToScreen({ type: "results" });
