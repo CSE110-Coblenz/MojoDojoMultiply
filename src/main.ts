@@ -57,7 +57,7 @@ class App implements ScreenSwitcher {
 
     // Start on start screen
     this.startController.show();
-    //this.switchToScreen({type: "stats", round : 1});
+    //this.switchToScreen({type: "intro"});
   
   }
 
