@@ -1,6 +1,7 @@
 import { ScreenController, type ScreenSwitcher } from "../types";
 import { BonusLevelView } from "./BonusLevelView";
 import { BonusLevelModel } from "./BonusLevelModel";
+import { GAMECST } from "../constants";
 
 export class BonusLevelController extends ScreenController {
   private view: BonusLevelView;
@@ -11,6 +12,7 @@ export class BonusLevelController extends ScreenController {
   private maxAnswer: number = 10;
   private maxDivisor: number = 10;
 
+  // TODO Adds these to constants
   constructor(screenSwitcher: ScreenSwitcher) {
     super();
     this.screenSwitcher = screenSwitcher;
@@ -19,30 +21,49 @@ export class BonusLevelController extends ScreenController {
   }
 
   // TODO Adds these to constants
+  /**
+   * Sets the constants maxAnswer and maxDivisor to modify difficulty
+   * @param maxAnswer Desired max answer
+   * @param maxDivisor Desired max divisor
+   */
   public setDifficulty(maxAnswer: number, maxDivisor: number): void {
     this.maxAnswer = maxAnswer;
     this.maxDivisor = maxDivisor;
   }
 
+  /**
+   * Get the view group
+   */
   getView(): BonusLevelView {
-    return this.view;
+      return this.view;
   }
 
+  /**
+   * 
+   */
   show(): void {
     this.isShowingResult = false;
     this.generateNewQuestion();
     this.view.update(this.model);
     this.view.show();
-    // Starts listener
+    // Starts listener that looks for any keydown ie key pressed down
     window.addEventListener("keydown", this.handleKeyDown);
   }
 
+  /**
+   * 
+   */
   hide(): void {
     this.view.hide();
     // Stops listener
     window.removeEventListener("keydown", this.handleKeyDown);
   }
 
+  /**
+   * Arrow function that handles keyboard inputs and deals with issues that I had when using this.
+   * @param e Keydown event from event listener
+   * @returns void
+   */
   private handleKeyDown = (e: KeyboardEvent): void => {
     if (this.isShowingResult) {
       return;
