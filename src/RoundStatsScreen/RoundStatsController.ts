@@ -4,6 +4,8 @@ import { RoundStatsView, type RoundStatsEntry } from "./RoundStatsView";
 export class RoundStatsController extends ScreenController {
   private screenSwitcher: ScreenSwitcher;
   private view: RoundStatsView;
+
+  //Key MUST MATCH MainPageControler
   private readonly HISTORY_KEY = "MojoDojoRoundStats";
 
   constructor(screenSwitcher: ScreenSwitcher) {
@@ -16,9 +18,13 @@ export class RoundStatsController extends ScreenController {
     );
   }
 
+  /**
+   * Reads JSON round history from localStorage
+   * @returns [] if none is found
+   */
   private loadHistory(): RoundStatsEntry[] {
     const raw = localStorage.getItem(this.HISTORY_KEY);
-    if (!raw) return [];
+    if (!raw) return []; //no history yet
     try {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
@@ -30,6 +36,10 @@ export class RoundStatsController extends ScreenController {
     return [];
   }
 
+  /**
+   * NEXT ROUND BUTTON -> goes to the roundIntro screen
+   * Use the last round number + 1 to increment to the next round
+   */
   private handleNextRoundButton(): void {
     // if we have history, use last round + 1, else start at 1
     const history = this.loadHistory();
@@ -42,25 +52,37 @@ export class RoundStatsController extends ScreenController {
     });
   }
 
+  /**
+   * MENU button -> go to the main menu
+   */
   private handleMenuButton(): void {
     this.screenSwitcher.switchToScreen({ type: "start" });
   }
 
+  /**
+   * When stats screen is shown, load the latest round from JSON and update the view
+   */
   show(): void {
     const history = this.loadHistory();
 
     if (history.length > 0) {
       const latest = history[history.length - 1];
 
+      //Update title: ROUND X COMPLETE!
       this.view.setRound(latest.round);
+
+      //Update the main "Final Round" score
       this.view.updateFinalRoundStats(
         latest.points,
         latest.correct,
         latest.total
       );
+
+      //Update the round history list
       this.view.updateLeaderboard(history);
+
     } else {
-      // fallback: no history yet
+      // No history yet
       this.view.setRound(1);
       this.view.updateFinalRoundStats(0, 0, 0);
       this.view.updateLeaderboard([]);

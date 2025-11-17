@@ -21,6 +21,7 @@ export class RoundStatsView implements View {
   constructor(onNextRoundClick: () => void, onMainMenuClick: () => void) {
     this.group = new Konva.Group({ visible: false });
 
+    //Main Title
     this.title = new Konva.Text({
       x: 50,
       y: 60,
@@ -33,6 +34,7 @@ export class RoundStatsView implements View {
     });
     this.group.add(this.title);
 
+    //Score for the most recent round
     this.finalScoreText = new Konva.Text({
       x: STAGE_WIDTH / 2 + 50,
       y: 150,
@@ -48,6 +50,7 @@ export class RoundStatsView implements View {
 
     this.loadStickFigure();
 
+    //Round History List
     this.leaderboardText = new Konva.Text({
       x: STAGE_WIDTH / 2 + 50,
       y: 205,
@@ -62,6 +65,7 @@ export class RoundStatsView implements View {
     this.leaderboardText.offsetX(this.leaderboardText.width() / 2);
     this.group.add(this.leaderboardText);
 
+    //NEXT ROUND Button
     const nextRound = new Konva.Group();
     nextRound.add(new Konva.Rect({
       x: STAGE_WIDTH / 2 - 220,
@@ -86,6 +90,7 @@ export class RoundStatsView implements View {
     nextRound.on("click", onNextRoundClick);
     this.group.add(nextRound);
 
+    //MENU Button
     const menu = new Konva.Group();
     menu.add(new Konva.Rect({
       x: STAGE_WIDTH / 2 + 20,
@@ -111,6 +116,7 @@ export class RoundStatsView implements View {
     this.group.add(menu);
   }
 
+  //Loads the "Victor" Test, Red Background, and StickFigure img
   private loadStickFigure(): void {
     const img = new Image();
     img.src = "/boxer.png";
@@ -154,11 +160,13 @@ export class RoundStatsView implements View {
     };
   }
 
+  //Update the Title Text
   setRound(round: number): void {
     this.title.text(`ROUND ${round} COMPLETE!`);
     this.group.getLayer()?.draw();
   }
 
+  //Update the final round results
   updateFinalRoundStats(points: number, correct: number, total: number): void {
     const percent = total > 0 ? Math.round((correct / total) * 100) : 0;
     this.finalScoreText.text(
@@ -168,6 +176,7 @@ export class RoundStatsView implements View {
     this.group.getLayer()?.draw();
   }
 
+  //Update the history section
   updateLeaderboard(entries: RoundStatsEntry[]): void { 
     if (entries.length === 0) {
       this.leaderboardText.text("Round History:\n(No rounds yet!)");

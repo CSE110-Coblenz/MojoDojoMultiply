@@ -64,9 +64,17 @@ export class MainPageController extends ScreenController {
 
     /**
     * Save the completed round’s stats into localStorage.
+    * @param:
+    * - Round Number
+    * - Round Score
+    * - Correct Answers
+    * - Total Answers
+    * - Time Stamps
     */
     private saveRoundStats(): void {
+        //Get existing stats list from storage
         const raw = localStorage.getItem(this.ROUND_HISTORY_KEY);
+
         let history: {
             round: number;
             points: number;
@@ -75,6 +83,7 @@ export class MainPageController extends ScreenController {
             timestamp: string;
         }[] = [];
 
+        //Attempt to parse history retrieved from storage
         if (raw) {
             try {
                 const parsed = JSON.parse(raw);
@@ -86,20 +95,24 @@ export class MainPageController extends ScreenController {
             }
         }
 
+        //Build the NEW entry (for the current round) to save
         const entry = {
-            round: this.model.currentRound,
-            points: this.model.roundScore,
-            correct: this.model.roundCorrect,
-            total: this.model.roundTotal,
-            timestamp: new Date().toLocaleString(),
+            round: this.model.currentRound, //Current Round num
+            points: this.model.roundScore, //Total Points for this round
+            correct: this.model.roundCorrect, //# correct answer
+            total: this.model.roundTotal, // # total questions
+            timestamp: new Date().toLocaleString(), //timestamp
         };
 
+        //Add this completed round to the round history
         history.push(entry);
 
+        //Keep the history length to only 5 (Player plays 5 rounds til bonus level)
         if (history.length > 5) {
             history = history.slice(history.length - 20);
         }
 
+        //Save the list back to localStorage
         try {
             localStorage.setItem(this.ROUND_HISTORY_KEY, JSON.stringify(history));
         } catch (e) {
@@ -341,8 +354,11 @@ export class MainPageController extends ScreenController {
                 this.model.roundScore += 400;
                 this.updateScore(this.model.score);
             }
+
+            //Save completed round stats BEFORE switching screens
             this.saveRoundStats();
 
+            //Switch to stats screen
             this.clearQuestionTimer();
             this.screenSwitcher.switchToScreen({
                 type: "stats",
