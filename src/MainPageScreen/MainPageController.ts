@@ -108,8 +108,8 @@ export class MainPageController extends ScreenController {
      * @returns void
      */
     private generateNewQuestion(): void {
-        this.model.num1 = this.getRandomNumber(1, 12);
-        this.model.num2 = this.getRandomNumber(1, 12);
+        this.model.num1 = this.getRandomNumber(this.model.questionMin, this.model.questionMax);
+        this.model.num2 = this.getRandomNumber(this.model.questionMin, this.model.questionMax);
         this.model.correctAnswer = this.model.num1 * this.model.num2;
         this.model.wrongAnswers = this.getWrongAnswers(this.model.correctAnswer, 3);
         this.model.allAnswers = this.randomizeOrder([this.model.correctAnswer, ...this.model.wrongAnswers]);
