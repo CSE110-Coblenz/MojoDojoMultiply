@@ -531,25 +531,25 @@ export class MainPageController extends ScreenController {
      */
     //TODO: if points get too high, scale numbers back
     private pointsCalculation(timeLeftSeconds: number): number {
-        const t = Math.max(0, timeLeftSeconds) * 10;
+        const t = Math.max(0, timeLeftSeconds);
 
         const playerCorrect = this.model.playerResponse === this.model.correctAnswer;
         const opponentCorrect = this.model.computerResponse === this.model.correctAnswer;
 
         if (playerCorrect && !opponentCorrect) {
-            return 15*t
+            return 5*t
         }
 
         if (playerCorrect && opponentCorrect) {
             if (this.model.playerTime < this.model.computerTime) {
                 // player answers faster
-                return 10 * t;
+                return 3 * t;
             } else if (this.model.playerTime > this.model.computerTime) {
                 // computer answers faster
                 return 2 * t;
             } else {
                 // tie
-                return 5 * t;
+                return t;
             }
         }
         // wrong
