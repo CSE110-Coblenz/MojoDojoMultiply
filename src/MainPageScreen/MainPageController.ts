@@ -108,8 +108,8 @@ export class MainPageController extends ScreenController {
      * @returns void
      */
     private generateNewQuestion(): void {
-        this.model.num1 = this.getRandomNumber(1, 12);
-        this.model.num2 = this.getRandomNumber(1, 12);
+        this.model.num1 = this.getRandomNumber(this.model.questionMin, this.model.questionMax);
+        this.model.num2 = this.getRandomNumber(this.model.questionMin, this.model.questionMax);
         this.model.correctAnswer = this.model.num1 * this.model.num2;
         this.model.wrongAnswers = this.getWrongAnswers(this.model.correctAnswer, 3);
         this.model.allAnswers = this.randomizeOrder([this.model.correctAnswer, ...this.model.wrongAnswers]);
@@ -150,6 +150,15 @@ export class MainPageController extends ScreenController {
 
         // Set the correct round number
         this.view.setRoundNumber(this.model.currentRound);
+
+        // increase difficulty every round
+        if(this.model.currentRound % 5 == 0) {
+            //increase difficulty every 5 rounds by increasing min value of numbers in questions
+            this.model.questionMin += 1;
+        }else{
+            // increase difficulty every round not a multiple of 5 by increasing max value of numbers in questions
+            this.model.questionMax += 1;
+        }
         
         // Generate first question
         this.generateNewQuestion();
@@ -399,7 +408,14 @@ export class MainPageController extends ScreenController {
         const wrongAnswers: Set<number> = new Set();
         const maxBetweenMultiplicands = Math.max(this.model.num1, this.model.num2)
         while (wrongAnswers.size < count) {
-            let wrongAnswer = this.getRandomNumber(0, correctAnswer * 2);
+            //Added special case for 1x1 multiplication to avoid having infinite loops
+            if(this.model.num1 == 1 && this.model.num2 == 1){
+                wrongAnswers.add(correctAnswer + 1);
+                wrongAnswers.add(0);
+                wrongAnswers.add(3);
+                break;
+            }
+            let wrongAnswer = this.getRandomNumber(correctAnswer-maxBetweenMultiplicands, correctAnswer + maxBetweenMultiplicands);
             if (wrongAnswer != correctAnswer && !wrongAnswers.has(wrongAnswer)) {
                 wrongAnswers.add(wrongAnswer);
             }
@@ -561,7 +577,7 @@ export class MainPageController extends ScreenController {
      */
     private endGame(playerLost: boolean): void {
         this.clearQuestionTimer();
-        this.model.currentRound += 1;
+        //this.model.currentRound += 1;
         this.view.hideCorrectIncorrect();
 
         //Switch to the stats page if the player looses or the results page if the player wins
@@ -574,6 +590,7 @@ export class MainPageController extends ScreenController {
                 this.model.roundScore += 400;
                 this.updateScore(400);
             }
+
             this.screenSwitcher.switchToScreen({ type: "stats", round: this.model.currentRound });
         }
     }
