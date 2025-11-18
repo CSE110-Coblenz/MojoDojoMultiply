@@ -147,7 +147,7 @@ export class MainPageController extends ScreenController {
      * Update score display in view
      */
     updateScore(score: number): void {
-        this.view.setScoreText(`Score: ${score}`);
+        this.view.setScoreText(score);
     }
 
     /**
