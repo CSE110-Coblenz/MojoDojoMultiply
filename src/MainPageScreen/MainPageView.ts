@@ -53,27 +53,38 @@ export class MainPageView implements View {
 		});
 		this.group.add(bg);
 
-		// Score display (bottom-center). origin will be set to the center so
-		// the text remains centered as its content changes.
 		this.scoreText = new Konva.Text({
 			x: GAMECST.STAGE_WIDTH / 2,
-			Y: GAMECST.STAGE_HEIGHT - 30,
-			text: "Score: 00000",
-			fontSize: 40,
+			y: GAMECST.STAGE_HEIGHT - 30,
+			text: "Game Score: 0000000",
+			fontSize: 30,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR,
 		});
 		// make origin the visual center
-		this.scoreText.offsetX(this.scoreText.width() / 2);
-		this.scoreText.offsetY(this.scoreText.height());
+		this.scoreText.offset({x: this.scoreText.width() / 2, y: this.scoreText.height()});
 		this.group.add(this.scoreText);
 
-		//TODO: Add function that changes the round number
+		// Score display (bottom-center). origin will be set to the center so
+		// the text remains centered as its content changes.
+		// const scoreLabelText = new Konva.Text({
+		// 	x: this.scoreText.x(),
+		// 	y: this.scoreText.y() - this.scoreText.height(),
+		// 	text: "Game Score:",
+		// 	fontSize: 40,
+		// 	fontFamily: GAMECST.DEFAULT_FONT,
+		// 	fill: GAMECST.DARK_COLOR,
+		// 	align: "left"
+		// });
+		// scoreLabelText.offset({x: scoreLabelText.width(), y: scoreLabelText.height()});
+		//
+		//this.group.add(scoreLabelText);
+
 		this.roundText = new Konva.Text({
-			x: GAMECST.STAGE_WIDTH - 40,
-			y: 35,
+			x: GAMECST.STAGE_WIDTH - 30,
+			y: GAMECST.STAGE_HEIGHT / 2,
 			text: "ROUND 1",
-			fontSize: 30,
+			fontSize: 45,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR
 		});
@@ -85,7 +96,7 @@ export class MainPageView implements View {
 		//The button allows the user to pause/play the gameplay 
 		const pausePlayButtonGroup = new Konva.Group({ 
 			visible: true,
-			x: 20,
+			x: GAMECST.STAGE_WIDTH - 160,
 			y: 20
 		});
 		this.group.add(pausePlayButtonGroup);
@@ -238,8 +249,6 @@ export class MainPageView implements View {
 		//Cycles between the play and pause logos when the button is clicked
 		muteButton.on('click tap', () => { onMuteClick() });
 
-
-
 		//Health bar that visualizes the health of the player's character
 		const playerHealthGroup = new Konva.Group();
 		this.group.add(playerHealthGroup);
@@ -247,10 +256,10 @@ export class MainPageView implements View {
 
 		//Background to visualize the full size of the health bar
 		const playerBarBacking = new Konva.Rect({
-			x: 80,
-			y: GAMECST.STAGE_HEIGHT * 2 / 3,
+			x: 55,
+			y: GAMECST.STAGE_HEIGHT - 160,
 			width: healthBarWidth,
-			height: 40,
+			height: 30,
 			stroke: GAMECST.DARK_COLOR,
 			strokeWidth: 4,
 			fill: GAMECST.NEUTRAL_COLOR
@@ -262,7 +271,7 @@ export class MainPageView implements View {
 			x: playerBarBacking.x() + 2,
 			y: playerBarBacking.y() + 2,
 			width: healthBarWidth - 4,
-			height: 36,
+			height: playerBarBacking.height() - 4,
 			strokeEnabled: false,
 			fill: GAMECST.ALERT_COLOR
 		});
@@ -274,10 +283,10 @@ export class MainPageView implements View {
 
 		//Background to visualize the full size of the health bar
 		const opponentBarBacking = new Konva.Rect({
-			x: 300,
-			y: playerBarBacking.y(),
+			x: playerBarBacking.x(),
+			y: 90,
 			width: healthBarWidth,
-			height: 40,
+			height: playerBarBacking.height(),
 			stroke: GAMECST.DARK_COLOR,
 			strokeWidth: 4,
 			fill: GAMECST.NEUTRAL_COLOR
@@ -289,7 +298,7 @@ export class MainPageView implements View {
 			x: opponentBarBacking.x() + 2,
 			y: opponentBarBacking.y() + 2,
 			width: healthBarWidth - 4,
-			height: 36,
+			height: opponentBarBacking.height() - 4,
 			strokeEnabled: false,
 			fill: GAMECST.ALERT_COLOR
 		});
@@ -308,8 +317,8 @@ export class MainPageView implements View {
 			this.playerAvatar = image;
 
 			// set desired scale and position (adjust values as needed)
-			image.scale({ x: 0.3, y: 0.3 });
-			image.position({ x: 80, y: GAMECST.STAGE_HEIGHT / 3});
+			image.scale({ x: 0.20, y: 0.20 });
+			image.position({ x: 20, y: 160});
 
 			// add to the fighting stage group
 			fightingStage.add(image);
@@ -321,17 +330,20 @@ export class MainPageView implements View {
 			this.opponentAvatar = image;
 
 			// set desired scale and position (adjust values as needed)
-			image.scale({ x: 0.3, y: 0.3 });
-			image.position({ x: 300, y: GAMECST.STAGE_HEIGHT / 3 });
+			image.scale({ x: 0.25, y: 0.25 });
+			image.position({ x: 80, y: GAMECST.STAGE_HEIGHT * 2 / 5 });
 
 			// add to the fighting stage group
 			fightingStage.add(image);
 		});
 
 		// Create four answer squares in a 2x2 grid pattern in the center of the screen
-		const squareSize = 80;
+		const squareSize = 90;
 		const spacing = 20;
+		const textSize = 40;
+		const supplimentTextSize = 32;
 		const totalWidth = (squareSize * 2) + spacing;
+		const totalHeight = (squareSize * 2) + (spacing * 5) + (supplimentTextSize * 4);
 		// initial empty values; controller will populate the first question
 		const allAnswers: (string | number)[] = ["", "", "", ""];
 		
@@ -341,7 +353,8 @@ export class MainPageView implements View {
 		const gameQuestAnsGroup = new Konva.Group();
 
 		//Set the position of the entire group
-		gameQuestAnsGroup.position({ x: GAMECST.STAGE_WIDTH * 2 / 3, y: GAMECST.STAGE_HEIGHT / 5, });
+		gameQuestAnsGroup.position({ x: GAMECST.STAGE_WIDTH / 2, y: GAMECST.STAGE_HEIGHT / 2, });
+		gameQuestAnsGroup.offset({x: totalWidth / 2, y: totalHeight / 2});
 		this.group.add(gameQuestAnsGroup);
 
 		//Group that holds the question text and the question box
@@ -353,7 +366,7 @@ export class MainPageView implements View {
 			x: totalWidth / 2,
 			y: 0,
 			text: "Time: 60",
-			fontSize: 32,
+			fontSize: supplimentTextSize,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.ALERT_COLOR,
 		});
@@ -441,7 +454,7 @@ export class MainPageView implements View {
 			x: questionBox.x() + questionBox.width() / 2,
 			y: questionBox.y() + questionBox.height() / 2,
 			text: ``,
-			fontSize: 30,
+			fontSize: textSize,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR
 		});
@@ -455,7 +468,7 @@ export class MainPageView implements View {
 				x: answer1Box.x() + answer1Box.width() / 2,
 				y: answer1Box.y() + answer1Box.height() / 2,
 				text: `${allAnswers[0]}`,
-				fontSize: 30,
+				fontSize: textSize,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: GAMECST.DARK_COLOR
 			}),
@@ -464,7 +477,7 @@ export class MainPageView implements View {
 				x: answer2Box.x() + answer2Box.width() / 2,
 				y: answer2Box.y() + answer2Box.height() / 2,
 				text: `${allAnswers[1]}`,
-				fontSize: 30,
+				fontSize: textSize,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: GAMECST.DARK_COLOR
 			}),
@@ -473,7 +486,7 @@ export class MainPageView implements View {
 				x: answer3Box.x() + answer3Box.width() / 2,
 				y: answer3Box.y() + answer3Box.height() / 2,
 				text: `${allAnswers[2]}`,
-				fontSize: 30,
+				fontSize: textSize,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: GAMECST.DARK_COLOR
 			}),
@@ -482,14 +495,12 @@ export class MainPageView implements View {
 				x: answer4Box.x() + answer4Box.width() / 2,
 				y: answer4Box.y() + answer4Box.height() / 2,
 				text: `${allAnswers[3]}`,
-				fontSize: 30,
+				fontSize: textSize,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: GAMECST.DARK_COLOR
 			})
 		
 		];
-
-		//TODO: add hide and show functionality to this text
 
 		//Text that tells the user they answered correctly
 		this.correctAnswerText = new Konva.Text({
@@ -691,14 +702,8 @@ export class MainPageView implements View {
 	/**
 	 * Internal method to update score text
 	 */
-	setScoreText(scoreText: string): void {
-		this.scoreText.text(scoreText);
-		// update origin so the text remains centered as width/height change
-		// this.scoreText.offsetX(this.scoreText.width() / 2);
-		// this.scoreText.offsetY(this.scoreText.height() / 2);
-		// keep positioned at bottom-center
-		// this.scoreText.position({ x: GAMECST.STAGE_WIDTH / 2, y: GAMECST.STAGE_HEIGHT - 30 });
-		this.group.getLayer()?.draw();
+	setScoreText(score: number): void {
+		this.scoreText.text("Game Score: " + score.toString().padStart(7, "0"));
 	}
 	
 
