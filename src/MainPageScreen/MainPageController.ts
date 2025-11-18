@@ -652,7 +652,6 @@ export class MainPageController extends ScreenController {
      */
     private endGame(playerLost: boolean): void {
         this.clearQuestionTimer();
-        //this.model.currentRound += 1;
         this.view.hideCorrectIncorrect();
 
         this.saveRoundStats();
