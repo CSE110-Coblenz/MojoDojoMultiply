@@ -1,20 +1,26 @@
+import Konva from "konva";
+import { AnimatedSprite } from "../AnimatedSprites";
 import { ScreenController, type ScreenSwitcher } from "../types";
 import { RoundStatsView, type RoundStatsEntry } from "./RoundStatsView";
 
 export class RoundStatsController extends ScreenController {
   private screenSwitcher: ScreenSwitcher;
   private view: RoundStatsView;
+  private readonly MAX_HISTORY_PRINT = 7;
+
+  private victorySprite: AnimatedSprite | null = null;
 
   //Key MUST MATCH MainPageControler
   private readonly HISTORY_KEY = "MojoDojoRoundStats";
 
-  constructor(screenSwitcher: ScreenSwitcher) {
+  constructor(screenSwitcher: ScreenSwitcher, layer: Konva.Layer) {
     super();
     this.screenSwitcher = screenSwitcher;
 
     this.view = new RoundStatsView(
       () => this.handleNextRoundButton(),
-      () => this.handleMenuButton()
+      () => this.handleMenuButton(),
+      layer
     );
   }
 
@@ -34,6 +40,29 @@ export class RoundStatsController extends ScreenController {
       console.error("Error parsing round history:", e);
     }
     return [];
+  }
+
+    /**
+   * Helper: return history sorted by "best round"
+   * Highest points first, then (optionally) by accuracy, then by round number.
+   */
+  private getHistorySortedByBest(history: RoundStatsEntry[]): RoundStatsEntry[] {
+    return [...history].sort((a, b) => {
+      // 1) Highest points first
+      if (b.points !== a.points) {
+        return b.points - a.points;
+      }
+
+      // 2) Tie-breaker: higher accuracy first
+      const aAccuracy = a.total > 0 ? a.correct / a.total : 0;
+      const bAccuracy = b.total > 0 ? b.correct / b.total : 0;
+      if (bAccuracy !== aAccuracy) {
+        return bAccuracy - aAccuracy;
+      }
+
+      // 3) Final tie-breaker: earlier round number first
+      return a.round - b.round;
+    });
   }
 
   /**
@@ -78,9 +107,18 @@ export class RoundStatsController extends ScreenController {
         latest.total
       );
 
-      //Update the round history list
-      this.view.updateLeaderboard(history);
+      // Only show *previous* rounds in the history box
+      let previousRounds = history.slice(0, -1);
 
+      // Limit how many we print
+      if (previousRounds.length > this.MAX_HISTORY_PRINT) {
+        previousRounds = previousRounds.slice(-this.MAX_HISTORY_PRINT); 
+      // last N entries (most recent)
+      }     
+
+      // Leaderboard sorted by BEST ROUND (highest points first)
+      const leaderboardByBest = this.getHistorySortedByBest(previousRounds);
+      this.view.updateLeaderboard(leaderboardByBest);
     } else {
       // No history yet
       this.view.setRound(1);

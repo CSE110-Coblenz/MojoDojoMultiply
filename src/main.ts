@@ -38,7 +38,7 @@ class App implements ScreenSwitcher {
     this.practiceController = new PracticeAreaController(this);
     this.resultsController = new ResultsScreenController(this);
     this.roundIntroController = new RoundIntroController(this);
-    this.roundStatsController = new RoundStatsController(this);
+    this.roundStatsController = new RoundStatsController(this, this.layer);
 
     // Add screen groups to same layer
     this.layer.add(this.startController.getView().getGroup());
@@ -52,7 +52,8 @@ class App implements ScreenSwitcher {
     this.layer.draw();
 
     // Start on start screen
-    this.startController.show();
+    //this.startController.show();
+    this.switchToScreen({type: "stats", round : 1});
   
   }
 
