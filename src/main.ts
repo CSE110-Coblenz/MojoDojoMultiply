@@ -22,7 +22,7 @@ class App implements ScreenSwitcher {
   private resultsController: ResultsScreenController;
   private roundIntroController: RoundIntroController;
   private roundStatsController: RoundStatsController;
-  private bonusLevelController: bonusLevelController;
+  private bonusLevelController: BonusLevelController;
 
   constructor(containerId: string) {
     this.stage = new Konva.Stage({
@@ -87,7 +87,7 @@ class App implements ScreenSwitcher {
         this.resultsController.show();
         break;
       case "bonus":
-        this.bonusController.show();
+        this.bonusLevelController.show();
         break;
     }
   }
