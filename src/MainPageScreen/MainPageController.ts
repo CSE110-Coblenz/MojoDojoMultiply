@@ -574,8 +574,17 @@ export class MainPageController extends ScreenController {
                 this.model.roundScore += 400;
                 this.updateScore(400);
             }
+
             this.screenSwitcher.switchToScreen({ type: "stats", round: this.model.currentRound });
         }
+
+         // increase difficulty every 5 rounds
+        //if(this.model.currentRound % 5 == 0) {
+        //    this.model.questionMin += 1;
+        //}
+
+        // increase difficulty every round
+        //this.model.questionMax += 1;
     }
 
     /**
