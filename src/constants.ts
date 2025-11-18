@@ -15,7 +15,8 @@ export const DEFAULT_FONT = "Impact";
 
 // Game settings
 export const GAME_DURATION = 10; // seconds
-export const ROUNDS_UNTIL_BONUS = 5;
+export const ROUNDS_UNTIL_BONUS = 3;
+export const BONUS_RESULT_DELAY = 1000; // milliseconds
 
 // AI settings
 export const AI_ANSWER_CHANCE = 0.1; // 10% chance AI answers correctly
@@ -39,8 +40,9 @@ export const GAMECST = {
     DEFAULT_FONT,
     GAME_DURATION,
     ROUNDS_UNTIL_BONUS,
+    BONUS_RESULT_DELAY,
     AI_ANSWER_CHANCE,
     AI_CHANCE_SCALE,
     WRONG_ANSWER_NUMBER,
-    GLOBAL_DATA_KEY,
+    GLOBAL_DATA_KEY
 } as const;
