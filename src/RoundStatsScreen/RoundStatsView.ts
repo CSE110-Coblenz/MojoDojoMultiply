@@ -160,7 +160,6 @@ export class RoundStatsView implements View {
 
   // Loads the "Victor" panel + adds the celebrating animation
   private loadPlayerFigure(): void {
-  console.log("[RoundStatsView] loadPlayerFigure() called");
 
   const redFill = "#f77";
   const redBackground = "rgba(236,147,138,1)";
@@ -169,21 +168,11 @@ export class RoundStatsView implements View {
   // Create Image object
   const playerCelebrating = new Image();
 
-
-  // --- DEBUGGING LOGS BEFORE LOADING ---
-  console.log("[RoundStatsView] Creating Image()");
-  console.log("[RoundStatsView] Image object =", playerCelebrating);
-
   // Handle successful load
   playerCelebrating.onload = () => {
-    console.log("[RoundStatsView] celebration image loaded SUCCESSFULLY");
-    console.log("[RoundStatsView] Image width =", playerCelebrating.width);
-    console.log("[RoundStatsView] Image height =", playerCelebrating.height);
 
     const panelX = STAGE_WIDTH - 225;
     const panelY = 150;
-
-    console.log("[RoundStatsView] Creating victorPanel...");
 
     this.victorPanel = new Konva.Group({
       x: panelX,
@@ -216,8 +205,6 @@ export class RoundStatsView implements View {
     this.victorPanel.add(victorText);
     this.group.add(this.victorPanel);
 
-    console.log("[RoundStatsView] victorPanel added to group");
-
     // Sprite frame dimensions
     const frameWidth = 128;
     const frameHeight = 128;
@@ -232,15 +219,6 @@ export class RoundStatsView implements View {
     const spriteX = this.victorPanel.width() / 2 - scaledWidth / 2 - 15;
     const spriteY = 140 - scaledHeight / 2 + 30; 
 
-    console.log("[RoundStatsView] Creating AnimatedSprite...");
-    console.log("→ spriteX (panel local) =", spriteX);
-    console.log("→ spriteY (panel local) =", spriteY);
-
-    console.log("[RoundStatsView] Creating AnimatedSprite...");
-    console.log("→ frameWidth =", frameWidth);
-    console.log("→ frameHeight =", frameHeight);
-    console.log("→ frameCount =", frameCount);
-
     this.victorySprite = new AnimatedSprite(this.layer, {
       image: playerCelebrating,
       frameWidth,
@@ -252,29 +230,15 @@ export class RoundStatsView implements View {
       y: spriteY,
     });
 
-    console.log("[RoundStatsView] AnimatedSprite created:", this.victorySprite);
-
     this.victorySprite.node.scale({ x: scale, y: scale });
 
     this.victorPanel.add(this.victorySprite.node);
 
-    console.log("[RoundStatsView] Sprite node added to victorPanel");
-
     this.victorySprite.play();
-    console.log("[RoundStatsView] victorySprite.play() called");
 
     this.layer.draw();
-    console.log("[RoundStatsView] layer.draw() called");
   };
 
-  // Handle loading error
-  playerCelebrating.onerror = (e) => {
-    console.error("[RoundStatsView] ERROR loading celebration image:", e);
-    console.error("→ Make sure /player.celebration.png exists and path is correct.");
-  };
-
-  // IMPORTANT! log BEFORE assigning src
-  console.log("[RoundStatsView] Setting image src = /player.celebration.png");
   playerCelebrating.src = "/player_celebration.png";
 
   }

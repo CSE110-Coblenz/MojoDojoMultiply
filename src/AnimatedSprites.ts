@@ -15,7 +15,7 @@ export interface AnimatedSpriteOptions {
  * AnimatedSprite
  *
  * Wraps a Konva.Image + Konva.Animation to play a horizontal spritesheet.
- * Expects a SINGLE ROW spritesheet:
+ * @param Expects a SINGLE ROW spritesheet:
  *  [frame0][frame1][frame2]...[frameN-1]
  */
 export class AnimatedSprite {

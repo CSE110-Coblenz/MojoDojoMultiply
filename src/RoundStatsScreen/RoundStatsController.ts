@@ -6,6 +6,8 @@ import { RoundStatsView, type RoundStatsEntry } from "./RoundStatsView";
 export class RoundStatsController extends ScreenController {
   private screenSwitcher: ScreenSwitcher;
   private view: RoundStatsView;
+
+  //Reduces the history print to confines of history box
   private readonly MAX_HISTORY_PRINT = 7;
 
   private victorySprite: AnimatedSprite | null = null;
