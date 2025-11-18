@@ -24,7 +24,7 @@ export class MainPageModel {
     roundCorrect = 0;
     roundTotal = 0;
     gamePaused: boolean;
-    questionMax = 1;
+    questionMax = 2;
     questionMin = 1;
 
 

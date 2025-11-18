@@ -399,7 +399,13 @@ export class MainPageController extends ScreenController {
         const wrongAnswers: Set<number> = new Set();
         const maxBetweenMultiplicands = Math.max(this.model.num1, this.model.num2)
         while (wrongAnswers.size < count) {
-            let wrongAnswer = this.getRandomNumber(0, correctAnswer * 2);
+            if(this.model.num1 == 1 && this.model.num2 == 1){
+                wrongAnswers.add(correctAnswer + 1);
+                wrongAnswers.add(0);
+                wrongAnswers.add(3);
+                break;
+            }
+            let wrongAnswer = this.getRandomNumber(correctAnswer-maxBetweenMultiplicands, correctAnswer + maxBetweenMultiplicands);
             if (wrongAnswer != correctAnswer && !wrongAnswers.has(wrongAnswer)) {
                 wrongAnswers.add(wrongAnswer);
             }
@@ -449,10 +455,10 @@ export class MainPageController extends ScreenController {
         const timeLeftSeconds = this.model.questionTimeRemaining;
 
          // Debug logging
-        //console.log('Question:', this.model.num1, 'x', this.model.num2, '=', this.model.correctAnswer);
-        //console.log('Player clicked:', selectedAnswer);
-        //console.log('Player response value:', this.model.playerResponse);
-        //console.log('Computer response value:', this.model.computerResponse);
+        console.log('Question:', this.model.num1, 'x', this.model.num2, '=', this.model.correctAnswer);
+        console.log('Player clicked:', selectedAnswer);
+        console.log('Player response value:', this.model.playerResponse);
+        console.log('Computer response value:', this.model.computerResponse);
 
         // Store current question's correct answer
         const currentCorrectAnswer = this.model.correctAnswer;
