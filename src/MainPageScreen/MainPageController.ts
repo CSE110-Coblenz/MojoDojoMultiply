@@ -150,6 +150,15 @@ export class MainPageController extends ScreenController {
 
         // Set the correct round number
         this.view.setRoundNumber(this.model.currentRound);
+
+        // increase difficulty every round
+        if(this.model.currentRound % 5 == 0) {
+            //increase difficulty every 5 rounds by increasing min value of numbers in questions
+            this.model.questionMin += 1;
+        }else{
+            // increase difficulty every round not a multiple of 5 by increasing max value of numbers in questions
+            this.model.questionMax += 1;
+        }
         
         // Generate first question
         this.generateNewQuestion();
@@ -399,6 +408,7 @@ export class MainPageController extends ScreenController {
         const wrongAnswers: Set<number> = new Set();
         const maxBetweenMultiplicands = Math.max(this.model.num1, this.model.num2)
         while (wrongAnswers.size < count) {
+            //Added special case for 1x1 multiplication to avoid having infinite loops
             if(this.model.num1 == 1 && this.model.num2 == 1){
                 wrongAnswers.add(correctAnswer + 1);
                 wrongAnswers.add(0);
@@ -455,10 +465,10 @@ export class MainPageController extends ScreenController {
         const timeLeftSeconds = this.model.questionTimeRemaining;
 
          // Debug logging
-        console.log('Question:', this.model.num1, 'x', this.model.num2, '=', this.model.correctAnswer);
-        console.log('Player clicked:', selectedAnswer);
-        console.log('Player response value:', this.model.playerResponse);
-        console.log('Computer response value:', this.model.computerResponse);
+        //console.log('Question:', this.model.num1, 'x', this.model.num2, '=', this.model.correctAnswer);
+        //console.log('Player clicked:', selectedAnswer);
+        //console.log('Player response value:', this.model.playerResponse);
+        //console.log('Computer response value:', this.model.computerResponse);
 
         // Store current question's correct answer
         const currentCorrectAnswer = this.model.correctAnswer;
@@ -567,7 +577,7 @@ export class MainPageController extends ScreenController {
      */
     private endGame(playerLost: boolean): void {
         this.clearQuestionTimer();
-        this.model.currentRound += 1;
+        //this.model.currentRound += 1;
         this.view.hideCorrectIncorrect();
 
         //Switch to the stats page if the player looses or the results page if the player wins
@@ -583,14 +593,6 @@ export class MainPageController extends ScreenController {
 
             this.screenSwitcher.switchToScreen({ type: "stats", round: this.model.currentRound });
         }
-
-         // increase difficulty every 5 rounds
-        //if(this.model.currentRound % 5 == 0) {
-        //    this.model.questionMin += 1;
-        //}
-
-        // increase difficulty every round
-        //this.model.questionMax += 1;
     }
 
     /**
