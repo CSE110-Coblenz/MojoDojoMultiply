@@ -296,10 +296,16 @@ export class MainPageController extends ScreenController {
             }
 
             this.clearQuestionTimer();
-            this.screenSwitcher.switchToScreen({
-                type: "stats",
-                round: this.model.currentRound
-            });
+
+            // Check if it's time for a bonus round
+            if (this.model.currentRound % GAMECST.ROUNDS_UNTIL_BONUS === 0) {
+                this.screenSwitcher.switchToScreen({ type: "bonus" });
+            } else { // Otherwise continue as usual
+                this.screenSwitcher.switchToScreen({
+                    type: "stats",
+                    round: this.model.currentRound
+                });
+            }
             return;
         }
         // handles losing round
