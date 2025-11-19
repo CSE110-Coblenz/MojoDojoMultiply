@@ -3,6 +3,7 @@ import { MainPageModel } from "./MainPageModel";
 import { MainPageView } from "./MainPageView";
 import { GAMECST } from "../constants";
 import { GlobalState } from "../storageManager"
+import { RoundStatsModel } from "../RoundStatsScreen/RoundStatsModel";
 
 export class MainPageController extends ScreenController {
     // Static reference to the most recently constructed MainPageController.
@@ -79,7 +80,66 @@ export class MainPageController extends ScreenController {
         });
     }
 
-    //TODO: Create counter variable to announce what specific round player is on
+    private readonly ROUND_HISTORY_KEY = "MojoDojoRoundStats";
+
+    /**
+    * Save the completed round’s stats into localStorage.
+    * @param:
+    * - Round Number
+    * - Round Score
+    * - Correct Answers
+    * - Total Answers
+    * - Time Stamps
+    */
+    private saveRoundStats(): void {
+        //Get existing stats list from storage
+        const raw = localStorage.getItem(this.ROUND_HISTORY_KEY);
+
+        let history: {
+            round: number;
+            points: number;
+            correct: number;
+            total: number;
+            timestamp: string;
+        }[] = [];
+
+        //Attempt to parse history retrieved from storage
+        if (raw) {
+            try {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    history = parsed;
+                }
+            } catch (e) {
+                console.error("Error parsing round history, resetting.", e);
+            }
+        }
+
+        //Build the NEW entry (for the current round) to save
+        const entry = {
+            round: this.model.currentRound, //Current Round num
+            points: this.model.roundScore, //Total Points for this round
+            correct: this.model.roundCorrect, //# correct answer
+            total: this.model.roundTotal, // # total questions
+            timestamp: new Date().toLocaleString(), //timestamp
+        };
+
+        //Add this completed round to the round history
+        history.push(entry);
+
+        //Keep the history length to only 5 (Player plays 5 rounds til bonus level)
+        if (history.length > 5) {
+            history = history.slice(history.length - 20);
+        }
+
+        //Save the list back to localStorage
+        try {
+            localStorage.setItem(this.ROUND_HISTORY_KEY, JSON.stringify(history));
+        } catch (e) {
+            console.error("Error saving round history.", e);
+        }
+    }
+
 
     /**
      * Update score display in view
@@ -515,13 +575,6 @@ export class MainPageController extends ScreenController {
         }
     }
 
-
-    //I put this todo somewhere within main page controller cause I'm not exactly sure where we should implement this switch-to yet
-    //TODO: switch screen at the end of each round to the results
-    private resultsScreen(): void {
-        this.screenSwitcher.switchToScreen({ type: "results"});
-    }
-
     /**
      * Returns negative value when player takes damage, positive when opponent takes damage
      * Takes no parameters but uses model properties determined by the handle click function to determine damages
@@ -572,6 +625,7 @@ export class MainPageController extends ScreenController {
         return 0
     }
 
+
     /**
      * End the game which for now just goes back to the start screen
      */
@@ -579,6 +633,8 @@ export class MainPageController extends ScreenController {
         this.clearQuestionTimer();
         //this.model.currentRound += 1;
         this.view.hideCorrectIncorrect();
+
+        this.saveRoundStats();
 
         //Switch to the stats page if the player looses or the results page if the player wins
         if(playerLost) {
