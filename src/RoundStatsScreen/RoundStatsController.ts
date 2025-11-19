@@ -77,6 +77,8 @@ export class RoundStatsController extends ScreenController {
     const lastRound =
       history.length > 0 ? history[history.length - 1].round : 1;
 
+    this.hide();
+
     this.screenSwitcher.switchToScreen({
       type: "intro",
       round: lastRound + 1,
@@ -87,6 +89,7 @@ export class RoundStatsController extends ScreenController {
    * MENU button -> go to the main menu
    */
   private handleMenuButton(): void {
+    this.hide();
     this.screenSwitcher.switchToScreen({ type: "start" });
   }
 
