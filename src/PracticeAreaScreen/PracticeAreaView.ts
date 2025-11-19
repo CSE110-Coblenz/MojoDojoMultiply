@@ -655,6 +655,14 @@ export class PracticeAreaView implements View {
 		this.incorrectAnswerText.visible(true);
 	}
 
+	/**
+	 * Hides both the correct and incorrect texts at the end of the game
+	 */
+	hideCorrectIncorrect(): void {
+		this.correctAnswerText.visible(false);
+		this.incorrectAnswerText.visible(false);
+	}
+
 
     show(): void {
 		this.group.visible(true);

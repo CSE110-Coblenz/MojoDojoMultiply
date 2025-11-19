@@ -9,7 +9,7 @@ export interface View {
 export type Screen =
   | { type: "start" }
   | { type: "main"; round: number }
-  | { type: "help" }
+  | { type: "help"; fromGame: boolean }
   | { type: "practice" }
   | { type: "intro"; round: number }
   | { type: "results" }

@@ -7,6 +7,7 @@ export const BCKGRD_COLOR = "#FFFFDD";
 export const HIGHLIGHT_COLOR = "#FD754D";
 export const ALERT_COLOR = "#F94449";
 export const UNAVAIL_COLOR = "grey";
+export const LIGHT_NEUTRAL_COLOR = "#b7b2b1ff";
 export const DARK_COLOR = "black";
 export const NEUTRAL_COLOR = "grey";
 

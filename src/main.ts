@@ -56,7 +56,8 @@ class App implements ScreenSwitcher {
     this.layer.draw();
 
     // Start on start screen
-    this.startController.show();
+    //this.startController.show();
+    this.switchToScreen({type: "stats", round : 1});
   
   }
 
@@ -73,14 +74,17 @@ class App implements ScreenSwitcher {
     switch (screen.type) {
       case "start": this.startController.show(); break;
       case "main": this.mainController.startGame(screen.round); break;
-      case "help": this.helpController.show(); break;
+      case "help": 
+        this.helpController.gamePrev(screen.fromGame);
+        this.helpController.show(); 
+        break;
       case "practice": this.practiceController.show(); break;
       case "intro":
         this.roundIntroController.setRound(screen.round);
         this.roundIntroController.show();
         break;
       case "stats":
-        this.roundStatsController.setRound(screen.round);
+        //this.roundStatsController.setRound(screen.round);
         this.roundStatsController.show();
         break;
       case "results":
