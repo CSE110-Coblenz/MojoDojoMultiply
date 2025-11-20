@@ -97,11 +97,11 @@ git push origin feature/your-feature-name
 
 ## 👥 Team Members
 
-| Name |
-|------|
+| Team Member |
+|-------------|
 | **Mohamed Adem** |
 | **Thatcher Eames** | 
 | **Richard Gabel** | 
 | **Sammy Hamouda** | 
 | **Christine Oswald** | 
-| **Edgar Seecof** | 
+| **Edgar Seecof** |
