@@ -22,6 +22,8 @@ export class RoundStatsController extends ScreenController {
     this.view = new RoundStatsView(
       () => this.handleNextRoundButton(),
       () => this.handleMenuButton(),
+      () => this.handleHoverStart(),
+      () => this.handleHoverEnd(),
       layer
     );
   }
@@ -84,6 +86,22 @@ export class RoundStatsController extends ScreenController {
       round: lastRound + 1,
     });
   }
+
+  /**
+     * Handle hover start on any clickable element
+     * Changes the cursor to a pointer
+     */
+    private handleHoverStart(): void {
+        document.body.style.cursor = 'pointer';
+    }
+
+    /**
+     * Handle hover end on any clickable element
+     * Resets the cursor to default
+     */
+    private handleHoverEnd(): void {
+        document.body.style.cursor = 'default';
+    }
 
   /**
    * MENU button -> go to the main menu
