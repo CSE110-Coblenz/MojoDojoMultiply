@@ -16,8 +16,10 @@ export class MainPageView implements View {
 	private answerTexts: Konva.Text[];
 	private correctAnswerText: Konva.Text;
 	private incorrectAnswerText: Konva.Text;
+	private healthBarWidth: number;
 	private playerHealthBar: Konva.Rect;
 	private opponentHealthBar: Konva.Rect;
+	private muteLogoSlash: Konva.Line;
 	// Konva image for the player's avatar
 	private playerAvatar?: Konva.Image;
 	// Konva image for the opponent's avatar
@@ -37,7 +39,8 @@ export class MainPageView implements View {
 		onHoverEnd: () => void,
 		onStartClick: () => void,
 		onHelpClick: () => void,
-		onSkipAhead: () => void
+		onSkipAhead: () => void,
+		onMuteClick: () => void
 	) {
 		this.group = new Konva.Group({ visible: false });
 
@@ -51,32 +54,29 @@ export class MainPageView implements View {
 		});
 		this.group.add(bg);
 
-		// Score display (bottom-center). origin will be set to the center so
-		// the text remains centered as its content changes.
 		this.scoreText = new Konva.Text({
 			x: GAMECST.STAGE_WIDTH / 2,
-			Y: GAMECST.STAGE_HEIGHT - 30,
-			text: "Score: 00000",
-			fontSize: 40,
+			y: GAMECST.STAGE_HEIGHT - 30,
+			text: "Game Score: 0000000",
+			fontSize: 30,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR,
 		});
 		// make origin the visual center
-		this.scoreText.offsetX(this.scoreText.width() / 2);
-		this.scoreText.offsetY(this.scoreText.height());
+		this.scoreText.offset({x: this.scoreText.width() / 2, y: this.scoreText.height()});
 		this.group.add(this.scoreText);
 
-		//TODO: Add function that changes the round number
+
 		this.roundText = new Konva.Text({
-			x: GAMECST.STAGE_WIDTH - 40,
-			y: 35,
+			x: GAMECST.STAGE_WIDTH - 30,
+			y: 20,
 			text: "ROUND 1",
-			fontSize: 30,
+			fontSize: 45,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR
 		});
 		this.roundText.offsetX(this.roundText.width());
-		this.roundText.offsetY(this.roundText.height() / 2);
+		//this.roundText.offsetY(this.roundText.height() / 2);
 		this.group.add(this.roundText);
 
 		//Group that holds the pause/play button
@@ -151,77 +151,162 @@ export class MainPageView implements View {
 		//Cycles between the play and pause logos when the button is clicked
 		pausePlayButtonGroup.on('click tap', () => { pauseResumeGame() });
 
+		const muteButton = new Konva.Group({
+			visible: true,
+			x: pausePlayButtonGroup.x() + pausePlayBox.width() + 20,
+			y: 20
+		});
+		this.group.add(muteButton);
 
-		//Health bar that visualizes the health of the player's character
-		const playerHealthGroup = new Konva.Group();
-		this.group.add(playerHealthGroup);
-		const healthBarWidth = 150;
-
-		//Background to visualize the full size of the health bar
-		const playerBarBacking = new Konva.Rect({
-			x: 80,
-			y: GAMECST.STAGE_HEIGHT * 2 / 3,
-			width: healthBarWidth,
-			height: 40,
+		//The background for the button
+		const muteBox = new Konva.Rect({
+			x: 0,
+			y: 0,
+			width: 60,
+			height: 60,
 			stroke: GAMECST.DARK_COLOR,
 			strokeWidth: 4,
 			fill: GAMECST.NEUTRAL_COLOR
-		});
-		playerHealthGroup.add(playerBarBacking);
+		})
+		muteButton.add(muteBox);
 
-		//Health bar that shrinks to model the health level of the player 
-		this.playerHealthBar = new Konva.Rect({
-			x: playerBarBacking.x() + 2,
-			y: playerBarBacking.y() + 2,
-			width: healthBarWidth - 4,
-			height: 36,
-			strokeEnabled: false,
-			fill: GAMECST.ALERT_COLOR
+		const muteLogo = new Konva.Group({ visible: true });
+		// position the logo inside the 60x60 button with a small inset
+		muteLogo.position({ x: muteBox.x() + 6, y: muteBox.y() + 6 });
+
+		// speaker wedge (filled polygon)
+		const speaker = new Konva.Line({
+			points: [
+				0, 12,  // left top
+				10, 12, // inner top
+				22, 0,  // tip top
+				22, 48, // tip bottom
+				10, 36, // inner bottom
+				0, 36   // left bottom
+			],
+			closed: true,
+			fill: GAMECST.DARK_COLOR
 		});
-		playerHealthGroup.add(this.playerHealthBar);
+		muteLogo.add(speaker);
+
+		// sound waves using arcs (stroked, rounded)
+		const wave1 = new Konva.Arc({
+			x: 16,
+			y: 24,
+			innerRadius: 15,
+			outerRadius: 19,
+			angle: 90,
+			rotation: -45,
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 3,
+			lineCap: 'round',
+			fill: GAMECST.DARK_COLOR
+		});
+		const wave2 = new Konva.Arc({
+			x: 22,
+			y: 24,
+			innerRadius: 21,
+			outerRadius: 25,
+			angle: 90,
+			rotation: -45,
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 3,
+			lineCap: 'round',
+			fill: GAMECST.DARK_COLOR
+		});
+		muteLogo.add(wave1, wave2);
+
+		// add the composed logo to the button
+		muteButton.add(muteLogo);
+
+		this.muteLogoSlash = new Konva.Line({
+			points: [2, 2, 46, 46], // diagonal from top-left to bottom-right (backslash)
+			stroke: GAMECST.ALERT_COLOR,
+			strokeWidth: 8,
+			lineCap: 'round',
+			lineJoin: 'round',
+			visible: false
+		});
+		muteLogo.add(this.muteLogoSlash);
+
+		//Adds the click mouse appearance when hovering
+		muteButton.on('mouseover', onHoverStart);
+		muteButton.on('mouseout', onHoverEnd);
+
+		//Cycles between the play and pause logos when the button is clicked
+		muteButton.on('click tap', () => { onMuteClick() });
+
+		//Group that contains all the elements of the fight scene
+		const fightingStage = new Konva.Group();
+		fightingStage.position({ x: 120, y: 160 });
+		this.group.add(fightingStage); 
 
 		//Health bar that visualizes the health of the opponent's character
 		const opponentHealthGroup = new Konva.Group();
-		this.group.add(opponentHealthGroup);
+		fightingStage.add(opponentHealthGroup);
+		this.healthBarWidth = 120;
 
 		//Background to visualize the full size of the health bar
 		const opponentBarBacking = new Konva.Rect({
-			x: 300,
-			y: playerBarBacking.y(),
-			width: healthBarWidth,
-			height: 40,
+			x: -20,
+			y: 250,
+			width: this.healthBarWidth,
+			height: 30,
 			stroke: GAMECST.DARK_COLOR,
 			strokeWidth: 4,
 			fill: GAMECST.NEUTRAL_COLOR
 		});
 		opponentHealthGroup.add(opponentBarBacking);
 
-		//Health bar that shrinks to model the health level of the opponent
+		//Health bar that shrinks to model the health level of the opponent 
 		this.opponentHealthBar = new Konva.Rect({
 			x: opponentBarBacking.x() + 2,
 			y: opponentBarBacking.y() + 2,
-			width: healthBarWidth - 4,
-			height: 36,
+			width: this.healthBarWidth - 4,
+			height: opponentBarBacking.height() - 4,
 			strokeEnabled: false,
 			fill: GAMECST.ALERT_COLOR
 		});
 		opponentHealthGroup.add(this.opponentHealthBar);
 
+		//Health bar that visualizes the health of the opponent's character
+		const playerHealthGroup = new Konva.Group();
+		fightingStage.add(playerHealthGroup);
+
+		//Background to visualize the full size of the health bar
+		const playerBarBacking = new Konva.Rect({
+			x: opponentBarBacking.x() + opponentBarBacking.width() + 40,
+			y: opponentBarBacking.y(),
+			width: this.healthBarWidth,
+			height: opponentBarBacking.height(),
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 4,
+			fill: GAMECST.NEUTRAL_COLOR
+		});
+		playerHealthGroup.add(playerBarBacking);
+
+		//Health bar that shrinks to model the health level of the opponent
+		this.playerHealthBar = new Konva.Rect({
+			x: playerBarBacking.x() + 2,
+			y: playerBarBacking.y() + 2,
+			width: this.healthBarWidth - 4,
+			height: playerBarBacking.height() - 4,
+			strokeEnabled: false,
+			fill: GAMECST.ALERT_COLOR
+		});
+		playerHealthGroup.add(this.playerHealthBar);
+
 		// Initialize health bars to full
 		this.updateHealthBars(1, 1);
-
-		//Group that contains all the elements of the fight scene
-		const fightingStage = new Konva.Group();
-		this.group.add(fightingStage);
 
 		// load boxer image and store it on the instance so other code can access it
 		Konva.Image.fromURL('/boxer.png', (image) => {
 			// keep a reference to the Konva.Image node
-			this.playerAvatar = image;
+			this.opponentAvatar = image;
 
 			// set desired scale and position (adjust values as needed)
-			image.scale({ x: 0.3, y: 0.3 });
-			image.position({ x: 80, y: GAMECST.STAGE_HEIGHT / 3});
+			image.scale({ x: 0.25, y: 0.25 });
+			image.position({ x: 0, y: 0 });
 
 			// add to the fighting stage group
 			fightingStage.add(image);
@@ -230,20 +315,23 @@ export class MainPageView implements View {
 		// load boxer image and store it on the instance so other code can access it
 		Konva.Image.fromURL('/boxer2.png', (image) => {
 			// keep a reference to the Konva.Image node
-			this.opponentAvatar = image;
+			this.playerAvatar = image;
 
 			// set desired scale and position (adjust values as needed)
-			image.scale({ x: 0.3, y: 0.3 });
-			image.position({ x: 300, y: GAMECST.STAGE_HEIGHT / 3 });
+			image.scale({ x: 0.35, y: 0.35 });
+			image.position({ x: 80, y: 20 });
 
 			// add to the fighting stage group
 			fightingStage.add(image);
 		});
 
 		// Create four answer squares in a 2x2 grid pattern in the center of the screen
-		const squareSize = 80;
+		const squareSize = 90;
 		const spacing = 20;
+		const textSize = 40;
+		const supplimentTextSize = 32;
 		const totalWidth = (squareSize * 2) + spacing;
+		const totalHeight = (squareSize * 2) + (spacing * 5) + (supplimentTextSize * 4);
 		// initial empty values; controller will populate the first question
 		const allAnswers: (string | number)[] = ["", "", "", ""];
 		
@@ -253,7 +341,8 @@ export class MainPageView implements View {
 		const gameQuestAnsGroup = new Konva.Group();
 
 		//Set the position of the entire group
-		gameQuestAnsGroup.position({ x: GAMECST.STAGE_WIDTH * 2 / 3, y: GAMECST.STAGE_HEIGHT / 5, });
+		gameQuestAnsGroup.position({ x: GAMECST.STAGE_WIDTH * 2 / 3, y: GAMECST.STAGE_HEIGHT / 2, });
+		gameQuestAnsGroup.offset({x: totalWidth / 2, y: totalHeight / 2});
 		this.group.add(gameQuestAnsGroup);
 
 		//Group that holds the question text and the question box
@@ -265,7 +354,7 @@ export class MainPageView implements View {
 			x: totalWidth / 2,
 			y: 0,
 			text: "Time: 60",
-			fontSize: 32,
+			fontSize: supplimentTextSize,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.ALERT_COLOR,
 		});
@@ -353,7 +442,7 @@ export class MainPageView implements View {
 			x: questionBox.x() + questionBox.width() / 2,
 			y: questionBox.y() + questionBox.height() / 2,
 			text: ``,
-			fontSize: 30,
+			fontSize: textSize,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR
 		});
@@ -367,7 +456,7 @@ export class MainPageView implements View {
 				x: answer1Box.x() + answer1Box.width() / 2,
 				y: answer1Box.y() + answer1Box.height() / 2,
 				text: `${allAnswers[0]}`,
-				fontSize: 30,
+				fontSize: textSize,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: GAMECST.DARK_COLOR
 			}),
@@ -376,7 +465,7 @@ export class MainPageView implements View {
 				x: answer2Box.x() + answer2Box.width() / 2,
 				y: answer2Box.y() + answer2Box.height() / 2,
 				text: `${allAnswers[1]}`,
-				fontSize: 30,
+				fontSize: textSize,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: GAMECST.DARK_COLOR
 			}),
@@ -385,7 +474,7 @@ export class MainPageView implements View {
 				x: answer3Box.x() + answer3Box.width() / 2,
 				y: answer3Box.y() + answer3Box.height() / 2,
 				text: `${allAnswers[2]}`,
-				fontSize: 30,
+				fontSize: textSize,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: GAMECST.DARK_COLOR
 			}),
@@ -394,14 +483,12 @@ export class MainPageView implements View {
 				x: answer4Box.x() + answer4Box.width() / 2,
 				y: answer4Box.y() + answer4Box.height() / 2,
 				text: `${allAnswers[3]}`,
-				fontSize: 30,
+				fontSize: textSize,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: GAMECST.DARK_COLOR
 			})
 		
 		];
-
-		//TODO: add hide and show functionality to this text
 
 		//Text that tells the user they answered correctly
 		this.correctAnswerText = new Konva.Text({
@@ -603,14 +690,8 @@ export class MainPageView implements View {
 	/**
 	 * Internal method to update score text
 	 */
-	setScoreText(scoreText: string): void {
-		this.scoreText.text(scoreText);
-		// update origin so the text remains centered as width/height change
-		// this.scoreText.offsetX(this.scoreText.width() / 2);
-		// this.scoreText.offsetY(this.scoreText.height() / 2);
-		// keep positioned at bottom-center
-		// this.scoreText.position({ x: GAMECST.STAGE_WIDTH / 2, y: GAMECST.STAGE_HEIGHT - 30 });
-		this.group.getLayer()?.draw();
+	setScoreText(score: number): void {
+		this.scoreText.text("Game Score: " + score.toString().padStart(7, "0"));
 	}
 	
 
@@ -724,6 +805,20 @@ export class MainPageView implements View {
 		this.pauseMenu.visible(false);
 	}
 
+	/**
+	 * 
+	 */
+	showMute(): void {
+		this.muteLogoSlash.visible(true);
+	}
+
+	/**
+	 * 
+	 */
+	showUnmute(): void {
+		this.muteLogoSlash.visible(false);
+	}
+
     /**
      * Update the health bars with new percentage values
 	 * @param playerHealthPercent The percentage of health for the player (0-1)
@@ -731,9 +826,8 @@ export class MainPageView implements View {
 	 * @returns void
      */
     updateHealthBars(playerHealthPercent: number, opponentHealthPercent: number): void {
-        const healthBarWidth = 150;
-        this.playerHealthBar.width((healthBarWidth - 4) * playerHealthPercent);
-        this.opponentHealthBar.width((healthBarWidth - 4) * opponentHealthPercent);
+        this.playerHealthBar.width((this.healthBarWidth - 4) * playerHealthPercent);
+        this.opponentHealthBar.width((this.healthBarWidth - 4) * opponentHealthPercent);
         this.group.getLayer()?.draw();
     }
 }

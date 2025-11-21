@@ -160,7 +160,7 @@ export class HelpPageView implements View {
         startGameButton.add(this.resumeGameButtonText);
         
         //Center the origin point of the text
-        this.resumeGameButtonText.offset({ x: this.startGameButtonText.width() / 2, y: this.startGameButtonText.height() / 2});
+        this.resumeGameButtonText.offset({ x: this.resumeGameButtonText.width() / 2, y: this.resumeGameButtonText.height() / 2});
 
         startGameButton.on("mouseenter", () => (document.body.style.cursor = "pointer"));
         startGameButton.on("mouseleave", () => (document.body.style.cursor = "default"));
