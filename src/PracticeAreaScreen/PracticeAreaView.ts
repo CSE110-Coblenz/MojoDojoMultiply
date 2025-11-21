@@ -7,26 +7,23 @@ import { GAMECST } from "../constants.js";
  */
 export class PracticeAreaView implements View {
 	private group: Konva.Group;
-    // Konva.Image placeholders for timer digits (minute, tens, ones)
     private readonly timerImageNodes: Konva.Image[] = [];
-	//private scoreText: Konva.Text;
 	private timerText: Konva.Text;
+	private pauseLogo: Konva.Group;
+	private playLogo: Konva.RegularPolygon;
+	private pauseMenu: Konva.Group;
+	private muteLogoSlash: Konva.Line;
 	private roundText: Konva.Text;
 	private questionText: Konva.Text;
 	private answerTexts: Konva.Text[];
 	private correctAnswerText: Konva.Text;
 	private incorrectAnswerText: Konva.Text;
-	//private playerHealthBar: Konva.Rect;
-	//private opponentHealthBar: Konva.Rect;
 	// Konva image for the player's avatar
 	private playerAvatar?: Konva.Image;
 	// Konva image for the opponent's avatar
 	private opponentAvatar?: Konva.Image;
 	// optional key handler for keyboard answer selection
 	private keyHandler?: (e: KeyboardEvent) => void;
-	public pauseLogo?: Konva.Group;
-	public playLogo?: Konva.RegularPolygon;
-	public pauseMenu?: Konva.Group;
 
 	
 	// constructor for the interface Main page interface
@@ -36,7 +33,8 @@ export class PracticeAreaView implements View {
 		onHoverStart: () => void,
 		onHoverEnd: () => void,
 		onStartClick: () => void,
-		onGameClick: () => void
+		onGameClick: () => void,
+		onMuteClick: () => void
 	) {
 		this.group = new Konva.Group({ visible: false });
 
@@ -208,21 +206,33 @@ export class PracticeAreaView implements View {
 		// });
 		// opponentHealthGroup.add(this.opponentHealthBar);
 
-		// Initialize health bars to full
-		this.updateHealthBars(1, 1);
-
 		//Group that contains all the elements of the fight scene
 		const fightingStage = new Konva.Group();
-		this.group.add(fightingStage);
+		fightingStage.position({ x: 120, y: 160 });
+		this.group.add(fightingStage); 
 
 		// load boxer image and store it on the instance so other code can access it
-		Konva.Image.fromURL('/boxer.png', (image) => {
+		Konva.Image.fromURL('/punchingBag.png', (image) => {
+			// keep a reference to the Konva.Image node
+			this.opponentAvatar = image;
+
+			// set desired scale and position (adjust values as needed)
+			image.scale({ x: 0.20, y: 0.20 });
+			image.position({ x: 0, y: 0 });
+
+			// add to the fighting stage group
+			fightingStage.add(image);
+		});
+
+		// load boxer image and store it on the instance so other code can access it
+		// load boxer image and store it on the instance so other code can access it
+		Konva.Image.fromURL('/boxer2.png', (image) => {
 			// keep a reference to the Konva.Image node
 			this.playerAvatar = image;
 
 			// set desired scale and position (adjust values as needed)
-			image.scale({ x: 0.3, y: 0.3 });
-			image.position({ x: 80, y: GAMECST.STAGE_HEIGHT / 3});
+			image.scale({ x: 0.35, y: 0.35 });
+			image.position({ x: 80, y: 20 });
 
 			// add to the fighting stage group
 			fightingStage.add(image);
@@ -242,9 +252,12 @@ export class PracticeAreaView implements View {
 		// });
 
 		// Create four answer squares in a 2x2 grid pattern in the center of the screen
-		const squareSize = 80;
+		const squareSize = 90;
 		const spacing = 20;
+		const textSize = 40;
+		const supplimentTextSize = 32;
 		const totalWidth = (squareSize * 2) + spacing;
+		const totalHeight = (squareSize * 2) + (spacing * 5) + (supplimentTextSize * 4);
 		// initial empty values; controller will populate the first question
 		const allAnswers: (string | number)[] = ["", "", "", ""];
 		
@@ -254,7 +267,8 @@ export class PracticeAreaView implements View {
 		const gameQuestAnsGroup = new Konva.Group();
 
 		//Set the position of the entire group
-		gameQuestAnsGroup.position({ x: GAMECST.STAGE_WIDTH * 2 / 3, y: GAMECST.STAGE_HEIGHT / 6, });
+		gameQuestAnsGroup.position({ x: GAMECST.STAGE_WIDTH * 2 / 3, y: GAMECST.STAGE_HEIGHT / 2, });
+		gameQuestAnsGroup.offset({x: totalWidth / 2, y: totalHeight / 2});
 		this.group.add(gameQuestAnsGroup);
 
 		//Group that holds the question text and the question box
@@ -266,7 +280,7 @@ export class PracticeAreaView implements View {
 			x: totalWidth / 2,
 			y: 0,
 			text: "Time: --- ",
-			fontSize: 32,
+			fontSize: supplimentTextSize,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.ALERT_COLOR,
 		});
@@ -284,6 +298,7 @@ export class PracticeAreaView implements View {
 			strokeWidth: 4
 		});
 		questionGroup.add(questionBox);
+
 
 		// Answer 1 (top-left)
 		const answer1Group = new Konva.Group();
@@ -351,7 +366,7 @@ export class PracticeAreaView implements View {
 			x: questionBox.x() + questionBox.width() / 2,
 			y: questionBox.y() + questionBox.height() / 2,
 			text: ``,
-			fontSize: 30,
+			fontSize: textSize,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR
 		});
@@ -364,7 +379,7 @@ export class PracticeAreaView implements View {
 			y: answer3Box.y() + answer3Box.width() + spacing,
 			text: "Correct!",
 			fill: "green",
-			fontSize: 40,
+			fontSize: supplimentTextSize,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			visible: false
 		});
@@ -380,7 +395,7 @@ export class PracticeAreaView implements View {
 			y: answer3Box.y() + answer3Box.width() + spacing,
 			text: "Incorrect",
 			fill: "red",
-			fontSize: 40,
+			fontSize: supplimentTextSize,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			visible: false
 		});
@@ -397,7 +412,7 @@ export class PracticeAreaView implements View {
 				x: answer1Box.x() + answer1Box.width() / 2,
 				y: answer1Box.y() + answer1Box.height() / 2,
 				text: `${allAnswers[0]}`,
-				fontSize: 30,
+				fontSize: textSize,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: GAMECST.DARK_COLOR
 			}),
@@ -406,7 +421,7 @@ export class PracticeAreaView implements View {
 				x: answer2Box.x() + answer2Box.width() / 2,
 				y: answer2Box.y() + answer2Box.height() / 2,
 				text: `${allAnswers[1]}`,
-				fontSize: 30,
+				fontSize: textSize,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: GAMECST.DARK_COLOR
 			}),
@@ -415,7 +430,7 @@ export class PracticeAreaView implements View {
 				x: answer3Box.x() + answer3Box.width() / 2,
 				y: answer3Box.y() + answer3Box.height() / 2,
 				text: `${allAnswers[2]}`,
-				fontSize: 30,
+				fontSize: textSize,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: GAMECST.DARK_COLOR
 			}),
@@ -424,7 +439,7 @@ export class PracticeAreaView implements View {
 				x: answer4Box.x() + answer4Box.width() / 2,
 				y: answer4Box.y() + answer4Box.height() / 2,
 				text: `${allAnswers[3]}`,
-				fontSize: 30,
+				fontSize: textSize,
 				fontFamily: GAMECST.DEFAULT_FONT,
 				fill: GAMECST.DARK_COLOR
 			})
@@ -517,6 +532,91 @@ export class PracticeAreaView implements View {
 		const pauseButtonSpacing = 80;
 		const pauseButtonHeight = 50;
 		
+		const muteButton = new Konva.Group({
+			visible: true,
+			x: pausePlayButtonGroup.x() + pausePlayBox.width() + 20,
+			y: 20
+		});
+		this.group.add(muteButton);
+
+		//The background for the button
+		const muteBox = new Konva.Rect({
+			x: 0,
+			y: 0,
+			width: 60,
+			height: 60,
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 4,
+			fill: GAMECST.NEUTRAL_COLOR
+		})
+		muteButton.add(muteBox);
+
+		const muteLogo = new Konva.Group({ visible: true });
+		// position the logo inside the 60x60 button with a small inset
+		muteLogo.position({ x: muteBox.x() + 6, y: muteBox.y() + 6 });
+
+		// speaker wedge (filled polygon)
+		const speaker = new Konva.Line({
+			points: [
+				0, 12,  // left top
+				10, 12, // inner top
+				22, 0,  // tip top
+				22, 48, // tip bottom
+				10, 36, // inner bottom
+				0, 36   // left bottom
+			],
+			closed: true,
+			fill: GAMECST.DARK_COLOR
+		});
+		muteLogo.add(speaker);
+
+		// sound waves using arcs (stroked, rounded)
+		const wave1 = new Konva.Arc({
+			x: 16,
+			y: 24,
+			innerRadius: 15,
+			outerRadius: 19,
+			angle: 90,
+			rotation: -45,
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 3,
+			lineCap: 'round',
+			fill: GAMECST.DARK_COLOR
+		});
+		const wave2 = new Konva.Arc({
+			x: 22,
+			y: 24,
+			innerRadius: 21,
+			outerRadius: 25,
+			angle: 90,
+			rotation: -45,
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 3,
+			lineCap: 'round',
+			fill: GAMECST.DARK_COLOR
+		});
+		muteLogo.add(wave1, wave2);
+
+		// add the composed logo to the button
+		muteButton.add(muteLogo);
+
+		this.muteLogoSlash = new Konva.Line({
+			points: [2, 2, 46, 46], // diagonal from top-left to bottom-right (backslash)
+			stroke: GAMECST.ALERT_COLOR,
+			strokeWidth: 8,
+			lineCap: 'round',
+			lineJoin: 'round',
+			visible: false
+		});
+		muteLogo.add(this.muteLogoSlash);
+
+		//Adds the click mouse appearance when hovering
+		muteButton.on('mouseover', onHoverStart);
+		muteButton.on('mouseout', onHoverEnd);
+
+		//Cycles between the play and pause logos when the button is clicked
+		muteButton.on('click tap', () => { onMuteClick() });
+
 		//Center the button group with its size
 		navigationOptions.offsetX(pauseButtonWidth + pauseButtonSpacing / 2);
 		navigationOptions.offsetY(pauseButtonHeight);
@@ -661,6 +761,38 @@ export class PracticeAreaView implements View {
 	hideCorrectIncorrect(): void {
 		this.correctAnswerText.visible(false);
 		this.incorrectAnswerText.visible(false);
+	}
+
+	/**
+	 * Switches the play pause button to the play button config
+	 */
+	showPlayButton(): void {
+		this.pauseLogo.visible(false);
+		this.playLogo.visible(true);
+		this.pauseMenu.visible(true);
+	}
+
+	/**
+	 * Switches the play pause button to the play button config
+	 */
+	showPauseButton(): void {
+		this.playLogo.visible(false);
+		this.pauseLogo.visible(true);
+		this.pauseMenu.visible(false);
+	}
+
+	/**
+	 * 
+	 */
+	showMute(): void {
+		this.muteLogoSlash.visible(true);
+	}
+
+	/**
+	 * 
+	 */
+	showUnmute(): void {
+		this.muteLogoSlash.visible(false);
 	}
 
 

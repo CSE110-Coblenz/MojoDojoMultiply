@@ -9,6 +9,7 @@ export class PracticeAreaController extends ScreenController {
     private view: PracticeAreaView;
     private screenSwitcher: ScreenSwitcher;
     private clickSound: HTMLAudioElement;
+    private isMuted: boolean = false;
 
     constructor(screenSwitcher: ScreenSwitcher) {
         super();
@@ -29,7 +30,8 @@ export class PracticeAreaController extends ScreenController {
             () => this.handleHoverStart(),
             () => this.handleHoverEnd(),
             () => this.handleStartClick(),
-            () => this.handleGameClick()
+            () => this.handleGameClick(),
+            () => this.handleMuteClick(),
         );
 
         this.setupGlobalStateListener();
@@ -256,6 +258,19 @@ export class PracticeAreaController extends ScreenController {
         }
     }
 
+    /**
+     * 
+     */
+    private handleMuteClick() {
+        if (this.isMuted == true) {
+            this.view.showUnmute();
+            this.isMuted = false;
+        } else {
+            this.view.showMute();
+            this.isMuted = true;
+        }
+    }
+
 
     /**
      * End the game which for now just goes back to the start screen
@@ -278,15 +293,13 @@ export class PracticeAreaController extends ScreenController {
         }
     }
 
-    /**
+   /**
      * Pause the game
      */
     pauseGame(): void {
         //this.pauseQuestionTimer();
         this.model.gamePaused = true;
-        this.view.pauseLogo?.visible(false);
-        this.view.playLogo?.visible(true);
-        this.view.pauseMenu?.visible(true);
+        this.view.showPlayButton();
     }
 
     /**
@@ -295,9 +308,7 @@ export class PracticeAreaController extends ScreenController {
     resumeGame(): void {
         //this.resumeQuestionTimer();
         this.model.gamePaused = false;
-        this.view.pauseLogo?.visible(true);
-        this.view.playLogo?.visible(false);
-        this.view.pauseMenu?.visible(false);
+        this.view.showPauseButton();
     }
 
     /**
