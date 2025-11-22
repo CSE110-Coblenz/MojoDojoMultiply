@@ -6,6 +6,8 @@ export class MainPageModel {
     score: number;
     num1: number;
     num2: number;
+    prevNum1: number;
+    prevNum2: number;
     correctAnswer: number;
     wrongAnswers: number[];
     allAnswers: number[];
@@ -24,7 +26,7 @@ export class MainPageModel {
     roundCorrect = 0;
     roundTotal = 0;
     gamePaused: boolean;
-    questionMax = 1;
+    questionMax = 3;
     questionMin = 1;
 
 
@@ -34,6 +36,8 @@ export class MainPageModel {
         this.score = 0;
         this.num1 = 0;
         this.num2 = 0;
+        this.prevNum1 = 0;
+        this.prevNum2 = 0;
         this.correctAnswer = 0;
         this.wrongAnswers = [];
         this.allAnswers = [];
