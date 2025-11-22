@@ -37,6 +37,8 @@ export class RoundStatsView implements View {
   constructor(
     onNextRoundClick: () => void,
     onMainMenuClick: () => void,
+    onHoverStart: () => void,
+    onHoverEnd: () => void,
     layer: Konva.Layer
   ) {
 
@@ -66,8 +68,8 @@ export class RoundStatsView implements View {
       y: 150,
       text: "Current Round: 0 pts (0% correct)",
       fontSize: 28,
-      fontFamily: "Arial",
-      fill: GAMECST.HIGHLIGHT_COLOR,
+      fontFamily: GAMECST.DEFAULT_FONT,
+      fill: GAMECST.DARK_COLOR,
       width: STAGE_WIDTH,
       align: "left",
     });
@@ -107,53 +109,58 @@ export class RoundStatsView implements View {
 
     // NEXT ROUND Button
     const nextRound = new Konva.Group();
-    nextRound.add(
-      new Konva.Rect({
-        x: STAGE_WIDTH / 2 - 260,
-        y: 480,
-        width: 250,
-        height: 60,
-        fill: HIGHLIGHT_COLOR,
-        stroke: DARK_COLOR,
-        strokeWidth: 3,
-      })
-    );
+    const nextRoundBackground = new Konva.Rect({
+      x: STAGE_WIDTH / 2 - 260,
+      y: 480,
+      width: 250,
+      height: 60,
+      fill: HIGHLIGHT_COLOR,
+      stroke: DARK_COLOR,
+      strokeWidth: 4,
+    })
+    nextRound.add(nextRoundBackground);
+
     const nextText = new Konva.Text({
-      x: STAGE_WIDTH / 2 - 135,
-      y: 495,
+      x: nextRoundBackground.x() + nextRoundBackground.width() / 2,
+      y: nextRoundBackground.y() + nextRoundBackground.height() / 2,
       text: "NEXT ROUND",
-      fontSize: 24,
+      fontSize: 30,
       fontFamily: DEFAULT_FONT,
       fill: DARK_COLOR,
     });
-    nextText.offsetX(nextText.width() / 2);
+    nextText.offset({x: nextText.width() / 2, y: nextText.height() / 2});
     nextRound.add(nextText);
+    nextRound.on("mouseover", onHoverStart);
+    nextRound.on("mouseout", onHoverEnd)
     nextRound.on("click", onNextRoundClick);
     this.group.add(nextRound);
 
     // MAIN MENU Button
     const menu = new Konva.Group();
-    menu.add(
-      new Konva.Rect({
-        x: STAGE_WIDTH / 2 + 40,
-        y: 480,
-        width: 250,
-        height: 60,
-        fill: HIGHLIGHT_COLOR,
-        stroke: DARK_COLOR,
-        strokeWidth: 3,
-      })
-    );
+    
+    const menuBackground = new Konva.Rect({
+      x: STAGE_WIDTH / 2 + 40,
+      y: 480,
+      width: 250,
+      height: 60,
+      fill: HIGHLIGHT_COLOR,
+      stroke: DARK_COLOR,
+      strokeWidth: 4,
+    });
+    menu.add(menuBackground);
+
     const menuText = new Konva.Text({
-      x: STAGE_WIDTH / 2 + 165,
-      y: 495,
+      x: menuBackground.x() + menuBackground.width() / 2,
+      y: menuBackground.y() + menuBackground.height() / 2,
       text: "MAIN MENU",
-      fontSize: 24,
+      fontSize: 30,
       fontFamily: DEFAULT_FONT,
       fill: DARK_COLOR,
     });
-    menuText.offsetX(menuText.width() / 2);
+    menuText.offset({x: menuText.width() / 2, y: menuText.height() / 2});
     menu.add(menuText);
+    menu.on("mouseover", onHoverStart);
+    menu.on("mouseout", onHoverEnd)
     menu.on("click", onMainMenuClick);
     this.group.add(menu);
   }

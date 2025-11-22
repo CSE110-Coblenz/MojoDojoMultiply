@@ -9,6 +9,10 @@ export class MainPageView implements View {
 	private group: Konva.Group;
     // Konva.Image placeholders for timer digits (minute, tens, ones)
     private readonly timerImageNodes: Konva.Image[] = [];
+	private pauseLogo: Konva.Group;
+	private playLogo: Konva.RegularPolygon;
+	private pauseMenu: Konva.Group;
+	private muteLogoSlash: Konva.Line;
 	private scoreText: Konva.Text;
 	private timerText: Konva.Text;
 	private roundText: Konva.Text;
@@ -19,16 +23,12 @@ export class MainPageView implements View {
 	private healthBarWidth: number;
 	private playerHealthBar: Konva.Rect;
 	private opponentHealthBar: Konva.Rect;
-	private muteLogoSlash: Konva.Line;
 	// Konva image for the player's avatar
 	private playerAvatar?: Konva.Image;
 	// Konva image for the opponent's avatar
 	private opponentAvatar?: Konva.Image;
 	// optional key handler for keyboard answer selection
 	private keyHandler?: (e: KeyboardEvent) => void;
-	private pauseLogo: Konva.Group;
-	private playLogo: Konva.RegularPolygon;
-	private pauseMenu: Konva.Group;
 
 	
 	// constructor for the interface Main page interface
