@@ -145,7 +145,7 @@ export class PracticeAreaController extends ScreenController {
      */
     private handleGameClick(): void {
         this.endGameEarly();
-        this.screenSwitcher.switchToScreen({ type: "main", round: 1 });
+        this.screenSwitcher.switchToScreen({ type: "main"});
     }
 
 
@@ -289,7 +289,7 @@ export class PracticeAreaController extends ScreenController {
             //     this.model.roundScore += 400;
             //     this.updateScore(400);
             // }
-            this.screenSwitcher.switchToScreen({ type: "stats", round: this.model.currentRound });
+            this.screenSwitcher.switchToScreen({ type: "stats"});
         }
     }
 
