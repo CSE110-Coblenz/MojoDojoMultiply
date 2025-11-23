@@ -1,18 +1,14 @@
 import { ScreenController, type ScreenSwitcher } from "../types";
-import { RoundIntroModel } from "./RoundIntroModel";
 import { RoundIntroView } from "./RoundIntroView";
-import { GAMECST } from "../constants";
-import { GlobalState } from "../storageManager"
 
 export class RoundIntroController extends ScreenController {
   private screenSwitcher: ScreenSwitcher;
   private view: RoundIntroView;
-  private model: RoundIntroModel;
+  private currentRound = 1;
 
   constructor(screenSwitcher: ScreenSwitcher) {
     super();
     this.screenSwitcher = screenSwitcher;
-    this.model = new RoundIntroModel();
 
     this.view = new RoundIntroView(
       () => this.startRound(),
@@ -20,45 +16,22 @@ export class RoundIntroController extends ScreenController {
       () => this.handleHoverStart(),
       () => this.handleHoverEnd()
     )
-
-    this.setupGlobalStateListener();
   }
-
-  setupGlobalStateListener(): void {
-          // Listen for changes made by other windows (automatic updates when saving)
-          window.addEventListener('storage', (event: StorageEvent) => {
-              // Check if the change was made to the same key
-              if (event.key === GAMECST.GLOBAL_DATA_KEY) {
-                  // event.newValue holds the new JSON string
-                  if (event.newValue) {
-                      try {
-                          const newState = JSON.parse(event.newValue) as GlobalState;
-                          
-                          // Update data with loaded data from JSON
-                          this.model.currentRound=newState.currentRound;
-                          
-                      } catch (e) {
-                          console.error("Failed to parse storage update:", e);
-                      }
-                  }
-              }
-          });
-      }
   
-  //TODO: double check where this is used -Richard
   /**
    * 
-   * 
+   * @param round 
    */
-  setRound() {
-    this.view.setRound(`Round ${this.model.currentRound}`); 
+  setRound(round: number) {
+    this.currentRound = round;
+    this.view.setRound(`Round ${round}`); 
   }  
   
   /**
    * Takes the user to the main game and starts gameplay when the start button is pressed
    */
   private startRound() {
-    this.screenSwitcher.switchToScreen({type: "main"});
+    this.screenSwitcher.switchToScreen({type: "main", round: this.currentRound});
   }
 
   /**
