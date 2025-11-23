@@ -2,10 +2,14 @@ import Konva from "konva";
 import { AnimatedSprite } from "../AnimatedSprites";
 import { ScreenController, type ScreenSwitcher } from "../types";
 import { RoundStatsView, type RoundStatsEntry } from "./RoundStatsView";
+import { GAMECST } from "../constants.js";
+import { getGlobalState, GlobalState, saveGlobalState } from "../storageManager"
+import { RoundStatsModel } from "./RoundStatsModel";
 
 export class RoundStatsController extends ScreenController {
   private screenSwitcher: ScreenSwitcher;
   private view: RoundStatsView;
+  private model: RoundStatsModel;
 
   //Reduces the history print to confines of history box
   private readonly MAX_HISTORY_PRINT = 7;
@@ -19,6 +23,8 @@ export class RoundStatsController extends ScreenController {
     super();
     this.screenSwitcher = screenSwitcher;
 
+    this.model = new RoundStatsModel();
+
     this.view = new RoundStatsView(
       () => this.handleNextRoundButton(),
       () => this.handleMenuButton(),
@@ -26,7 +32,33 @@ export class RoundStatsController extends ScreenController {
       () => this.handleHoverEnd(),
       layer
     );
+
+    this.setupGlobalStateListener();
   }
+
+  /**
+       * function for activating listener for stored data change to trigger resync
+       */
+      setupGlobalStateListener(): void {
+          // Listen for changes made by other windows (automatic updates when saving)
+          window.addEventListener('storage', (event: StorageEvent) => {
+              // Check if the change was made to the same key
+              if (event.key === GAMECST.GLOBAL_DATA_KEY) {
+                  // event.newValue holds the new JSON string
+                  if (event.newValue) {
+                      try {
+                          const newState = JSON.parse(event.newValue) as GlobalState;
+                          
+                          // Update data with loaded data from JSON
+                          this.model.currentRound=newState.currentRound;
+                          
+                      } catch (e) {
+                          console.error("Failed to parse storage update:", e);
+                      }
+                  }
+              }
+          });
+      }
 
   /**
    * Reads JSON round history from localStorage
@@ -74,17 +106,14 @@ export class RoundStatsController extends ScreenController {
    * Use the last round number + 1 to increment to the next round
    */
   private handleNextRoundButton(): void {
-    // if we have history, use last round + 1, else start at 1
-    const history = this.loadHistory();
-    const lastRound =
-      history.length > 0 ? history[history.length - 1].round : 1;
-
     this.hide();
 
-    this.screenSwitcher.switchToScreen({
-      type: "intro",
-      round: lastRound + 1,
-    });
+    //increment round num thats in the save system
+    const savedState = getGlobalState();
+    savedState.currentRound++;
+    saveGlobalState(savedState);
+
+    this.screenSwitcher.switchToScreen({type: "intro"});
   }
 
   /**
