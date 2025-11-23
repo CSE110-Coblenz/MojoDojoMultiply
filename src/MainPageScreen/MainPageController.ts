@@ -642,7 +642,7 @@ export class MainPageController extends ScreenController {
         }else if (this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse == this.model.correctAnswer){
             return [5, 5];
         }else if (this.model.playerResponse != this.model.correctAnswer && this.model.computerResponse != this.model.correctAnswer){
-            return [15, 10];
+            return [15, 5];
         }
         return [20, 0];
     }
