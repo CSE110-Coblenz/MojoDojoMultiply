@@ -9,6 +9,12 @@ export interface AnimatedSpriteOptions {
   loop: boolean;
   x: number;
   y: number;
+
+  //optional callback when a non-looping animation finishes 
+  onComplete?: () => void;
+
+  //scaling: number = uniform or separate x/y
+  scale?: number | { x: number; y: number };
 }
 
 /**
@@ -29,17 +35,21 @@ export class AnimatedSprite {
   private frameHeight: number;
   private frameCount: number;
   private frameRate: number;
-  private loop: boolean;
+  private loop?: boolean;
 
   private currentFrame = 0;
   private timeAccumulator = 0; // seconds
+
+  private onComplete?: () => void;
+  private completedOnce = false;
 
   constructor(layer: Konva.Layer, options: AnimatedSpriteOptions) {
     this.frameWidth = options.frameWidth;
     this.frameHeight = options.frameHeight;
     this.frameCount = options.frameCount;
     this.frameRate = options.frameRate;
-    this.loop = options.loop;
+    this.loop = options.loop ?? true;
+    this.onComplete = options.onComplete;
 
     // Create the image node, initially showing frame 0
     this.node = new Konva.Image({
@@ -57,6 +67,15 @@ export class AnimatedSprite {
       },
     });
 
+    //Scaling
+    if (options.scale !== undefined) {
+      if (typeof options.scale === "number") {
+        this.node.scale({ x: options.scale, y: options.scale });
+      } else {
+        this.node.scale(options.scale);
+      }
+    }
+
     // Add it to the layer so it's visible
     layer.add(this.node);
 
@@ -73,16 +92,29 @@ export class AnimatedSprite {
         this.timeAccumulator * this.frameRate
       );
 
-      // Wrap or clamp frame index
       if (this.loop) {
+        //Looping animation
         this.currentFrame = totalFramesPassed % this.frameCount;
       } else {
-        this.currentFrame = Math.min(totalFramesPassed, this.frameCount - 1);
+        //Non-looping: clamps at last frame
+        if (totalFramesPassed >= this.frameCount) {
+          this.currentFrame = this.frameCount - 1;
+
+          if (!this.completedOnce) {
+            this.completedOnce = true;
+            if (this.onComplete) {
+              this.onComplete();
+            }
+            this.animation.stop();
+          }
+        } else {
+          this.currentFrame = totalFramesPassed;
+        }
       }
 
       const frameX = this.currentFrame * this.frameWidth;
 
-      // IMPORTANT: update the crop rect so we show the correct slice
+      // update the crop rect so we show the correct slice
       this.node.crop({
         x: frameX,
         y: 0,
@@ -102,7 +134,7 @@ export class AnimatedSprite {
     this.animation.stop();
   }
 
-  /** Optionally jump back to frame 0 */
+  /** Jump back to frame 0 and allow onComplete to run again */
   reset(): void {
     this.timeAccumulator = 0;
     this.currentFrame = 0;
@@ -112,5 +144,19 @@ export class AnimatedSprite {
       width: this.frameWidth,
       height: this.frameHeight,
     });
+  }
+
+  /** Change sprite scale at runtime */
+  setScale(scale: number | { x: number; y: number }): void {
+    if (typeof scale === "number") {
+      this.node.scale({ x: scale, y: scale });
+    } else {
+      this.node.scale(scale);
+    }
+  }
+
+  /** Total length of this animation in milliseconds */
+  getDurationMs(): number {
+    return (this.frameCount / this.frameRate) * 1000;
   }
 }

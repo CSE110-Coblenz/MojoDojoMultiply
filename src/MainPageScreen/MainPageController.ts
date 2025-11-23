@@ -181,6 +181,9 @@ export class MainPageController extends ScreenController {
         this.model.computerTime = 0;
         this.model.playerResponse = 0;
 
+        // Clear bubbles for the new question
+        this.view.clearAnswerBubble();
+
         // AI chance to get the correct answer
         if (Math.random() < GAMECST.AI_ANSWER_CHANCE + GAMECST.AI_CHANCE_SCALE * this.model.currentRound) {
             this.model.computerResponse = this.model.correctAnswer;
@@ -191,12 +194,25 @@ export class MainPageController extends ScreenController {
             ];
         }
 
+        this.view.clearAnswerBubble();
+        this.view.setOpponentAnswerBubble("...");
+
         // Simulate computer's response after a random delay
         const minDelay = 1000; // 1 second
         const maxDelay = 3000; // 3 seconds
-        const delay = Math.random() * (maxDelay - minDelay) + minDelay;
+        const thinkingDelay = 9000;
         
-        setTimeout(() => {this.model.computerTime = Date.now(); }, delay);
+        setTimeout(() => {
+            this.model.computerTime = Date.now();
+
+            // Optional extra short delay before showing the real answer
+            const revealDelay = 800; 
+
+            setTimeout(() => {
+                // swap "..." with the actual answer
+                this.view.setOpponentAnswerBubble(String(this.model.computerResponse));
+            }, revealDelay);
+        }, thinkingDelay);
     }
 
     /**
@@ -362,6 +378,14 @@ export class MainPageController extends ScreenController {
         }
         if (oppDmg > 0) {
             this.model.opponentHealth = Math.max(0, this.model.opponentHealth - oppDmg);
+        }
+
+        // trigger attack animations
+        if (oppDmg > 0) {
+            this.view.playPlayerAttack();
+        }
+        if (playerDmg > 0) {
+            this.view.playOpponentAttack();
         }
         
         //Records the stats at the end of each question
