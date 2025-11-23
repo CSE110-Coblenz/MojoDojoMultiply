@@ -82,8 +82,6 @@ export class MainPageController extends ScreenController {
         });
     }
 
-    private readonly ROUND_HISTORY_KEY = "MojoDojoRoundStats";
-
     /**
     * Save the completed round’s stats into localStorage.
     * @param:
@@ -95,7 +93,7 @@ export class MainPageController extends ScreenController {
     */
     private saveRoundStats(): void {
         //Get existing stats list from storage
-        const raw = localStorage.getItem(this.ROUND_HISTORY_KEY);
+        const raw = localStorage.getItem(GAMECST.HISTORY_KEY);
 
         let history: {
             round: number;
@@ -136,7 +134,7 @@ export class MainPageController extends ScreenController {
 
         //Save the list back to localStorage
         try {
-            localStorage.setItem(this.ROUND_HISTORY_KEY, JSON.stringify(history));
+            localStorage.setItem(GAMECST.HISTORY_KEY, JSON.stringify(history));
         } catch (e) {
             console.error("Error saving round history.", e);
         }

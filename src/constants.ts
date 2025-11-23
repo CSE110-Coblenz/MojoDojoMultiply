@@ -29,6 +29,10 @@ export const WRONG_ANSWER_NUMBER = 3;
 // JSON storage key
 export const GLOBAL_DATA_KEY = "AppGlobalState";
 
+//constants for RoundStats history
+export const HISTORY_KEY = "MojoDojoRoundStats";
+export const MAX_HISTORY_PRINT = 7;
+
 export const GAMECST = {
     STAGE_HEIGHT,
     STAGE_WIDTH,
@@ -45,5 +49,7 @@ export const GAMECST = {
     AI_ANSWER_CHANCE,
     AI_CHANCE_SCALE,
     WRONG_ANSWER_NUMBER,
-    GLOBAL_DATA_KEY
+    GLOBAL_DATA_KEY,
+    HISTORY_KEY,
+    MAX_HISTORY_PRINT
 } as const;
