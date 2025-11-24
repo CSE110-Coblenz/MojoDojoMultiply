@@ -65,7 +65,7 @@ export class ResultsScreenController extends ScreenController {
 	 * Handle main Menu button click
 	 */
 	private handleNextRoundClick(): void {
-		this.screenSwitcher.switchToScreen({ type: "intro", round: 1 });
+		this.screenSwitcher.switchToScreen({ type: "intro"});
 	}
 
 	/**

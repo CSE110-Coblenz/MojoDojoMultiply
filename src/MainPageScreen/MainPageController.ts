@@ -705,7 +705,7 @@ export class MainPageController extends ScreenController {
             if (this.model.currentRound % GAMECST.ROUNDS_UNTIL_BONUS === 0) {
                 this.screenSwitcher.switchToScreen({ type: "bonus" });
             } else {
-                this.screenSwitcher.switchToScreen({ type: "stats", round: this.model.currentRound });
+                this.screenSwitcher.switchToScreen({ type: "stats"});
             }
         }
     }
