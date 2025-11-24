@@ -3,6 +3,7 @@ import type { ScreenSwitcher} from "../types";
 import { HelpPageView } from "./HelpPageView";
 import { MainPageController } from "../MainPageScreen/MainPageController";
 import { clearGlobalState } from "../storageManager";
+import { GAMECST } from "../constants";
 
 export class HelpPageController extends ScreenController {
     private view: HelpPageView;
@@ -43,6 +44,7 @@ export class HelpPageController extends ScreenController {
      */
     private handleMenuClick(): void {
         if(this.gameWasPrevious) MainPageController.endGameEarly();
+        localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
         clearGlobalState();
         this.screenSwitcher.switchToScreen({ type: "start"});
     }
@@ -52,6 +54,7 @@ export class HelpPageController extends ScreenController {
      */
     private handleStartPracticeClick(): void {
         if(this.gameWasPrevious) MainPageController.endGameEarly();
+        localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
         clearGlobalState();
         this.screenSwitcher.switchToScreen({ type: "practice"});
     }

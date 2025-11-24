@@ -328,6 +328,7 @@ export class MainPageController extends ScreenController {
      */
     private handleStartClick(): void {
         this.endGameEarly();
+        localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
         clearGlobalState();
         this.screenSwitcher.switchToScreen({ type: "start" });
     }
@@ -688,6 +689,7 @@ export class MainPageController extends ScreenController {
         //Switch to the stats page if the player looses or the results page if the player wins
         if(playerLost) {
             this.screenSwitcher.switchToScreen({ type: "results" });
+            localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
             clearGlobalState();
         } else {
             // gives bonus points if win w/ > 50% health

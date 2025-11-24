@@ -132,6 +132,7 @@ export class RoundStatsController extends ScreenController {
   private handleMenuButton(): void {
     this.hide();
     clearGlobalState();
+    localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
     this.screenSwitcher.switchToScreen({ type: "start" });
   }
 
