@@ -241,11 +241,9 @@ export class MainPageController extends ScreenController {
         this.view.setRoundNumber(this.model.currentRound);
 
         // increase difficulty every round
-        if(this.model.currentRound % 3 == 0) {
-            //increase difficulty every 5 rounds by increasing min value of numbers in questions
+        if(this.model.currentRound % GAMECST.MIN_QUESTION_VALUE_UPDATE == 0) {
             this.model.questionMin += 1;
-        }else if (this.model.currentRound % 2 == 1){
-            // increase difficulty every round not a multiple of 5 by increasing max value of numbers in questions
+        }else if (this.model.currentRound % GAMECST.MAX_QUESTION_VALUE_UPDATE == 1){
             this.model.questionMax += 1;
         }
         

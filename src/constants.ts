@@ -29,6 +29,9 @@ export const WRONG_ANSWER_NUMBER = 3;
 // JSON storage key
 export const GLOBAL_DATA_KEY = "AppGlobalState";
 
+export const MIN_QUESTION_VALUE_UPDATE = 3;
+export const MAX_QUESTION_VALUE_UPDATE = 2;
+
 export const GAMECST = {
     STAGE_HEIGHT,
     STAGE_WIDTH,
@@ -45,5 +48,7 @@ export const GAMECST = {
     AI_ANSWER_CHANCE,
     AI_CHANCE_SCALE,
     WRONG_ANSWER_NUMBER,
-    GLOBAL_DATA_KEY
+    GLOBAL_DATA_KEY,
+    MIN_QUESTION_VALUE_UPDATE,
+    MAX_QUESTION_VALUE_UPDATE
 } as const;
