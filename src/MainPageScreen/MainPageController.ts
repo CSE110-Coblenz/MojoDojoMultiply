@@ -17,6 +17,7 @@ export class MainPageController extends ScreenController {
     private backgroundMusic: HTMLAudioElement;
     private playerLost: boolean = false;
     private isMuted: boolean = false;
+    private isRunning: boolean = false;
 
     constructor(screenSwitcher: ScreenSwitcher) {
         super();
@@ -47,7 +48,7 @@ export class MainPageController extends ScreenController {
             () => this.handlePausePlayGame(),
             () => this.handleHoverStart(),
             () => this.handleHoverEnd(),
-            () => this.handleStartClick(),
+            () => this.handleMenuClick(),
             () => this.handleHelpClick(),
             () => this.endGame(false),
             () => this.handleMuteClick()
@@ -247,6 +248,7 @@ export class MainPageController extends ScreenController {
 
         // Reset game state
         this.resetForRound();
+        this.isRunning = true;
 
         // Reset round score
         this.model.roundScore = 0;
@@ -298,7 +300,7 @@ export class MainPageController extends ScreenController {
      */
     private startQuestionTimer(): void {
         this.clearQuestionTimer();
-        this.model.questionTimeRemaining = 30;
+        this.model.questionTimeRemaining = 5;
         this.updateTimer(this.model.questionTimeRemaining);
 
         this.model.questionTimerId = window.setInterval(() => {
@@ -351,7 +353,7 @@ export class MainPageController extends ScreenController {
     /**
      * Switches the screen to the start page when the pause menu button is clicked
      */
-    private handleStartClick(): void {
+    private handleMenuClick(): void {
         this.endGameEarly();
         localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
         clearGlobalState();
@@ -386,6 +388,7 @@ export class MainPageController extends ScreenController {
      * Reset game state by setting model properties to default values
      */
     private onQuestionTimeout(): void {
+        if(!this.isRunning) return;
         this.clearQuestionTimer();
         this.model.playerResponse = NaN;
         this.model.playerTime = Number.POSITIVE_INFINITY;
@@ -576,6 +579,7 @@ export class MainPageController extends ScreenController {
      * @returns void
      */
     private handleAnswerClick(selectedAnswer: number): void {
+
         
         // Record player's response and time
         this.model.playerResponse = selectedAnswer;
@@ -611,6 +615,7 @@ export class MainPageController extends ScreenController {
         this.applyDamages(damages);
         
         this.advanceGame();
+        
         // Play sound effects
         if(!this.isMuted) this.clickSound.play();
         this.clickSound.currentTime = 0;
@@ -666,6 +671,7 @@ export class MainPageController extends ScreenController {
      * @returns [playerDamage, opponentDamage]
      */
     private damageCalculation(): number[] {
+        console.log("Damage calculated");
         if(this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse != this.model.correctAnswer){
             return [0, 15];
         }else if (this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse == this.model.correctAnswer && this.model.playerTime < this.model.computerTime){
@@ -715,7 +721,8 @@ export class MainPageController extends ScreenController {
      * End the game which for now just goes back to the start screen
      */
     private endGame(playerLost: boolean): void {
-        this.clearQuestionTimer();
+        this.pauseQuestionTimer();
+        this.isRunning = false;
         this.view.hideCorrectIncorrect();
 
         //Switch to the stats page if the player looses or the results page if the player wins
@@ -767,6 +774,7 @@ export class MainPageController extends ScreenController {
     endGameEarly(): void {
         this.clearQuestionTimer();
         this.model.roundScore = 0;
+        this.isRunning = false;
         this.model.playerHealth = this.model.maxHealth;
         this.model.opponentHealth = this.model.maxHealth;
         this.view.hideCorrectIncorrect();
