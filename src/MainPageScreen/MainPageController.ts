@@ -257,10 +257,16 @@ export class MainPageController extends ScreenController {
         // Set the correct round number
         this.view.setRoundNumber(this.model.currentRound);
 
+        if(this.model.currentRound == 1){
+            this.model.questionMin = GAMECST.INITIAL_MIN_QUESTION_VALUE;
+            this.model.questionMax = GAMECST.INITIAL_MAX_QUESTION_VALUE;
+        }
+
         // increase difficulty every round
         if(this.model.currentRound % GAMECST.MIN_QUESTION_VALUE_UPDATE == 0) {
             this.model.questionMin += 1;
-        }else if (this.model.currentRound % GAMECST.MAX_QUESTION_VALUE_UPDATE == 1){
+        }
+        if (this.model.currentRound % GAMECST.MAX_QUESTION_VALUE_UPDATE == 1){
             this.model.questionMax += 1;
         }
         

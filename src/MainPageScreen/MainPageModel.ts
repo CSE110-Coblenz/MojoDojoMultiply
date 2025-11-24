@@ -28,8 +28,6 @@ export class MainPageModel {
     questionMax = 3;
     questionMin = 1;
 
-
-
     constructor() {
         this.tickCallback = null;
         this.num1 = 0;
