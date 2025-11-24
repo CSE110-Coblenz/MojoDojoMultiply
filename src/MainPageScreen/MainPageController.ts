@@ -588,13 +588,11 @@ export class MainPageController extends ScreenController {
         //console.log('Player response value:', this.model.playerResponse);
         //console.log('Computer response value:', this.model.computerResponse);
 
-        // Store current question's correct answer
-        const currentCorrectAnswer = this.model.correctAnswer;
-
         if (this.model.playerResponse == this.model.correctAnswer) {
             this.view.correctAnswer();
         } else {
             this.view.incorrectAnswer();
+            this.view.showCorrectAnswer(this.model.num1, this.model.num2, this.model.correctAnswer);
         }
         
         // Calculate damages based on both player and computer responses
