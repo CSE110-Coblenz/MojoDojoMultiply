@@ -9,6 +9,7 @@ import { PracticeAreaController } from "./PracticeAreaScreen/PracticeAreaControl
 import { ResultsScreenController} from "./ResultsPageScreen/ResultsPageController";
 import { RoundIntroController } from "./RoundIntroScreen/RoundIntroController";
 import { RoundStatsController } from "./RoundStatsScreen/RoundStatsController";
+import { BonusLevelController } from "./BonusLevelScreen/BonusLevelController";
 
 class App implements ScreenSwitcher {
   private stage: Konva.Stage;
@@ -21,6 +22,7 @@ class App implements ScreenSwitcher {
   private resultsController: ResultsScreenController;
   private roundIntroController: RoundIntroController;
   private roundStatsController: RoundStatsController;
+  private bonusLevelController: BonusLevelController;
 
   constructor(containerId: string) {
     this.stage = new Konva.Stage({
@@ -38,7 +40,8 @@ class App implements ScreenSwitcher {
     this.practiceController = new PracticeAreaController(this);
     this.resultsController = new ResultsScreenController(this);
     this.roundIntroController = new RoundIntroController(this);
-    this.roundStatsController = new RoundStatsController(this);
+    this.roundStatsController = new RoundStatsController(this, this.layer);
+    this.bonusLevelController = new BonusLevelController(this);
 
     // Add screen groups to same layer
     this.layer.add(this.startController.getView().getGroup());
@@ -47,7 +50,8 @@ class App implements ScreenSwitcher {
     this.layer.add(this.practiceController.getView().getGroup());
     this.layer.add(this.resultsController.getView().getGroup());
     this.layer.add(this.roundIntroController.getView().getGroup());
-    this.layer.add(this.roundStatsController.getView().getGroup());
+    //this.layer.add(this.roundStatsController.getView().getGroup());
+    this.layer.add(this.bonusLevelController.getView().getGroup());
 
     this.layer.draw();
 
@@ -63,23 +67,30 @@ class App implements ScreenSwitcher {
     this.practiceController.hide();
     this.resultsController.hide();
     this.roundIntroController.hide();
-    this.roundStatsController.hide();
+    //this.roundStatsController.hide();
+    this.bonusLevelController.hide();
 
     switch (screen.type) {
       case "start": this.startController.show(); break;
-      case "main": this.mainController.startGame(screen.round); break;
-      case "help": this.helpController.show(); break;
+      case "main": this.mainController.startGame(); break;
+      case "help": 
+        this.helpController.gamePrev(screen.fromGame);
+        this.helpController.show(); 
+        break;
       case "practice": this.practiceController.show(); break;
-      case "roundIntro":
-        this.roundIntroController.setRound(screen.round);
+      case "intro":
+        this.roundIntroController.setRound();
         this.roundIntroController.show();
         break;
-      case "roundStats":
-        this.roundStatsController.setRound(screen.round);
+      case "stats":
+        //this.roundStatsController.setRound(screen.round);
         this.roundStatsController.show();
         break;
       case "results":
-        this.resultsController.show()
+        this.resultsController.show();
+        break;
+      case "bonus":
+        this.bonusLevelController.show();
         break;
     }
   }

@@ -8,12 +8,13 @@ export interface View {
 
 export type Screen =
   | { type: "start" }
-  | { type: "main"; round: number }
-  | { type: "help" }
+  | { type: "main";}
+  | { type: "help"; fromGame: boolean }
   | { type: "practice" }
-  | { type: "roundIntro"; round: number }
+  | { type: "intro";}
   | { type: "results" }
-  | { type: "roundStats"; round: number; };
+  | { type: "stats";}
+  | { type: "bonus";};
 
 
 export abstract class ScreenController {

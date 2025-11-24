@@ -2,34 +2,70 @@ import { ScreenController, type ScreenSwitcher } from "../types";
 import { MainPageModel } from "./MainPageModel";
 import { MainPageView } from "./MainPageView";
 import { GAMECST } from "../constants";
-import {GlobalState} from "../storageManager"
+import { clearGlobalState, GlobalState } from "../storageManager"
+import { RoundStatsModel } from "../RoundStatsScreen/RoundStatsModel";
 
 export class MainPageController extends ScreenController {
+    // Static reference to the most recently constructed MainPageController.
+    // This allows other controllers/screens to call MainPageController.endGameEarly()
+    // without needing a direct reference to the instance.
+    private static currentInstance: MainPageController | null = null;
     private model: MainPageModel;
     private view: MainPageView;
     private screenSwitcher: ScreenSwitcher;
     private clickSound: HTMLAudioElement;
+    private backgroundMusic: HTMLAudioElement;
+    private playerLost: boolean = false;
+    private isMuted: boolean = false;
 
     constructor(screenSwitcher: ScreenSwitcher) {
         super();
+        // register this instance as the active controller
+        MainPageController.currentInstance = this;
         this.screenSwitcher = screenSwitcher;
 
         this.model = new MainPageModel();
         
         // Initialize click sound with error handling
         this.clickSound = new Audio("/PunchSound.mp3");
+        this.clickSound.volume = 0.5;
         this.clickSound.onerror = (e) => {
             console.error('Error loading sound:', e);
+        };
+
+        // Initialize background music with looping enabled
+        this.backgroundMusic = new Audio("/BackgroundMusic.mp3");
+        this.backgroundMusic.loop = true;
+        this.backgroundMusic.volume = 0.5;
+        this.backgroundMusic.onerror = (e) => {
+            console.error('Error loading background music:', e);
         };
 
         // Pass the event handlers to the view
         this.view = new MainPageView(
             (answer: number) => this.handleAnswerClick(answer),
-            () => this.handleAnswerHoverStart(),
-            () => this.handleAnswerHoverEnd()
+            () => this.handlePausePlayGame(),
+            () => this.handleHoverStart(),
+            () => this.handleHoverEnd(),
+            () => this.handleStartClick(),
+            () => this.handleHelpClick(),
+            () => this.endGame(false),
+            () => this.handleMuteClick()
         );
 
         this.setupGlobalStateListener();
+    }
+
+    /**
+     * Static wrapper so other modules can request the active MainPageController
+     * to end the game early without having a direct instance reference.
+     */
+    static endGameEarly(): void {
+        if (MainPageController.currentInstance) {
+            MainPageController.currentInstance.endGameEarly();
+        } else {
+            console.warn("MainPageController.endGameEarly() called but no controller instance is available.");
+        }
     }
 
     /**
@@ -56,13 +92,70 @@ export class MainPageController extends ScreenController {
         });
     }
 
-    //TODO: Create counter variable to announce what specific round player is on
+    /**
+    * Save the completed round’s stats into localStorage.
+    * @param:
+    * - Round Number
+    * - Round Score
+    * - Correct Answers
+    * - Total Answers
+    * - Time Stamps
+    */
+    private saveRoundStats(): void {
+        //Get existing stats list from storage
+        const raw = localStorage.getItem(GAMECST.ROUND_STATS_KEY);
+
+        let history: {
+            round: number;
+            points: number;
+            correct: number;
+            total: number;
+            timestamp: string;
+        }[] = [];
+
+        //Attempt to parse history retrieved from storage
+        if (raw) {
+            try {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    history = parsed;
+                }
+            } catch (e) {
+                console.error("Error parsing round history, resetting.", e);
+            }
+        }
+
+        //Build the NEW entry (for the current round) to save
+        const entry = {
+            round: this.model.currentRound, //Current Round num
+            points: this.model.roundScore, //Total Points for this round
+            correct: this.model.roundCorrect, //# correct answer
+            total: this.model.roundTotal, // # total questions
+            timestamp: new Date().toLocaleString(), //timestamp
+        };
+
+        //Add this completed round to the round history
+        history.push(entry);
+
+        //Keep the history length to only 5 (Player plays 5 rounds til bonus level)
+        if (history.length > 5) {
+            history = history.slice(history.length - 20);
+        }
+
+        //Save the list back to localStorage
+        try {
+            localStorage.setItem(GAMECST.ROUND_STATS_KEY, JSON.stringify(history));
+        } catch (e) {
+            console.error("Error saving round history.", e);
+        }
+    }
+
 
     /**
      * Update score display in view
      */
     updateScore(score: number): void {
-        this.view.setScoreText(`Score: ${score}`);
+        this.view.setScoreText(score);
     }
 
     /**
@@ -81,12 +174,22 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * Generate a new question whiele setting up computer's response and their timing
+     * Generate a new question while setting up computer's response and their timing
      * @returns void
      */
     private generateNewQuestion(): void {
-        this.model.num1 = this.getRandomNumber(1, 12);
-        this.model.num2 = this.getRandomNumber(1, 12);
+        this.model.prevNum1 = this.model.num1;
+        this.model.prevNum2 = this.model.num2;
+
+        this.model.num1 = this.getRandomNumber(this.model.questionMin, this.model.questionMax);
+        this.model.num2 = this.getRandomNumber(this.model.questionMin, this.model.questionMax);
+
+        //Decreases the chance of duplicate questions appearing back to back
+        if((this.model.prevNum1 == this.model.num1 && this.model.prevNum2 == this.model.num2) || (this.model.prevNum1 == this.model.num2 && this.model.prevNum2 == this.model.num1)){
+            this.model.num1 = this.getRandomNumber(this.model.questionMin, this.model.questionMax);
+            this.model.num2 = this.getRandomNumber(this.model.questionMin, this.model.questionMax);
+        }
+
         this.model.correctAnswer = this.model.num1 * this.model.num2;
         this.model.wrongAnswers = this.getWrongAnswers(this.model.correctAnswer, 3);
         this.model.allAnswers = this.randomizeOrder([this.model.correctAnswer, ...this.model.wrongAnswers]);
@@ -96,8 +199,11 @@ export class MainPageController extends ScreenController {
         this.model.computerTime = 0;
         this.model.playerResponse = 0;
 
-        // 50% chance to get the correct answer
-        if (Math.random() < 0.5) {
+        // Clear bubbles for the new question
+        this.view.clearAnswerBubble();
+
+        // AI chance to get the correct answer
+        if (Math.random() < GAMECST.AI_ANSWER_CHANCE + GAMECST.AI_CHANCE_SCALE * this.model.currentRound) {
             this.model.computerResponse = this.model.correctAnswer;
         } else {
             // Pick a random wrong answer
@@ -106,24 +212,57 @@ export class MainPageController extends ScreenController {
             ];
         }
 
+        this.view.clearAnswerBubble();
+        this.view.setOpponentAnswerBubble("...");
+
         // Simulate computer's response after a random delay
         const minDelay = 1000; // 1 second
         const maxDelay = 3000; // 3 seconds
-        const delay = Math.random() * (maxDelay - minDelay) + minDelay;
+        const thinkingDelay = 9000;
         
-        setTimeout(() => {this.model.computerTime = Date.now(); }, delay);
+        setTimeout(() => {
+            this.model.computerTime = Date.now();
+
+            // Optional extra short delay before showing the real answer
+            const revealDelay = 800; 
+
+            setTimeout(() => {
+                // swap "..." with the actual answer
+                this.view.setOpponentAnswerBubble(String(this.model.computerResponse));
+            }, revealDelay);
+        }, thinkingDelay);
     }
 
     /**
      * Start the game running other functions that update the game view
      * @returns void
      */
-    startGame(round: number = this.model.currentRound): void {
+    startGame(): void {
+        // Start background music if not muted
+        if (!this.isMuted) {
+            this.backgroundMusic.play().catch((e) => {
+                console.warn('Failed to play background music:', e);
+            });
+        }
+
         // Reset game state
-        this.resetForRound(round);
+        this.resetForRound();
+
+        // Reset round score
+        this.model.roundScore = 0;
 
         // Update view with initial state
-        this.updateScore(this.model.score);
+        this.updateScore(this.model.roundScore);
+
+        // Set the correct round number
+        this.view.setRoundNumber(this.model.currentRound);
+
+        // increase difficulty every round
+        if(this.model.currentRound % GAMECST.MIN_QUESTION_VALUE_UPDATE == 0) {
+            this.model.questionMin += 1;
+        }else if (this.model.currentRound % GAMECST.MAX_QUESTION_VALUE_UPDATE == 1){
+            this.model.questionMax += 1;
+        }
         
         // Generate first question
         this.generateNewQuestion();
@@ -139,8 +278,7 @@ export class MainPageController extends ScreenController {
     /**
      * reset state for new rounds
      */
-    private resetForRound(round: number): void {
-        this.model.currentRound = round;
+    private resetForRound(): void {
         this.model.playerHealth = this.model.maxHealth;
         this.model.opponentHealth = this.model.maxHealth;
         this.model.roundCorrect = 0;
@@ -185,38 +323,56 @@ export class MainPageController extends ScreenController {
         if (this.model.questionTimerId !== null) return;
 
         // if resume is called without calling start first
-        if (this.model.questionTimeRemaining <= 0) {
-            this.onQuestionTimeout();
-            return;
-        }
+        if (this.model.questionTimeRemaining <= 0) {
+            this.onQuestionTimeout();
+            return;
+        }
 
-        // Update UI with current remaining time
-        this.updateTimer(this.model.questionTimeRemaining);
+        // Update UI with current remaining time
+        this.updateTimer(this.model.questionTimeRemaining);
 
-        // resume countdown
-        this.model.questionTimerId = window.setInterval(() => {
-            this.model.questionTimeRemaining--;
-            this.updateTimer(this.model.questionTimeRemaining);
+        // resume countdown
+        this.model.questionTimerId = window.setInterval(() => {
+            this.model.questionTimeRemaining--;
+            this.updateTimer(this.model.questionTimeRemaining);
 
-            if (this.model.questionTimeRemaining <= 0) {
-                this.onQuestionTimeout();
-            }
-        }, 1000);
+            if (this.model.questionTimeRemaining <= 0) {
+                this.onQuestionTimeout();
+            }
+        }, 1000);
     }
+
+    /**
+     * Switches the screen to the start page when the pause menu button is clicked
+     */
+    private handleStartClick(): void {
+        this.endGameEarly();
+        localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
+        clearGlobalState();
+        this.screenSwitcher.switchToScreen({ type: "start" });
+    }
+
+    /**
+     * Switches the screen to the start page when the pause menu button is clicked
+     */
+    private handleHelpClick(): void {
+        this.screenSwitcher.switchToScreen({ type: "help", fromGame: true });
+    }
+
 
     /**
      * clears timer for new questions
      */
     private clearQuestionTimer(): void {
         // stop timer if running
-        if (this.model.questionTimerId !== null) {
-            clearInterval(this.model.questionTimerId);
-            this.model.questionTimerId = null;
-        }
+        if (this.model.questionTimerId !== null) {
+            clearInterval(this.model.questionTimerId);
+            this.model.questionTimerId = null;
+        }
 
-        // remove saved remaining time
-        this.model.questionTimeRemaining = 0;
-        this.updateTimer(this.model.questionTimeRemaining);
+        // remove saved remaining time
+        this.model.questionTimeRemaining = 0;
+        this.updateTimer(this.model.questionTimeRemaining);
     }
 
     /**
@@ -228,17 +384,22 @@ export class MainPageController extends ScreenController {
         this.model.playerResponse = NaN;
         this.model.playerTime = Number.POSITIVE_INFINITY;
         const damages = this.damageCalculation();
-        this.applyDamagesAndAdvance(damages);
+        this.applyDamages(damages);
+        this.updatePoints(0);
+        this.advanceGame();
     }
 
     /**
      * handles damage, score, advancing rounds
+     * @param [playerDmg, oppDmg] tuple with damage that player and opponent will face
+     * @param questionPoints points that will be awarded 
+     * @returns void
      */
-    private applyDamagesAndAdvance([playerDmg, oppDmg]: number[]): void {
+    private applyDamages([playerDmg, oppDmg]: number[]): void {
         // debugging to show cur round
         console.log("Current round: " + this.getCurrentRound());
 
-        // deals damage to player and opponet 
+        // deals damage to player and opponent 
         if (playerDmg > 0) {
             this.model.playerHealth = Math.max(0, this.model.playerHealth - playerDmg);
         }
@@ -246,69 +407,62 @@ export class MainPageController extends ScreenController {
             this.model.opponentHealth = Math.max(0, this.model.opponentHealth - oppDmg);
         }
 
-        // increments score by one if player gets answer right
-        // TODO: update scoring system
-        if (this.model.playerResponse === this.model.correctAnswer) {
-            this.model.score++;
-            this.model.roundScore++;
-            this.updateScore(this.model.score);
+        // trigger attack animations
+        if (oppDmg > 0) {
+            this.view.playPlayerAttack();
         }
+        if (playerDmg > 0) {
+            this.view.playOpponentAttack();
+        }
+        
+        //Records the stats at the end of each question
+        this.recordStats();
+
+        //Changes the health bars to reflect damage done
         this.updateHealthBars();
 
-        // handles winning round
+        // ends game when the players run out of health
         if (this.model.opponentHealth <= 0) {
-            this.clearQuestionTimer();
-            this.screenSwitcher.switchToScreen({
-                type: "roundStats",
-                round: this.model.currentRound
-            });
+            this.endGame(false);
+            return;
+        } else if (this.model.playerHealth <= 0) {
+            this.endGame(true);
             return;
         }
-        // handles losing round
-        if (this.model.playerHealth <= 0) {
-            this.clearQuestionTimer();
-            this.screenSwitcher.switchToScreen( {type: "results"});
-            return;
-        }
+    }
 
+    /**
+     * records statistics from each question that will be used to show the user personal bests later in the game
+     */
+    private recordStats() {
+        // TODO: Expand Stats
+        // increments stats (total answered, correct answers)
+        const playerCorrect = this.model.playerResponse === this.model.correctAnswer;
+        this.model.roundTotal++
+        if (playerCorrect) {
+            this.model.roundCorrect++;
+        }
+    }
+
+    /**
+     * 
+     */
+    private updatePoints( questionPoints: number = 0 ) {
+        // handles points
+        if (questionPoints > 0) {
+            this.model.roundScore += questionPoints;
+            this.updateScore(this.model.roundScore);
+        }
+    }
+
+    /**
+     * Generates new questions, displays the new questions, and resets the timer.
+     */
+    private advanceGame() {
         this.generateNewQuestion();
         this.updateQuestion();
         this.startQuestionTimer();
     }
-
-// OLD TIMER FUNCTIONALITY
-    // /**
-    //  * Start the timer
-    //  */
-    // private startTimer(callback: (timeLeft: number) => void): void {
-    //     if (!this.model.isTimerRunning) {
-    //         this.model.isTimerRunning = true;
-            
-    //         // Initial call to set initial state
-    //         callback(this.model.timeRemaining);
-            
-    //         this.model.timerInterval = globalThis.setInterval(() => {
-    //             if (this.model.timeRemaining > 0) {
-    //                 this.model.timeRemaining--;
-    //                 callback(this.model.timeRemaining);
-    //             } else {
-    //                 this.stopTimer();
-    //                 this.endGame();
-    //             }
-    //         }, 1000);
-    //     }
-    // }
-
-    // /**
-    //  * Stop the timer
-    //  */
-    // private stopTimer(): void {
-    //     if (this.model.timerInterval) {
-    //         globalThis.clearInterval(this.model.timerInterval);
-    //         this.model.timerInterval = null;
-    //         this.model.isTimerRunning = false;
-    //     }
-    // }
 
 
     /**
@@ -366,7 +520,14 @@ export class MainPageController extends ScreenController {
         const wrongAnswers: Set<number> = new Set();
         const maxBetweenMultiplicands = Math.max(this.model.num1, this.model.num2)
         while (wrongAnswers.size < count) {
-            let wrongAnswer = this.getRandomNumber(0, correctAnswer * 2);
+            //Added special case for 1x1 multiplication to avoid having infinite loops
+            if(this.model.num1 == 1 && this.model.num2 == 1){
+                wrongAnswers.add(correctAnswer + 1);
+                wrongAnswers.add(0);
+                wrongAnswers.add(3);
+                break;
+            }
+            let wrongAnswer = this.getRandomNumber(correctAnswer-maxBetweenMultiplicands, correctAnswer + maxBetweenMultiplicands);
             if (wrongAnswer != correctAnswer && !wrongAnswers.has(wrongAnswer)) {
                 wrongAnswers.add(wrongAnswer);
             }
@@ -387,18 +548,18 @@ export class MainPageController extends ScreenController {
     }
 
     /**
-     * Handle hover start on answer squares
+     * Handle hover start on any clickable element
      * Changes the cursor to a pointer
      */
-    private handleAnswerHoverStart(): void {
+    private handleHoverStart(): void {
         document.body.style.cursor = 'pointer';
     }
 
     /**
-     * Handle hover end on answer squares
+     * Handle hover end on any clickable element
      * Resets the cursor to default
      */
-    private handleAnswerHoverEnd(): void {
+    private handleHoverEnd(): void {
         document.body.style.cursor = 'default';
     }
 
@@ -413,6 +574,7 @@ export class MainPageController extends ScreenController {
         // Record player's response and time
         this.model.playerResponse = selectedAnswer;
         this.model.playerTime = Date.now();
+        const timeLeftSeconds = this.model.questionTimeRemaining;
 
          // Debug logging
         //console.log('Question:', this.model.num1, 'x', this.model.num2, '=', this.model.correctAnswer);
@@ -422,22 +584,67 @@ export class MainPageController extends ScreenController {
 
         // Store current question's correct answer
         const currentCorrectAnswer = this.model.correctAnswer;
+
+        if (this.model.playerResponse == this.model.correctAnswer) {
+            this.view.correctAnswer();
+        } else {
+            this.view.incorrectAnswer();
+        }
         
         // Calculate damages based on both player and computer responses
         const damages = this.damageCalculation();
+        // Calculates points based on speed of answer
+        const questionPoints = this.pointsCalculation(timeLeftSeconds);
 
         // Stop timer
         this.clearQuestionTimer();
 
+        this.updatePoints(questionPoints);
+
         // apply damage 
-        this.applyDamagesAndAdvance(damages);
+        this.applyDamages(damages);
+        
+        this.advanceGame();
         // Play sound effects
-        this.clickSound.play();
+        if(!this.isMuted) this.clickSound.play();
         this.clickSound.currentTime = 0;
 
+        // * game ending is handled in applyDamageAndAdvance
         // Check if game should end due to health
-        if (this.model.playerHealth <= 0 || this.model.opponentHealth <= 0) {
-            this.endGame();
+        // if (this.model.playerHealth <= 0 || this.model.opponentHealth <= 0) {
+        //     this.endGame();
+        // }
+    }
+
+    /**
+     * Pauses the timer, hides the question and answer choices for the user
+     * @param pauseGame Boolean telling whether the game needs to be paused or resumed
+     */
+    private handlePausePlayGame() {
+        console.log(this.model.gamePaused);
+        if(this.model.gamePaused) {
+            this.resumeGame();
+        } else {
+            this.pauseGame();
+        }
+    }
+
+    /**
+     * 
+     */
+    private handleMuteClick() {
+        if (this.isMuted == true) {
+            this.view.showUnmute();
+            this.isMuted = false;
+            // Resume music when unmuted
+            this.backgroundMusic.play().catch((e) => {
+                console.warn('Failed to resume background music:', e);
+            });
+        } else {
+            this.view.showMute();
+            this.isMuted = true;
+            // Pause music when muted
+            this.backgroundMusic.pause();
         }
     }
 
@@ -460,21 +667,73 @@ export class MainPageController extends ScreenController {
         }else if (this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse == this.model.correctAnswer){
             return [5, 5];
         }else if (this.model.playerResponse != this.model.correctAnswer && this.model.computerResponse != this.model.correctAnswer){
-            return [0, 0];
+            return [15, 5];
         }
-        return [15, 0];
+        return [20, 0];
     }
+
+    /**
+     * Calculates number of points, based off time remaining when answered. 
+     * @param timeLeftSeconds time remaining when player answered
+     * @returns number of points earned
+     */
+    //TODO: if points get too high, scale numbers back
+    private pointsCalculation(timeLeftSeconds: number): number {
+        const t = Math.max(0, timeLeftSeconds);
+
+        const playerCorrect = this.model.playerResponse === this.model.correctAnswer;
+        const opponentCorrect = this.model.computerResponse === this.model.correctAnswer;
+
+        if (playerCorrect && !opponentCorrect) {
+            return 5*t
+        }
+
+        if (playerCorrect && opponentCorrect) {
+            if (this.model.playerTime < this.model.computerTime) {
+                // player answers faster
+                return 3 * t;
+            } else if (this.model.playerTime > this.model.computerTime) {
+                // computer answers faster
+                return 2 * t;
+            } else {
+                // tie
+                return t;
+            }
+        }
+        // wrong
+        return 0
+    }
+
 
     /**
      * End the game which for now just goes back to the start screen
      */
-    private endGame(): void {
+    private endGame(playerLost: boolean): void {
         this.clearQuestionTimer();
+        this.view.hideCorrectIncorrect();
 
-        // Switch back to start screen
-        this.screenSwitcher.switchToScreen({
-            type: "start"
-        });
+        //Switch to the stats page if the player looses or the results page if the player wins
+        if(playerLost) {
+            this.saveRoundStats();
+            this.screenSwitcher.switchToScreen({ type: "results" });
+            localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
+            clearGlobalState();
+        } else {
+            // gives bonus points if win w/ > 50% health
+            if (this.model.playerHealth > this.model.maxHealth / 2) {
+                this.model.roundScore += 400;
+            }
+
+            this.saveRoundStats();
+
+            // TODO need to decide if we want to go maingame --> bonus --> stats or maingame --> stats --> bonus etc.
+            // Check if we should go to the bonus level
+            if (this.model.currentRound % GAMECST.ROUNDS_UNTIL_BONUS === 0) {
+                this.screenSwitcher.switchToScreen({ type: "bonus" });
+            } else {
+                this.screenSwitcher.switchToScreen({ type: "stats"});
+            }
+        }
     }
 
     /**
@@ -482,6 +741,8 @@ export class MainPageController extends ScreenController {
      */
     pauseGame(): void {
         this.pauseQuestionTimer();
+        this.model.gamePaused = true;
+        this.view.showPlayButton();
     }
 
     /**
@@ -489,14 +750,24 @@ export class MainPageController extends ScreenController {
      */
     resumeGame(): void {
         this.resumeQuestionTimer();
+        this.model.gamePaused = false;
+        this.view.showPauseButton();
     }
 
 
     /**
      * Exit the game
      */
-    exitGame(): void {
+    endGameEarly(): void {
         this.clearQuestionTimer();
+        this.model.roundScore = 0;
+        this.model.playerHealth = this.model.maxHealth;
+        this.model.opponentHealth = this.model.maxHealth;
+        this.view.hideCorrectIncorrect();
+        // Stop background music when exiting
+        this.backgroundMusic.pause();
+        this.backgroundMusic.currentTime = 0;
+        this.resumeGame();
     }
 
     /**
@@ -511,6 +782,22 @@ export class MainPageController extends ScreenController {
      * This is because the game should reset each time the user navigates to this screen
      */
     show(): void {
-        this.startGame(this.model.currentRound);
+        // Start background music if not muted
+        if (!this.isMuted) {
+            this.backgroundMusic.play().catch((e) => {
+                console.warn('Failed to play background music:', e);
+            });
+        }
+        this.startGame();
+    }
+
+    /**
+     * Override the hide method to stop music when leaving the screen
+     */
+    hide(): void {
+        this.view.hide();
+        // Stop background music
+        this.backgroundMusic.pause();
+        this.backgroundMusic.currentTime = 0;
     }
 }

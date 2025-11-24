@@ -64,7 +64,6 @@ export class ResultsScreenController extends ScreenController {
 	 * Handle play again button click
 	 */
 	private handleMainMenuClick(): void {
-		//this.mainModel.currentRound = 1; Can use if we want to have it when user clicks on the start page, it resets 
 		this.screenSwitcher.switchToScreen({ type: "start" });
 	}
 
@@ -72,8 +71,7 @@ export class ResultsScreenController extends ScreenController {
 	 * Handle main Menu button click
 	 */
 	private handleNextRoundClick(): void {
-		this.mainModel.currentRound++;
-		this.screenSwitcher.switchToScreen({ type: "roundIntro", round: this.mainModel.currentRound });
+		this.screenSwitcher.switchToScreen({ type: "intro"});
 	}
 
 	/**
