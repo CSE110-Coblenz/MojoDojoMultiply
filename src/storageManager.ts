@@ -2,10 +2,12 @@ import { GAMECST } from "./constants";
 
 export interface GlobalState {
     currentRound: number;
+    totalScore: number;
 }
 
 const DEFAULT_STATE: GlobalState = { 
-    currentRound: 1 
+    currentRound: 1, 
+    totalScore: 0
 };
 
 /**

@@ -237,7 +237,7 @@ export class MainPageController extends ScreenController {
      * Start the game running other functions that update the game view
      * @returns void
      */
-    startGame(round: number = this.model.currentRound): void {
+    startGame(): void {
         // Start background music if not muted
         if (!this.isMuted) {
             this.backgroundMusic.play().catch((e) => {
@@ -248,8 +248,11 @@ export class MainPageController extends ScreenController {
         // Reset game state
         this.resetForRound();
 
+        // Reset round score
+        this.model.roundScore = 0;
+
         // Update view with initial state
-        this.updateScore(this.model.score);
+        this.updateScore(this.model.roundScore);
 
         // Set the correct round number
         this.view.setRoundNumber(this.model.currentRound);
@@ -447,9 +450,8 @@ export class MainPageController extends ScreenController {
     private updatePoints( questionPoints: number = 0 ) {
         // handles points
         if (questionPoints > 0) {
-            this.model.score += questionPoints;
             this.model.roundScore += questionPoints;
-            this.updateScore(this.model.score);
+            this.updateScore(this.model.roundScore);
         }
     }
 
@@ -597,9 +599,11 @@ export class MainPageController extends ScreenController {
         // Stop timer
         this.clearQuestionTimer();
 
+        this.updatePoints(questionPoints);
+
         // apply damage 
         this.applyDamages(damages);
-        this.updatePoints(questionPoints);
+        
         this.advanceGame();
         // Play sound effects
         if(!this.isMuted) this.clickSound.play();
@@ -708,20 +712,19 @@ export class MainPageController extends ScreenController {
         this.clearQuestionTimer();
         this.view.hideCorrectIncorrect();
 
-        this.saveRoundStats();
-
         //Switch to the stats page if the player looses or the results page if the player wins
         if(playerLost) {
+            this.saveRoundStats();
             this.screenSwitcher.switchToScreen({ type: "results" });
             localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
             clearGlobalState();
         } else {
             // gives bonus points if win w/ > 50% health
             if (this.model.playerHealth > this.model.maxHealth / 2) {
-                this.model.score += 400;
                 this.model.roundScore += 400;
-                this.updateScore(400);
             }
+
+            this.saveRoundStats();
 
             // TODO need to decide if we want to go maingame --> bonus --> stats or maingame --> stats --> bonus etc.
             // Check if we should go to the bonus level
@@ -757,7 +760,7 @@ export class MainPageController extends ScreenController {
      */
     endGameEarly(): void {
         this.clearQuestionTimer();
-        this.model.score = 0;
+        this.model.roundScore = 0;
         this.model.playerHealth = this.model.maxHealth;
         this.model.opponentHealth = this.model.maxHealth;
         this.view.hideCorrectIncorrect();
@@ -785,7 +788,7 @@ export class MainPageController extends ScreenController {
                 console.warn('Failed to play background music:', e);
             });
         }
-        this.startGame(this.model.currentRound);
+        this.startGame();
     }
 
     /**
