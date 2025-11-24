@@ -10,6 +10,7 @@ export class BonusLevelController extends ScreenController {
   private isShowingResult: boolean = false;
   private maxAnswer: number = 10;
   private maxDivisor: number = 10;
+  private timerInterval: number | null = null;
 
   constructor(screenSwitcher: ScreenSwitcher) {
     super();
@@ -36,24 +37,144 @@ export class BonusLevelController extends ScreenController {
   }
 
   /**
+   * Helper to calculate total points from previous rounds stored in localStorage
+   */
+  private getPreviousTotalScore(): number {
+    const raw = localStorage.getItem(GAMECST.ROUND_STATS_KEY);
+    if (!raw) return 0;
+    
+    try {
+        const history = JSON.parse(raw);
+        if (Array.isArray(history)) {
+            // Sum up the 'points' field from each entry
+            return history.reduce((sum: number, entry: any) => sum + (entry.points || 0), 0);
+        }
+    } catch (e) {
+        console.error("Error parsing stats for score calculation:", e);
+    }
+    return 0;
+  }
+
+  /**
    * Show view and start event listener
    */
   show(): void {
     this.isShowingResult = false;
+
+    // Log points before the bonus round starts
+    const previousTotal = this.getPreviousTotalScore();
+    console.log("Points before bonus round:", previousTotal);
+
     this.generateNewQuestion();
+    
+    // Fixed: Ensure view is updated immediately so it doesn't show 0/0
     this.view.update(this.model);
+    
     this.view.show();
     // Starts listener that looks for any keydown ie key pressed down
     window.addEventListener("keydown", this.handleKeyDown);
+    this.startTimer()
   }
 
   /**
    * Hides view and stops event listener
    */
   hide(): void {
+    this.stopTimer();
     this.view.hide();
     // Stops listener
     window.removeEventListener("keydown", this.handleKeyDown);
+  }
+
+  private resetBonusRound(): void {
+    this.isShowingResult = false;
+    this.model.timeRemaining = GAMECST.BONUS_DURATION;
+    this.model.score = 0;
+    this.model.correctCount = 0;
+    this.model.totalQuestions = 0;
+    this.generateNewQuestion();
+    this.view.update(this.model);
+  }
+
+  private startTimer(): void {
+    if (this.timerInterval) clearInterval(this.timerInterval);
+    
+    this.timerInterval = window.setInterval(() => {
+        this.model.timeRemaining--;
+        this.view.update(this.model);
+
+        if (this.model.timeRemaining <= 0) {
+            this.endBonusRound();
+        }
+    }, 1000);
+  }
+
+  private stopTimer(): void {
+    if (this.timerInterval) {
+        clearInterval(this.timerInterval);
+        this.timerInterval = null;
+    }
+  }
+
+  /**
+   * Ends the bonus round, saves stats, and switches to results
+   */
+  private endBonusRound(): void {
+    this.stopTimer();
+
+    // Log points earned during and after the round
+    const bonusPoints = this.model.score;
+    const previousTotal = this.getPreviousTotalScore();
+    const totalAfter = previousTotal + bonusPoints;
+
+    console.log("Points earned during bonus round:", bonusPoints);
+    console.log("Points after the round:", totalAfter);
+
+    this.saveBonusStats();
+    this.screenSwitcher.switchToScreen({ type: "results" });
+  }
+
+  /**
+   * Saves the bonus round stats to localStorage so they appear in history/results
+   */
+  private saveBonusStats(): void {
+    const raw = localStorage.getItem(GAMECST.ROUND_STATS_KEY);
+    let history: {
+        round: number;
+        points: number;
+        correct: number;
+        total: number;
+        timestamp: string;
+    }[] = [];
+
+    if (raw) {
+        try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+                history = parsed;
+            }
+        } catch (e) {
+            console.error("Error parsing round history", e);
+        }
+    }
+
+    // Create a "Bonus" entry. Using 999 to denote bonus round in the number field.
+    const entry = {
+        round: 999, 
+        points: this.model.score,
+        correct: this.model.correctCount,
+        total: this.model.totalQuestions,
+        timestamp: new Date().toLocaleString(),
+    };
+
+    history.push(entry);
+
+    // Keep history length reasonable
+    if (history.length > 20) {
+        history = history.slice(history.length - 20);
+    }
+
+    localStorage.setItem(GAMECST.ROUND_STATS_KEY, JSON.stringify(history));
   }
 
   /**
@@ -109,9 +230,16 @@ export class BonusLevelController extends ScreenController {
    */
   private checkAnswer(): boolean {
     const isCorrect = this.checkDivisionAnswer();
-    this.model.resultMessage = isCorrect
-      ? "Correct!"
-      : `Wrong! ${this.model.dividend} / ${this.model.divisor} = ${this.model.quotient}`;
+    this.model.totalQuestions++;
+    
+    if (isCorrect) {
+        this.model.score += GAMECST.POINTS_PER_ANSWER;
+        this.model.correctCount++;
+        this.model.resultMessage = "Correct!";
+    } else {
+        this.model.resultMessage = `Wrong! ${this.model.dividend} / ${this.model.divisor} = ${this.model.quotient}`;
+    }
+    
     return isCorrect;
   }
   
