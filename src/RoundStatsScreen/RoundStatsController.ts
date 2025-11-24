@@ -148,6 +148,11 @@ export class RoundStatsController extends ScreenController {
       //Update title: ROUND X COMPLETE!
       this.view.setRound(latest.round);
 
+      // Update total score in global state
+      const savedState = getGlobalState();
+      savedState.totalScore+=latest.points;
+      saveGlobalState(savedState);
+
       //Update the main "Final Round" score
       this.view.updateFinalRoundStats(
         latest.points,
