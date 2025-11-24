@@ -7,6 +7,9 @@ export class RoundIntroView {
   private nextButton: Konva.Group;
   private backButton: Konva.Group;
 
+  private gongSound: HTMLAudioElement;
+  private isMuted: boolean = false;
+
   constructor(
     onNext: () => void,
     onBack: () => void,
@@ -14,6 +17,14 @@ export class RoundIntroView {
     onHoverEnd: () => void
   ) {
     this.group = new Konva.Group({ visible: false });
+
+    // mute state from MainPage mute button (via localStorage)
+    this.isMuted = localStorage.getItem("MojoDojoMuted") === "true";
+
+    this.gongSound = new Audio("/gong.mp3"); 
+    this.gongSound.onerror = (e) => {
+      console.error("Error loading gong sound:", e);
+    };
 
     //Text that tells the user what round they are about to start
     this.roundText = new Konva.Text({
@@ -63,7 +74,10 @@ export class RoundIntroView {
     nextButtonText.offsetY(nextButtonText.height() / 2);
 
     //Adds click and hover functionalities to the game button
-    this.nextButton.on("click", onNext);
+    this.nextButton.on("click tap", () => {
+      this.playGong();
+      onNext();
+    });
     this.nextButton.on("mouseover", onHoverStart);
     this.nextButton.on("mouseout", onHoverEnd);
 
@@ -118,6 +132,15 @@ export class RoundIntroView {
     this.roundText.text(text);
     this.roundText.offsetX(this.roundText.width() / 2);
     this.group.getLayer()?.draw();
+  }
+
+  private playGong(): void {
+    if (this.isMuted) return; // respect main mute button
+
+    this.gongSound.currentTime = 0;
+    this.gongSound.play().catch(() => {
+      // ignore autoplay / gesture issues
+    });
   }
 
   getGroup(): Konva.Group { return this.group; }
