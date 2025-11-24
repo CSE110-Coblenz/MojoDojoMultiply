@@ -1,5 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach,beforeAll } from "vitest";
 import { StartPageController } from "./StartPageController";
+
+beforeAll(() => {
+  vi.stubGlobal("localStorage", {
+    getItem: vi.fn(),
+    setItem: vi.fn(),
+    removeItem: vi.fn(),
+    clear: vi.fn(),
+  });
+});
 
 //TODO: See if we can import screenswitcher from types.ts to here instead of using a mock version
 

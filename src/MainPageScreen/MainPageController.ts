@@ -2,7 +2,7 @@ import { ScreenController, type ScreenSwitcher } from "../types";
 import { MainPageModel } from "./MainPageModel";
 import { MainPageView } from "./MainPageView";
 import { GAMECST } from "../constants";
-import { GlobalState } from "../storageManager"
+import { clearGlobalState, GlobalState } from "../storageManager"
 import { RoundStatsModel } from "../RoundStatsScreen/RoundStatsModel";
 
 export class MainPageController extends ScreenController {
@@ -330,6 +330,7 @@ export class MainPageController extends ScreenController {
      */
     private handleStartClick(): void {
         this.endGameEarly();
+        clearGlobalState();
         this.screenSwitcher.switchToScreen({ type: "start" });
     }
 
@@ -689,6 +690,7 @@ export class MainPageController extends ScreenController {
         //Switch to the stats page if the player looses or the results page if the player wins
         if(playerLost) {
             this.screenSwitcher.switchToScreen({ type: "results" });
+            clearGlobalState();
         } else {
             // gives bonus points if win w/ > 50% health
             if (this.model.playerHealth > this.model.maxHealth / 2) {
