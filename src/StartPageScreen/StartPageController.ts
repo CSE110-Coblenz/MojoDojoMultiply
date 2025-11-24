@@ -1,3 +1,4 @@
+import { GAMECST } from "../constants";
 import { clearGlobalState } from "../storageManager";
 import { ScreenController, type ScreenSwitcher } from "../types";
 import { StartPageView } from "./StartPageView";
@@ -11,6 +12,7 @@ export class StartPageController extends ScreenController {
 
     //delete prev save data
     clearGlobalState();
+    localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
 
     this.screenSwitcher = screenSwitcher;
     this.view = new StartPageView(
