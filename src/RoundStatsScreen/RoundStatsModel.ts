@@ -1,4 +1,5 @@
 import type { MainPageModel } from "../MainPageScreen/MainPageModel";
+import { GAMECST } from "../constants";
 
 export interface RoundStatsEntry {
   round: number;      // which round was completed
@@ -8,8 +9,6 @@ export interface RoundStatsEntry {
   timestamp: string;  // when round finished
 }
 
-const ROUND_STATS_KEY = "MojoDojoRoundStats";
-
 export class RoundStatsModel {
   //vars
   currentRound = 1;
@@ -18,7 +17,7 @@ export class RoundStatsModel {
    * Load all saved round stats from localStorage.
    */
   static load(): RoundStatsEntry[] {
-    const jsonString = localStorage.getItem(ROUND_STATS_KEY);
+    const jsonString = localStorage.getItem(GAMECST.ROUND_STATS_KEY);
     if (!jsonString) {
       return [];
     }
@@ -38,7 +37,7 @@ export class RoundStatsModel {
   static save(entries: RoundStatsEntry[]): void {
     try {
       const jsonString = JSON.stringify(entries);
-      localStorage.setItem(ROUND_STATS_KEY, jsonString);
+      localStorage.setItem(GAMECST.ROUND_STATS_KEY, jsonString);
     } catch (e) {
       console.error("Error saving round stats:", e);
     }
