@@ -3,7 +3,7 @@ import { AnimatedSprite } from "../AnimatedSprites";
 import { ScreenController, type ScreenSwitcher } from "../types";
 import { RoundStatsView, type RoundStatsEntry } from "./RoundStatsView";
 import { GAMECST } from "../constants.js";
-import { getGlobalState, GlobalState, saveGlobalState } from "../storageManager"
+import { clearGlobalState, getGlobalState, GlobalState, saveGlobalState } from "../storageManager"
 import { RoundStatsModel } from "./RoundStatsModel";
 
 export class RoundStatsController extends ScreenController {
@@ -137,6 +137,7 @@ export class RoundStatsController extends ScreenController {
    */
   private handleMenuButton(): void {
     this.hide();
+    clearGlobalState();
     this.screenSwitcher.switchToScreen({ type: "start" });
   }
 
