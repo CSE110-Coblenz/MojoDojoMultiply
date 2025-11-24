@@ -65,6 +65,7 @@ export class RoundIntroController extends ScreenController {
    */
   private returnStartPage() {
     clearGlobalState();
+    localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
     this.screenSwitcher.switchToScreen({type: "start"});
   }
 

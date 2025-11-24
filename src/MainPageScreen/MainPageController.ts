@@ -17,6 +17,7 @@ export class MainPageController extends ScreenController {
     private backgroundMusic: HTMLAudioElement;
     private playerLost: boolean = false;
     private isMuted: boolean = false;
+    private isRunning: boolean = false;
 
     constructor(screenSwitcher: ScreenSwitcher) {
         super();
@@ -47,7 +48,7 @@ export class MainPageController extends ScreenController {
             () => this.handlePausePlayGame(),
             () => this.handleHoverStart(),
             () => this.handleHoverEnd(),
-            () => this.handleStartClick(),
+            () => this.handleMenuClick(),
             () => this.handleHelpClick(),
             () => this.endGame(false),
             () => this.handleMuteClick()
@@ -237,7 +238,7 @@ export class MainPageController extends ScreenController {
      * Start the game running other functions that update the game view
      * @returns void
      */
-    startGame(round: number = this.model.currentRound): void {
+    startGame(): void {
         // Start background music if not muted
         if (!this.isMuted) {
             this.backgroundMusic.play().catch((e) => {
@@ -247,17 +248,27 @@ export class MainPageController extends ScreenController {
 
         // Reset game state
         this.resetForRound();
+        this.isRunning = true;
+
+        // Reset round score
+        this.model.roundScore = 0;
 
         // Update view with initial state
-        this.updateScore(this.model.score);
+        this.updateScore(this.model.roundScore);
 
         // Set the correct round number
         this.view.setRoundNumber(this.model.currentRound);
 
+        if(this.model.currentRound == 1){
+            this.model.questionMin = GAMECST.INITIAL_MIN_QUESTION_VALUE;
+            this.model.questionMax = GAMECST.INITIAL_MAX_QUESTION_VALUE;
+        }
+
         // increase difficulty every round
         if(this.model.currentRound % GAMECST.MIN_QUESTION_VALUE_UPDATE == 0) {
             this.model.questionMin += 1;
-        }else if (this.model.currentRound % GAMECST.MAX_QUESTION_VALUE_UPDATE == 1){
+        }
+        if (this.model.currentRound % GAMECST.MAX_QUESTION_VALUE_UPDATE == 1){
             this.model.questionMax += 1;
         }
         
@@ -342,7 +353,7 @@ export class MainPageController extends ScreenController {
     /**
      * Switches the screen to the start page when the pause menu button is clicked
      */
-    private handleStartClick(): void {
+    private handleMenuClick(): void {
         this.endGameEarly();
         localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
         clearGlobalState();
@@ -377,6 +388,7 @@ export class MainPageController extends ScreenController {
      * Reset game state by setting model properties to default values
      */
     private onQuestionTimeout(): void {
+        if(!this.isRunning) return;
         this.clearQuestionTimer();
         this.model.playerResponse = NaN;
         this.model.playerTime = Number.POSITIVE_INFINITY;
@@ -393,8 +405,6 @@ export class MainPageController extends ScreenController {
      * @returns void
      */
     private applyDamages([playerDmg, oppDmg]: number[]): void {
-        // debugging to show cur round
-        console.log("Current round: " + this.getCurrentRound());
 
         // deals damage to player and opponent 
         if (playerDmg > 0) {
@@ -447,9 +457,8 @@ export class MainPageController extends ScreenController {
     private updatePoints( questionPoints: number = 0 ) {
         // handles points
         if (questionPoints > 0) {
-            this.model.score += questionPoints;
             this.model.roundScore += questionPoints;
-            this.updateScore(this.model.score);
+            this.updateScore(this.model.roundScore);
         }
     }
 
@@ -568,6 +577,7 @@ export class MainPageController extends ScreenController {
      * @returns void
      */
     private handleAnswerClick(selectedAnswer: number): void {
+
         
         // Record player's response and time
         this.model.playerResponse = selectedAnswer;
@@ -580,13 +590,11 @@ export class MainPageController extends ScreenController {
         //console.log('Player response value:', this.model.playerResponse);
         //console.log('Computer response value:', this.model.computerResponse);
 
-        // Store current question's correct answer
-        const currentCorrectAnswer = this.model.correctAnswer;
-
         if (this.model.playerResponse == this.model.correctAnswer) {
             this.view.correctAnswer();
         } else {
             this.view.incorrectAnswer();
+            this.view.showCorrectAnswer(this.model.num1, this.model.num2, this.model.correctAnswer);
         }
         
         // Calculate damages based on both player and computer responses
@@ -597,10 +605,13 @@ export class MainPageController extends ScreenController {
         // Stop timer
         this.clearQuestionTimer();
 
+        this.updatePoints(questionPoints);
+
         // apply damage 
         this.applyDamages(damages);
-        this.updatePoints(questionPoints);
+        
         this.advanceGame();
+        
         // Play sound effects
         if(!this.isMuted) this.clickSound.play();
         this.clickSound.currentTime = 0;
@@ -617,7 +628,6 @@ export class MainPageController extends ScreenController {
      * @param pauseGame Boolean telling whether the game needs to be paused or resumed
      */
     private handlePausePlayGame() {
-        console.log(this.model.gamePaused);
         if(this.model.gamePaused) {
             this.resumeGame();
         } else {
@@ -656,6 +666,7 @@ export class MainPageController extends ScreenController {
      * @returns [playerDamage, opponentDamage]
      */
     private damageCalculation(): number[] {
+        console.log("Damage calculated");
         if(this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse != this.model.correctAnswer){
             return [0, 15];
         }else if (this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse == this.model.correctAnswer && this.model.playerTime < this.model.computerTime){
@@ -705,25 +716,25 @@ export class MainPageController extends ScreenController {
      * End the game which for now just goes back to the start screen
      */
     private endGame(playerLost: boolean): void {
-        this.clearQuestionTimer();
+        this.pauseQuestionTimer();
+        this.isRunning = false;
         this.view.hideCorrectIncorrect();
-
-        this.saveRoundStats();
 
         //Switch to the stats page if the player looses or the results page if the player wins
         if(playerLost) {
-            //this.screenSwitcher.switchToScreen({ type: "results" });
-            this.screenSwitcher.switchToScreen({ type: "bonus" });
+            this.saveRoundStats();
+            this.screenSwitcher.switchToScreen({ type: "results" });
             localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
             clearGlobalState();
         } else {
             // gives bonus points if win w/ > 50% health
             if (this.model.playerHealth > this.model.maxHealth / 2) {
-                this.model.score += 400;
                 this.model.roundScore += 400;
-                this.updateScore(400);
             }
 
+            this.saveRoundStats();
+
+            // TODO need to decide if we want to go maingame --> bonus --> stats or maingame --> stats --> bonus etc.
             // Check if we should go to the bonus level
             this.screenSwitcher.switchToScreen({ type: "stats"});
         }
@@ -753,7 +764,8 @@ export class MainPageController extends ScreenController {
      */
     endGameEarly(): void {
         this.clearQuestionTimer();
-        this.model.score = 0;
+        this.model.roundScore = 0;
+        this.isRunning = false;
         this.model.playerHealth = this.model.maxHealth;
         this.model.opponentHealth = this.model.maxHealth;
         this.view.hideCorrectIncorrect();
@@ -781,7 +793,7 @@ export class MainPageController extends ScreenController {
                 console.warn('Failed to play background music:', e);
             });
         }
-        this.startGame(this.model.currentRound);
+        this.startGame();
     }
 
     /**
