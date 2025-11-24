@@ -450,8 +450,6 @@ export class MainPageController extends ScreenController {
     private updatePoints( questionPoints: number = 0 ) {
         // handles points
         if (questionPoints > 0) {
-
-            this.model.score += questionPoints;
             this.model.roundScore += questionPoints;
             this.updateScore(this.model.roundScore);
         }
@@ -762,7 +760,7 @@ export class MainPageController extends ScreenController {
      */
     endGameEarly(): void {
         this.clearQuestionTimer();
-        this.model.score = 0;
+        this.model.roundScore = 0;
         this.model.playerHealth = this.model.maxHealth;
         this.model.opponentHealth = this.model.maxHealth;
         this.view.hideCorrectIncorrect();
