@@ -45,7 +45,6 @@ export class RoundIntroController extends ScreenController {
           });
       }
   
-      //TODO: eliminated round param, check where its used to mmake sure it still works -Richard
   /**
    * 
    * 
