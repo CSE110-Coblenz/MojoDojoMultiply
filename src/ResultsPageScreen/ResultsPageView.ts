@@ -2,13 +2,14 @@ import Konva from "konva";
 import type { View } from "../types";
 import { STAGE_WIDTH } from "../constants";
 import { GAMECST } from "../constants.js";
-import { LeaderboardEntry } from "./ResultsPageModel";
+import { RoundStatsEntry } from "./ResultsPageModel";
 
 /**
  * ResultsScreenView - Renders the results screen
  */
 export class ResultsPageView implements View {
   private group: Konva.Group;
+  private title: Konva.Text;
   private finalScoreText: Konva.Text;
   private leaderboardText: Konva.Text;
   private playerAvatar?: Konva.Image;
@@ -18,7 +19,7 @@ export class ResultsPageView implements View {
 
     // Title
 	//TODO: Import counter variable to announce what specific round is over
-    const title = new Konva.Text({
+    this.title = new Konva.Text({
       x: 50,
       y: 60,
       text: "ROUND __ COMPLETE!",
@@ -28,7 +29,7 @@ export class ResultsPageView implements View {
       width: STAGE_WIDTH - 100,
       align: "left",
     });
-    this.group.add(title);
+    this.group.add(this.title);
 
     // Final score
     this.finalScoreText = new Konva.Text({
@@ -162,6 +163,11 @@ export class ResultsPageView implements View {
     };
   }
 
+  setRound(roundNum: number): void {
+    this.title.text(`ROUND ${roundNum} COMPLETE!`);
+    this.group.getLayer()?.draw();
+  }
+
   	/**
 	 * Update the final score display
 	*/
@@ -174,13 +180,13 @@ export class ResultsPageView implements View {
 	/**
  	* Update the leaderboard display
  	*/
-  updateLeaderboard(entries: LeaderboardEntry[]): void {
+  updateLeaderboard(entries: RoundStatsEntry[]): void {
     if (entries.length === 0) {
       this.leaderboardText.text("Top Scores:\n(No scores yet!)");
     } else {
       let text = "Top Scores:\n";
       entries.forEach((entry, index) => {
-        text += `${index + 1}. ${entry.score} - ${entry.timestamp}\n`;
+        text += `${index + 1}. ${entry.points} - ${entry.timestamp}\n`;
       });
       this.leaderboardText.text(text);
     }
