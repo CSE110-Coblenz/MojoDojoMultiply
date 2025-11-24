@@ -27,7 +27,6 @@ export class MainPageView implements View {
 	private playerAvatar?: Konva.Image;
 	// Konva image for the opponent's avatar
 	private opponentAvatar?: Konva.Image;
-	// optional key handler for keyboard answer selection
 	private keyHandler?: (e: KeyboardEvent) => void;
 
 	
@@ -76,7 +75,6 @@ export class MainPageView implements View {
 			fill: GAMECST.DARK_COLOR
 		});
 		this.roundText.offsetX(this.roundText.width());
-		//this.roundText.offsetY(this.roundText.height() / 2);
 		this.group.add(this.roundText);
 
 		//Group that holds the pause/play button

@@ -14,6 +14,7 @@ export class MainPageController extends ScreenController {
     private view: MainPageView;
     private screenSwitcher: ScreenSwitcher;
     private clickSound: HTMLAudioElement;
+    private backgroundMusic: HTMLAudioElement;
     private playerLost: boolean = false;
     private isMuted: boolean = false;
 
@@ -27,8 +28,17 @@ export class MainPageController extends ScreenController {
         
         // Initialize click sound with error handling
         this.clickSound = new Audio("/PunchSound.mp3");
+        this.clickSound.volume = 0.5;
         this.clickSound.onerror = (e) => {
             console.error('Error loading sound:', e);
+        };
+
+        // Initialize background music with looping enabled
+        this.backgroundMusic = new Audio("/BackgroundMusic.mp3");
+        this.backgroundMusic.loop = true;
+        this.backgroundMusic.volume = 0.5;
+        this.backgroundMusic.onerror = (e) => {
+            console.error('Error loading background music:', e);
         };
 
         // Pass the event handlers to the view
@@ -170,8 +180,18 @@ export class MainPageController extends ScreenController {
      * @returns void
      */
     private generateNewQuestion(): void {
+        this.model.prevNum1 = this.model.num1;
+        this.model.prevNum2 = this.model.num2;
+
         this.model.num1 = this.getRandomNumber(this.model.questionMin, this.model.questionMax);
         this.model.num2 = this.getRandomNumber(this.model.questionMin, this.model.questionMax);
+
+        //Decreases the chance of duplicate questions appearing back to back
+        if((this.model.prevNum1 == this.model.num1 && this.model.prevNum2 == this.model.num2) || (this.model.prevNum1 == this.model.num2 && this.model.prevNum2 == this.model.num1)){
+            this.model.num1 = this.getRandomNumber(this.model.questionMin, this.model.questionMax);
+            this.model.num2 = this.getRandomNumber(this.model.questionMin, this.model.questionMax);
+        }
+
         this.model.correctAnswer = this.model.num1 * this.model.num2;
         this.model.wrongAnswers = this.getWrongAnswers(this.model.correctAnswer, 3);
         this.model.allAnswers = this.randomizeOrder([this.model.correctAnswer, ...this.model.wrongAnswers]);
@@ -203,7 +223,14 @@ export class MainPageController extends ScreenController {
      * Start the game running other functions that update the game view
      * @returns void
      */
-    startGame(): void {
+    startGame(round: number = this.model.currentRound): void {
+        // Start background music if not muted
+        if (!this.isMuted) {
+            this.backgroundMusic.play().catch((e) => {
+                console.warn('Failed to play background music:', e);
+            });
+        }
+
         // Reset game state
         this.resetForRound();
 
@@ -214,11 +241,9 @@ export class MainPageController extends ScreenController {
         this.view.setRoundNumber(this.model.currentRound);
 
         // increase difficulty every round
-        if(this.model.currentRound % 5 == 0) {
-            //increase difficulty every 5 rounds by increasing min value of numbers in questions
+        if(this.model.currentRound % GAMECST.MIN_QUESTION_VALUE_UPDATE == 0) {
             this.model.questionMin += 1;
-        }else{
-            // increase difficulty every round not a multiple of 5 by increasing max value of numbers in questions
+        }else if (this.model.currentRound % GAMECST.MAX_QUESTION_VALUE_UPDATE == 1){
             this.model.questionMax += 1;
         }
         
@@ -583,9 +608,15 @@ export class MainPageController extends ScreenController {
         if (this.isMuted == true) {
             this.view.showUnmute();
             this.isMuted = false;
+            // Resume music when unmuted
+            this.backgroundMusic.play().catch((e) => {
+                console.warn('Failed to resume background music:', e);
+            });
         } else {
             this.view.showMute();
             this.isMuted = true;
+            // Pause music when muted
+            this.backgroundMusic.pause();
         }
     }
 
@@ -608,9 +639,9 @@ export class MainPageController extends ScreenController {
         }else if (this.model.playerResponse == this.model.correctAnswer && this.model.computerResponse == this.model.correctAnswer){
             return [5, 5];
         }else if (this.model.playerResponse != this.model.correctAnswer && this.model.computerResponse != this.model.correctAnswer){
-            return [0, 0];
+            return [15, 5];
         }
-        return [15, 0];
+        return [20, 0];
     }
 
     /**
@@ -704,6 +735,9 @@ export class MainPageController extends ScreenController {
         this.model.playerHealth = this.model.maxHealth;
         this.model.opponentHealth = this.model.maxHealth;
         this.view.hideCorrectIncorrect();
+        // Stop background music when exiting
+        this.backgroundMusic.pause();
+        this.backgroundMusic.currentTime = 0;
         this.resumeGame();
     }
 
@@ -719,6 +753,22 @@ export class MainPageController extends ScreenController {
      * This is because the game should reset each time the user navigates to this screen
      */
     show(): void {
-        this.startGame();
+        // Start background music if not muted
+        if (!this.isMuted) {
+            this.backgroundMusic.play().catch((e) => {
+                console.warn('Failed to play background music:', e);
+            });
+        }
+        this.startGame(this.model.currentRound);
+    }
+
+    /**
+     * Override the hide method to stop music when leaving the screen
+     */
+    hide(): void {
+        this.view.hide();
+        // Stop background music
+        this.backgroundMusic.pause();
+        this.backgroundMusic.currentTime = 0;
     }
 }
