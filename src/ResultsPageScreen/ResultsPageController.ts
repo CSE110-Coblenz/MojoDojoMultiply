@@ -26,7 +26,9 @@ export class ResultsScreenController extends ScreenController {
 		this.model = new ResultsPageModel();
 		this.view = new ResultsPageView(
   			() => this.handleNextRoundClick(),
-  			() => this.handleMainMenuClick()
+  			() => this.handleMainMenuClick(),
+			() => this.handleHoverStart(),
+			() => this.handleHoverEnd()
 		);
 
 		// TODO: Task 4 - Initialize game over sound audio
@@ -34,9 +36,7 @@ export class ResultsScreenController extends ScreenController {
 	}
 
 	showResults(finalScore: number): void {
-        //TODO: Show results screen with the final score
-
-		// TODO: Play the game over sound
+        this.view.updateFinalScore(0);
 	}
 
 	/**
@@ -145,4 +145,20 @@ export class ResultsScreenController extends ScreenController {
 	getView(): ResultsPageView {
 		return this.view;
 	}
+
+	/**
+     * Handle hover start on any clickable element
+     * Changes the cursor to a pointer
+     */
+    private handleHoverStart(): void {
+        document.body.style.cursor = 'pointer';
+    }
+
+    /**
+     * Handle hover end on any clickable element
+     * Resets the cursor to default
+     */
+    private handleHoverEnd(): void {
+        document.body.style.cursor = 'default';
+    }
 }
