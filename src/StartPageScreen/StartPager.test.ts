@@ -71,7 +71,7 @@ describe("StartPageController", () => {
     const controller = new StartPageController(screenSwitcher as any);
     // @ts-ignore
     controller.handleHelpClick();
-    expect(screenSwitcher.switchToScreen).toHaveBeenCalledWith({ type: "help" });
+    expect(screenSwitcher.switchToScreen).toHaveBeenCalledWith({ type: "help", fromGame: false });
   });
 
   it("calls switchToScreen({ type: 'practice' }) when practice is triggered", () => {
