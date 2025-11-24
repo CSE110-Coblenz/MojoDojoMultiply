@@ -26,11 +26,15 @@ export const AI_CHANCE_SCALE = 0.02;
 // Number of wrong answers to generate
 export const WRONG_ANSWER_NUMBER = 3;
 
-// JSON storage key
+// globalvar JSON storage key
 export const GLOBAL_DATA_KEY = "AppGlobalState";
 
 export const MIN_QUESTION_VALUE_UPDATE = 3;
 export const MAX_QUESTION_VALUE_UPDATE = 2;
+
+// round stats storage vars
+export const ROUND_STATS_KEY = "MojoDojoRoundStats";
+export const MAX_HISTORY_PRINT = 7;
 
 export const GAMECST = {
     STAGE_HEIGHT,
@@ -50,5 +54,7 @@ export const GAMECST = {
     WRONG_ANSWER_NUMBER,
     GLOBAL_DATA_KEY,
     MIN_QUESTION_VALUE_UPDATE,
-    MAX_QUESTION_VALUE_UPDATE
+    MAX_QUESTION_VALUE_UPDATE,
+    ROUND_STATS_KEY,
+    MAX_HISTORY_PRINT
 } as const;
