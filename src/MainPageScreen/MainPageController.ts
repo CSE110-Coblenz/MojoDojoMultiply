@@ -203,9 +203,9 @@ export class MainPageController extends ScreenController {
      * Start the game running other functions that update the game view
      * @returns void
      */
-    startGame(round: number = this.model.currentRound): void {
+    startGame(): void {
         // Reset game state
-        this.resetForRound(round);
+        this.resetForRound();
 
         // Update view with initial state
         this.updateScore(this.model.score);
@@ -236,8 +236,7 @@ export class MainPageController extends ScreenController {
     /**
      * reset state for new rounds
      */
-    private resetForRound(round: number): void {
-        this.model.currentRound = round;
+    private resetForRound(): void {
         this.model.playerHealth = this.model.maxHealth;
         this.model.opponentHealth = this.model.maxHealth;
         this.model.roundCorrect = 0;
@@ -720,6 +719,6 @@ export class MainPageController extends ScreenController {
      * This is because the game should reset each time the user navigates to this screen
      */
     show(): void {
-        this.startGame(this.model.currentRound);
+        this.startGame();
     }
 }
