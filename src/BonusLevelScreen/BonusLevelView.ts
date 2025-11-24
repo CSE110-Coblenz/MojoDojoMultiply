@@ -8,6 +8,8 @@ export class BonusLevelView implements View {
   private questionText: Konva.Text;
   private inputText: Konva.Text;
   private resultText: Konva.Text;
+  private timerText: Konva.Text;
+  private scoreText: Konva.Text;
 
   constructor() {
     this.group = new Konva.Group({ visible: false });
@@ -21,6 +23,28 @@ export class BonusLevelView implements View {
       fill: GAMECST.BCKGRD_COLOR
     });
     this.group.add(bg);
+
+    // Timer
+    this.timerText = new Konva.Text({
+        x: 20,
+        y: 20,
+        text: "Time: 30",
+        fontSize: 32,
+        fontFamily: GAMECST.DEFAULT_FONT,
+        fill: GAMECST.ALERT_COLOR,
+    });
+    this.group.add(this.timerText);
+
+    // Score
+    this.scoreText = new Konva.Text({
+        x: STAGE_WIDTH - 150,
+        y: 20,
+        text: "Score: 0",
+        fontSize: 32,
+        fontFamily: GAMECST.DEFAULT_FONT,
+        fill: GAMECST.DARK_COLOR,
+    });
+    this.group.add(this.scoreText);
 
     // Division Question
     this.questionText = new Konva.Text({
@@ -72,6 +96,9 @@ export class BonusLevelView implements View {
     this.resultText.text(model.resultMessage);
     this.resultText.fill(model.resultMessage === "Correct!" ? "green" : "red");
     this.resultText.offsetX(this.resultText.width() / 2);
+
+    this.timerText.text(`Time: ${model.timeRemaining}`);
+    this.scoreText.text(`Score: ${model.score}`);
 
     this.group.getLayer()?.draw();
   }
