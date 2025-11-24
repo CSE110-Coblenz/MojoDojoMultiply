@@ -712,7 +712,8 @@ export class MainPageController extends ScreenController {
 
         //Switch to the stats page if the player looses or the results page if the player wins
         if(playerLost) {
-            this.screenSwitcher.switchToScreen({ type: "results" });
+            //this.screenSwitcher.switchToScreen({ type: "results" });
+            this.screenSwitcher.switchToScreen({ type: "bonus" });
             localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
             clearGlobalState();
         } else {
