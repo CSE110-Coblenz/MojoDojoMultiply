@@ -300,7 +300,7 @@ export class MainPageController extends ScreenController {
      */
     private startQuestionTimer(): void {
         this.clearQuestionTimer();
-        this.model.questionTimeRemaining = 5;
+        this.model.questionTimeRemaining = 30;
         this.updateTimer(this.model.questionTimeRemaining);
 
         this.model.questionTimerId = window.setInterval(() => {
@@ -405,8 +405,6 @@ export class MainPageController extends ScreenController {
      * @returns void
      */
     private applyDamages([playerDmg, oppDmg]: number[]): void {
-        // debugging to show cur round
-        console.log("Current round: " + this.getCurrentRound());
 
         // deals damage to player and opponent 
         if (playerDmg > 0) {
@@ -632,7 +630,6 @@ export class MainPageController extends ScreenController {
      * @param pauseGame Boolean telling whether the game needs to be paused or resumed
      */
     private handlePausePlayGame() {
-        console.log(this.model.gamePaused);
         if(this.model.gamePaused) {
             this.resumeGame();
         } else {
