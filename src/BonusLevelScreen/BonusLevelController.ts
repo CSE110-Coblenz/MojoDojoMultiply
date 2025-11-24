@@ -86,6 +86,9 @@ export class BonusLevelController extends ScreenController {
     window.removeEventListener("keydown", this.handleKeyDown);
   }
 
+  /**
+   * Resets model values
+   */
   private resetBonusRound(): void {
     this.isShowingResult = false;
     this.model.timeRemaining = GAMECST.BONUS_DURATION;
@@ -96,8 +99,13 @@ export class BonusLevelController extends ScreenController {
     this.view.update(this.model);
   }
 
+  /**
+   * Starts bonusRound local timer
+   */
   private startTimer(): void {
-    if (this.timerInterval) clearInterval(this.timerInterval);
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval)
+    };
     
     this.timerInterval = window.setInterval(() => {
         this.model.timeRemaining--;
@@ -109,6 +117,9 @@ export class BonusLevelController extends ScreenController {
     }, 1000);
   }
 
+  /**
+   * Stops bonusRound local timer
+   */
   private stopTimer(): void {
     if (this.timerInterval) {
         clearInterval(this.timerInterval);
@@ -122,7 +133,6 @@ export class BonusLevelController extends ScreenController {
   private endBonusRound(): void {
     this.stopTimer();
 
-    // Log points earned during and after the round
     const bonusPoints = this.model.score;
     const previousTotal = this.getPreviousTotalScore();
     const totalAfter = previousTotal + bonusPoints;
@@ -134,6 +144,7 @@ export class BonusLevelController extends ScreenController {
     this.screenSwitcher.switchToScreen({ type: "results" });
   }
 
+  // TODO I vibe coded the crap out of this fix/understand later
   /**
    * Saves the bonus round stats to localStorage so they appear in history/results
    */
@@ -158,7 +169,7 @@ export class BonusLevelController extends ScreenController {
         }
     }
 
-    // Create a "Bonus" entry. Using 999 to denote bonus round in the number field.
+    // Creates a "bonus" entry at round 999
     const entry = {
         round: 999, 
         points: this.model.score,
@@ -169,7 +180,6 @@ export class BonusLevelController extends ScreenController {
 
     history.push(entry);
 
-    // Keep history length reasonable
     if (history.length > 20) {
         history = history.slice(history.length - 20);
     }
