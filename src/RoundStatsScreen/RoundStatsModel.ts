@@ -11,6 +11,9 @@ export interface RoundStatsEntry {
 const ROUND_STATS_KEY = "MojoDojoRoundStats";
 
 export class RoundStatsModel {
+  //vars
+  currentRound = 1;
+
   /**
    * Load all saved round stats from localStorage.
    */
