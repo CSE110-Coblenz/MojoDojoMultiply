@@ -1,3 +1,4 @@
+import { clearGlobalState } from "../storageManager";
 import { ScreenController, type ScreenSwitcher } from "../types";
 import { StartPageView } from "./StartPageView";
 
@@ -7,6 +8,10 @@ export class StartPageController extends ScreenController {
 
   constructor(screenSwitcher: ScreenSwitcher) {
     super();
+
+    //delete prev save data
+    clearGlobalState();
+
     this.screenSwitcher = screenSwitcher;
     this.view = new StartPageView(
       () => this.handleStartClick(),

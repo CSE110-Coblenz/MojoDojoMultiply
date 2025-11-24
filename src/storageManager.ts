@@ -42,6 +42,12 @@ export function saveGlobalState(state: GlobalState): void {
         const jsonString = JSON.stringify(state);
         // 2. Save the string to localStorage
         localStorage.setItem(GAMECST.GLOBAL_DATA_KEY, jsonString);
+        // 3. Trigger a refresh in tabs listening for storage changes
+        window.dispatchEvent(new StorageEvent('storage', {
+            key: GAMECST.GLOBAL_DATA_KEY,
+            newValue: jsonString,
+            storageArea: localStorage,
+        }));
     } catch (e) {
         console.error("Error saving global state.", e);
     }
@@ -51,7 +57,7 @@ export function clearGlobalState(): void {
     // Removes current save data with key
     localStorage.removeItem(GAMECST.GLOBAL_DATA_KEY);
     
-    // optional: makes currently open game sync to default data aka override current data with default data
-    // saveGlobalState(DEFAULT_STATE)
+    // override current data with default data
+    saveGlobalState(DEFAULT_STATE)
 
 }

@@ -3,7 +3,7 @@ import { AnimatedSprite } from "../AnimatedSprites";
 import { ScreenController, type ScreenSwitcher } from "../types";
 import { RoundStatsView, type RoundStatsEntry } from "./RoundStatsView";
 import { GAMECST } from "../constants.js";
-import { getGlobalState, GlobalState, saveGlobalState } from "../storageManager"
+import { clearGlobalState, getGlobalState, GlobalState, saveGlobalState } from "../storageManager"
 import { RoundStatsModel } from "./RoundStatsModel";
 
 export class RoundStatsController extends ScreenController {
@@ -11,13 +11,7 @@ export class RoundStatsController extends ScreenController {
   private view: RoundStatsView;
   private model: RoundStatsModel;
 
-  //Reduces the history print to confines of history box
-  private readonly MAX_HISTORY_PRINT = 7;
-
   private victorySprite: AnimatedSprite | null = null;
-
-  //Key MUST MATCH MainPageControler
-  private readonly HISTORY_KEY = "MojoDojoRoundStats";
 
   constructor(screenSwitcher: ScreenSwitcher, layer: Konva.Layer) {
     super();
@@ -65,7 +59,7 @@ export class RoundStatsController extends ScreenController {
    * @returns [] if none is found
    */
   private loadHistory(): RoundStatsEntry[] {
-    const raw = localStorage.getItem(this.HISTORY_KEY);
+    const raw = localStorage.getItem(GAMECST.ROUND_STATS_KEY);
     if (!raw) return []; //no history yet
     try {
       const parsed = JSON.parse(raw);
@@ -137,6 +131,7 @@ export class RoundStatsController extends ScreenController {
    */
   private handleMenuButton(): void {
     this.hide();
+    clearGlobalState();
     this.screenSwitcher.switchToScreen({ type: "start" });
   }
 
@@ -163,8 +158,8 @@ export class RoundStatsController extends ScreenController {
       let previousRounds = history.slice(0, -1);
 
       // Limit how many we print
-      if (previousRounds.length > this.MAX_HISTORY_PRINT) {
-        previousRounds = previousRounds.slice(-this.MAX_HISTORY_PRINT); 
+      if (previousRounds.length > GAMECST.MAX_HISTORY_PRINT) {
+        previousRounds = previousRounds.slice(-GAMECST.MAX_HISTORY_PRINT); 
       // last N entries (most recent)
       }     
 

@@ -2,7 +2,7 @@ import { ScreenController, type ScreenSwitcher } from "../types";
 import { MainPageModel } from "./MainPageModel";
 import { MainPageView } from "./MainPageView";
 import { GAMECST } from "../constants";
-import { GlobalState } from "../storageManager"
+import { clearGlobalState, GlobalState } from "../storageManager"
 import { RoundStatsModel } from "../RoundStatsScreen/RoundStatsModel";
 
 export class MainPageController extends ScreenController {
@@ -92,8 +92,6 @@ export class MainPageController extends ScreenController {
         });
     }
 
-    private readonly ROUND_HISTORY_KEY = "MojoDojoRoundStats";
-
     /**
     * Save the completed round’s stats into localStorage.
     * @param:
@@ -105,7 +103,7 @@ export class MainPageController extends ScreenController {
     */
     private saveRoundStats(): void {
         //Get existing stats list from storage
-        const raw = localStorage.getItem(this.ROUND_HISTORY_KEY);
+        const raw = localStorage.getItem(GAMECST.ROUND_STATS_KEY);
 
         let history: {
             round: number;
@@ -146,7 +144,7 @@ export class MainPageController extends ScreenController {
 
         //Save the list back to localStorage
         try {
-            localStorage.setItem(this.ROUND_HISTORY_KEY, JSON.stringify(history));
+            localStorage.setItem(GAMECST.ROUND_STATS_KEY, JSON.stringify(history));
         } catch (e) {
             console.error("Error saving round history.", e);
         }
@@ -346,6 +344,7 @@ export class MainPageController extends ScreenController {
      */
     private handleStartClick(): void {
         this.endGameEarly();
+        clearGlobalState();
         this.screenSwitcher.switchToScreen({ type: "start" });
     }
 
@@ -713,6 +712,7 @@ export class MainPageController extends ScreenController {
         //Switch to the stats page if the player looses or the results page if the player wins
         if(playerLost) {
             this.screenSwitcher.switchToScreen({ type: "results" });
+            clearGlobalState();
         } else {
             // gives bonus points if win w/ > 50% health
             if (this.model.playerHealth > this.model.maxHealth / 2) {
