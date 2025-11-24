@@ -39,8 +39,8 @@ export class HelpPageView implements View {
         //Editable instruction text array
         const instructions = [
             "1. Select answer to given equation.",
-            "2. If wrong, opponent attacks you.",
-            "3. If correct, you attack opponent",
+            "2. If wrong, opponent attacks you and if correct, you attack opponent",
+            "3. Shows opponents answer (doesn't mean correct) ",
             "4. Whoever's health bar is gone first, loses!",
             "5. Earn points for each attack, loose points if hit",
         ];

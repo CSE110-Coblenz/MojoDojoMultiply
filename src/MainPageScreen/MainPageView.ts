@@ -1,6 +1,7 @@
 import Konva from "konva";
 import type { View } from "../types.js";
 import { DARK_COLOR, GAMECST } from "../constants.js";
+import { AnimatedSprite } from "../AnimatedSprites"
 
 /**
  * MainPageView - Renders the main game screen
@@ -22,12 +23,20 @@ export class MainPageView implements View {
 	private incorrectAnswerText: Konva.Text;
 	private healthBarWidth: number;
 	private playerHealthBar: Konva.Rect;
+	private playerHealthBarText: Konva.Text;
+	private opponentHealthBarText : Konva.Text;
 	private opponentHealthBar: Konva.Rect;
-	// Konva image for the player's avatar
-	private playerAvatar?: Konva.Image;
-	// Konva image for the opponent's avatar
-	private opponentAvatar?: Konva.Image;
+	// optional key handler for keyboard answer selection
 	private keyHandler?: (e: KeyboardEvent) => void;
+
+	/** Animated Sprites */
+	private playerIdleSprite?: AnimatedSprite;
+	private playerPunchSprite?: AnimatedSprite;
+	private opponentIdleSprite?: AnimatedSprite;
+	private opponentPunchSprite?: AnimatedSprite;
+
+	/** Answer Bubbles */
+	private opponentAnswerBubbleText!: Konva.Text;
 
 	
 	// constructor for the interface Main page interface
@@ -44,14 +53,32 @@ export class MainPageView implements View {
 		this.group = new Konva.Group({ visible: false });
 
 		//Stage background for Konva Group
-		const bg = new Konva.Rect({
+		const bg1 = new Konva.Rect({
 			x: 0,
 			y: 0,
 			width: GAMECST.STAGE_WIDTH,
 			height: GAMECST.STAGE_HEIGHT,
 			fill: GAMECST.BCKGRD_COLOR
 		});
-		this.group.add(bg);
+		this.group.add(bg1);
+
+		const bg2 = new Konva.Rect({
+			x: 0,
+			y: GAMECST.STAGE_HEIGHT / 2 + 30,
+			width: GAMECST.STAGE_WIDTH,
+			height: GAMECST.STAGE_HEIGHT / 2,
+			fill: "#f1e6afff"
+		});
+		this.group.add(bg2);
+
+		const bg3 = new Konva.Rect({
+			x: 0,
+			y: GAMECST.STAGE_HEIGHT / 2 + 50,
+			width: GAMECST.STAGE_WIDTH,
+			height: GAMECST.STAGE_HEIGHT / 2,
+			fill: "#ebdfaaff"
+		});
+		this.group.add(bg3);
 
 		this.scoreText = new Konva.Text({
 			x: GAMECST.STAGE_WIDTH / 2,
@@ -294,34 +321,195 @@ export class MainPageView implements View {
 		});
 		playerHealthGroup.add(this.playerHealthBar);
 
+		this.playerHealthBarText = new Konva.Text({
+			x: playerHealthGroup.x() + playerBarBacking.width() / 2 + 115,
+			y: playerHealthGroup.y() + playerBarBacking.height() + 258,
+			text: "PLAYER",
+			fontSize: 20,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			fill: GAMECST.DARK_COLOR,
+		});
+		playerHealthGroup.add(this.playerHealthBarText)
+
+		this.opponentHealthBarText = new Konva.Text({
+			x: opponentHealthGroup.x() + opponentBarBacking.width() / 2 - 60,
+			y: opponentHealthGroup.y() + opponentBarBacking.height() + 258,
+			text: "OPPONENT",
+			fontSize: 20,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			fill: GAMECST.DARK_COLOR,
+		});
+		opponentHealthGroup.add(this.opponentHealthBarText)
+
 		// Initialize health bars to full
 		this.updateHealthBars(1, 1);
 
-		// load boxer image and store it on the instance so other code can access it
-		Konva.Image.fromURL('/boxer.png', (image) => {
-			// keep a reference to the Konva.Image node
-			this.opponentAvatar = image;
-
-			// set desired scale and position (adjust values as needed)
-			image.scale({ x: 0.25, y: 0.25 });
-			image.position({ x: 0, y: 0 });
-
-			// add to the fighting stage group
-			fightingStage.add(image);
+		const playerGroup = new Konva.Group({
+			x: 80,
+			y: GAMECST.STAGE_HEIGHT / 3,
 		});
+		fightingStage.add(playerGroup);
 
-		// load boxer image and store it on the instance so other code can access it
-		Konva.Image.fromURL('/boxer2.png', (image) => {
-			// keep a reference to the Konva.Image node
-			this.playerAvatar = image;
-
-			// set desired scale and position (adjust values as needed)
-			image.scale({ x: 0.35, y: 0.35 });
-			image.position({ x: 80, y: 20 });
-
-			// add to the fighting stage group
-			fightingStage.add(image);
+		const opponentGroup = new Konva.Group({
+			x: 300,
+			y: GAMECST.STAGE_HEIGHT / 3,
 		});
+		fightingStage.add(opponentGroup);
+
+		/** Animated Sprites */
+		// Player Idle
+		const playerIdleImg = new Image();
+		playerIdleImg.src = "/player_idle.png"; 
+
+		playerIdleImg.onload = () => {
+			const animLayer = this.group.getLayer() as Konva.Layer | null;
+			if (!animLayer) {
+				console.warn("MainPageView: no layer found for playerIdleSprite");
+				return;
+			}
+			this.playerIdleSprite = new AnimatedSprite(animLayer, {
+				image: playerIdleImg,
+				frameWidth: 128,   
+				frameHeight: 128,  
+				frameCount: 6,     
+				frameRate: 8,
+				loop: true,
+				x: playerGroup.x() - 120,
+				y: playerGroup.y() - 425,
+				scale: 2.5,        
+			});
+			playerGroup.add(this.playerIdleSprite.node);
+			this.playerIdleSprite.play();
+			this.group.getLayer()?.draw();
+		};
+
+		// Player punch
+		const playerPunchImg = new Image();
+		playerPunchImg.src = "/player_kick.png"; 
+
+		playerPunchImg.onload = () => {
+			const animLayer = this.group.getLayer() as Konva.Layer | null;
+			if (!animLayer) {
+				console.warn("MainPageView: no layer found for playerPunchSprite");
+				return;
+			}
+			this.playerPunchSprite = new AnimatedSprite(animLayer, {
+				image: playerPunchImg,
+				frameWidth: 128,   
+				frameHeight: 128,  
+				frameCount: 6,     
+				frameRate: 8,
+				loop: false,
+				x: playerGroup.x() - 120,
+				y: playerGroup.y() - 450,
+				scale: 2.5,
+			});
+			playerGroup.add(this.playerPunchSprite.node);
+			this.playerPunchSprite.node.visible(false);
+			this.group.getLayer()?.draw();
+		};
+
+		// Opponent idle
+		const opponentIdleImg = new Image();
+		opponentIdleImg.src = "/opponent_idle.png"; 
+
+		opponentIdleImg.onload = () => {
+			const animLayer = this.group.getLayer() as Konva.Layer | null;
+			if (!animLayer) {
+				console.warn("MainPageView: no layer found for opponentIdleSprite");
+				return;
+			}
+			this.opponentIdleSprite = new AnimatedSprite(animLayer, {
+				image: opponentIdleImg,
+				frameWidth: 128,   
+				frameHeight: 128,  
+				frameCount: 8,     
+				frameRate: 6,
+				loop: true,
+				x: opponentGroup.x() - 685,
+				y: opponentGroup.y() - 425,
+				scale: 2,
+			});
+			opponentGroup.add(this.opponentIdleSprite.node);
+			this.opponentIdleSprite.play();
+			this.group.getLayer()?.draw();
+		};
+
+		// Opponent punch
+		const opponentPunchImg = new Image();
+		opponentPunchImg.src = "/opponent_kicking.png"; 
+
+		opponentPunchImg.onload = () => {
+			const animLayer = this.group.getLayer() as Konva.Layer | null;
+			if (!animLayer) {
+				console.warn("MainPageView: no layer found for opponentPunchSprite");
+				return;
+			}
+			this.opponentPunchSprite = new AnimatedSprite(animLayer, {
+				image: opponentPunchImg,
+				frameWidth: 128,   
+				frameHeight: 128,  
+				frameCount: 8,     
+				frameRate: 6,
+				loop: false,
+				x: opponentGroup.x() - 685,
+				y: opponentGroup.y() - 425,
+				scale: 2,
+			});
+			opponentGroup.add(this.opponentPunchSprite.node);
+			this.opponentPunchSprite.node.visible(false);
+			this.group.getLayer()?.draw();
+		};
+
+		// speech bubble for the opponent
+		const opponentBubbleGroup = new Konva.Group({
+			x: -350,
+			y: -220,
+			visible: false,
+			});
+		opponentGroup.add(opponentBubbleGroup);
+
+		// main rounded bubble
+		const bubbleWidth = 70;
+		const bubbleHeight = 32;
+		const tailWidth = 16;
+		const tailHeight = 12;
+
+		const opponentBubbleRect = new Konva.Rect({
+			x: 0,
+			y: 0,
+			width: bubbleWidth,
+			height: bubbleHeight,
+			fill: "white",
+			cornerRadius: 10,
+		});
+		opponentBubbleGroup.add(opponentBubbleRect);
+
+		// little triangle tail pointing down toward the fighter
+		const opponentBubbleTail = new Konva.Line({
+			points: [
+				bubbleWidth / 3 - tailWidth / 3, bubbleHeight,             // left of tail
+				bubbleWidth / 3 + tailWidth / 3, bubbleHeight ,             // right of tail
+				bubbleWidth / 3 + 10, bubbleHeight + tailHeight + 1    // tip
+			],
+			closed: true,
+			fill: "white",
+			lineJoin: "round",
+		});
+		opponentBubbleGroup.add(opponentBubbleTail);
+
+		this.opponentAnswerBubbleText = new Konva.Text({
+			x: opponentBubbleRect.x() + opponentBubbleRect.width() / 2,
+			y: opponentBubbleRect.y() + opponentBubbleRect.height() / 2,
+			text: "",
+			fontSize: 18,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			fill: GAMECST.DARK_COLOR,
+			align: "center",
+		});
+		this.opponentAnswerBubbleText.offsetX(this.opponentAnswerBubbleText.width() / 2);
+		this.opponentAnswerBubbleText.offsetY(this.opponentAnswerBubbleText.height() / 2);
+		opponentBubbleGroup.add(this.opponentAnswerBubbleText);
 
 		// Create four answer squares in a 2x2 grid pattern in the center of the screen
 		const squareSize = 90;
@@ -828,4 +1016,113 @@ export class MainPageView implements View {
         this.opponentHealthBar.width((this.healthBarWidth - 4) * opponentHealthPercent);
         this.group.getLayer()?.draw();
     }
+
+	/** Reset both fighters to idle (used at round start) */
+	resetFightersToIdle(): void {
+		// Player
+		if (this.playerIdleSprite) {
+			this.playerIdleSprite.node.visible(true);
+			this.playerIdleSprite.reset();
+			this.playerIdleSprite.play();
+		}
+		if (this.playerPunchSprite) {
+			this.playerPunchSprite.node.visible(false);
+			this.playerPunchSprite.stop();
+			this.playerPunchSprite.reset();
+		}
+
+		// Opponent
+		if (this.opponentIdleSprite) {
+			this.opponentIdleSprite.node.visible(true);
+			this.opponentIdleSprite.reset();
+			this.opponentIdleSprite.play();
+		}
+		if (this.opponentPunchSprite) {
+			this.opponentPunchSprite.node.visible(false);
+			this.opponentPunchSprite.stop();
+			this.opponentPunchSprite.reset();
+		}
+
+		this.group.getLayer()?.draw();
+	}
+
+	/** Player attack animation: punch, then back to idle */
+	playPlayerAttack(): void {
+		if (!this.playerIdleSprite || !this.playerPunchSprite) return;
+
+		this.playerIdleSprite.node.visible(false);
+		this.playerIdleSprite.stop();
+
+		this.playerPunchSprite.reset();
+		this.playerPunchSprite.node.visible(true);
+		this.playerPunchSprite.play();
+		this.group.getLayer()?.draw();
+
+		const durationMs = this.playerPunchSprite.getDurationMs();
+
+		window.setTimeout(() => {
+			if (!this.playerIdleSprite || !this.playerPunchSprite) return;
+
+			this.playerPunchSprite.node.visible(false);
+			this.playerPunchSprite.stop();
+			this.playerPunchSprite.reset();
+
+			this.playerIdleSprite.node.visible(true);
+			this.playerIdleSprite.reset();
+			this.playerIdleSprite.play();
+
+			this.group.getLayer()?.draw();
+		}, durationMs);
+	}
+
+	/** Opponent attack animation: punch, then back to idle */
+	playOpponentAttack(): void {
+		if (!this.opponentIdleSprite || !this.opponentPunchSprite) return;
+
+		this.opponentIdleSprite.node.visible(false);
+		this.opponentIdleSprite.stop();
+
+		this.opponentPunchSprite.reset();
+		this.opponentPunchSprite.node.visible(true);
+		this.opponentPunchSprite.play();
+		this.group.getLayer()?.draw();
+
+		const durationMs = this.opponentPunchSprite.getDurationMs();
+
+		window.setTimeout(() => {
+			if (!this.opponentIdleSprite || !this.opponentPunchSprite) return;
+
+			this.opponentPunchSprite.node.visible(false);
+			this.opponentPunchSprite.stop();
+			this.opponentPunchSprite.reset();
+
+			this.opponentIdleSprite.node.visible(true);
+			this.opponentIdleSprite.reset();
+			this.opponentIdleSprite.play();
+
+			this.group.getLayer()?.draw();
+		}, durationMs);
+	}
+
+	// 🔹 Clear both bubbles (used on new question)
+	clearAnswerBubble(): void {
+		this.setOpponentAnswerBubble(null);
+	}
+
+	/** Show or hide the opponent's answer bubble */
+	setOpponentAnswerBubble(answer: string | null): void {
+		const group = this.opponentAnswerBubbleText.getParent();
+		if (!group) return;
+
+		if (answer === null || answer === "") {
+			this.opponentAnswerBubbleText.text("");
+			group.visible(false);
+		} else {
+			this.opponentAnswerBubbleText.text(answer);
+			this.opponentAnswerBubbleText.offsetX(this.opponentAnswerBubbleText.width() / 2);
+			this.opponentAnswerBubbleText.offsetY(this.opponentAnswerBubbleText.height() / 2);
+			group.visible(true);
+		}
+		this.group.getLayer()?.draw();
+	}
 }
