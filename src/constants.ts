@@ -18,7 +18,7 @@ export const DEFAULT_FONT = "Impact";
 export const GAME_DURATION = 10; // seconds
 export const ROUNDS_UNTIL_BONUS = 3;
 export const BONUS_RESULT_DELAY = 200; // milliseconds
-export const BONUS_DURATION = 30; // Seconds
+export const BONUS_DURATION = 10; // Seconds
 export const POINTS_PER_ANSWER = 100;
 
 // AI settings

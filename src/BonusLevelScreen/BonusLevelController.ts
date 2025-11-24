@@ -36,39 +36,14 @@ export class BonusLevelController extends ScreenController {
       return this.view;
   }
 
-  // TODO I vibe coded the crap out of this fix/understand later
-  /**
-   * Helper to calculate total points from previous rounds stored in localStorage
-   */
-  private getPreviousTotalScore(): number {
-    const raw = localStorage.getItem(GAMECST.ROUND_STATS_KEY);
-    if (!raw) return 0;
-    
-    try {
-        const history = JSON.parse(raw);
-        if (Array.isArray(history)) {
-            // Sum up the 'points' field from each entry
-            return history.reduce((sum: number, entry: any) => sum + (entry.points || 0), 0);
-        }
-    } catch (e) {
-        console.error("Error parsing stats for score calculation:", e);
-    }
-    return 0;
-  }
-
   /**
    * Show view and start event listener
    */
   show(): void {
-    this.isShowingResult = false;
-
-    // Log points before the bonus round starts
-    const previousTotal = this.getPreviousTotalScore();
-    console.log("Points before bonus round:", previousTotal);
+    this.resetBonusRound();
 
     this.generateNewQuestion();
     
-    // Fixed: Ensure view is updated immediately so it doesn't show 0/0
     this.view.update(this.model);
     
     this.view.show();
@@ -135,57 +110,8 @@ export class BonusLevelController extends ScreenController {
     this.stopTimer();
 
     const bonusPoints = this.model.score;
-    const previousTotal = this.getPreviousTotalScore();
-    const totalAfter = previousTotal + bonusPoints;
 
-    console.log("Points earned during bonus round:", bonusPoints);
-    console.log("Points after the round:", totalAfter);
-
-    this.saveBonusStats();
     this.screenSwitcher.switchToScreen({ type: "results" });
-  }
-
-  // TODO I vibe coded the crap out of this fix/understand later
-  /**
-   * Saves the bonus round stats to localStorage so they appear in history/results
-   */
-  private saveBonusStats(): void {
-    const raw = localStorage.getItem(GAMECST.ROUND_STATS_KEY);
-    let history: {
-        round: number;
-        points: number;
-        correct: number;
-        total: number;
-        timestamp: string;
-    }[] = [];
-
-    if (raw) {
-        try {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)) {
-                history = parsed;
-            }
-        } catch (e) {
-            console.error("Error parsing round history", e);
-        }
-    }
-
-    // Creates a "bonus" entry at round 999
-    const entry = {
-        round: 999, 
-        points: this.model.score,
-        correct: this.model.correctCount,
-        total: this.model.totalQuestions,
-        timestamp: new Date().toLocaleString(),
-    };
-
-    history.push(entry);
-
-    if (history.length > 20) {
-        history = history.slice(history.length - 20);
-    }
-
-    localStorage.setItem(GAMECST.ROUND_STATS_KEY, JSON.stringify(history));
   }
 
   /**
