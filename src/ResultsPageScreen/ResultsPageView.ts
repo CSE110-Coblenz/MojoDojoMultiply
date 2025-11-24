@@ -28,7 +28,7 @@ export class ResultsPageView implements View {
       x: 50,
       y: 60,
       text: "GAME OVER",
-      fontSize: 52,
+      fontSize: 60,
       fontFamily: GAMECST.DEFAULT_FONT,
       fill: GAMECST.HIGHLIGHT_COLOR,
       width: STAGE_WIDTH - 100,
@@ -170,10 +170,10 @@ export class ResultsPageView implements View {
     };
   }
 
-  setRound(roundNum: number): void {
-    this.title.text(`ROUND ${roundNum} COMPLETE!`);
-    this.group.getLayer()?.draw();
-  }
+  // setRound(roundNum: number): void {
+  //   this.title.text(`ROUND ${roundNum} COMPLETE!`);
+  //   this.group.getLayer()?.draw();
+  // }
 
   	/**
 	 * Update the final score display
