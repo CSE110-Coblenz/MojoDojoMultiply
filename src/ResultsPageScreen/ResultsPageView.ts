@@ -45,11 +45,7 @@ export class ResultsPageView implements View {
     this.finalScoreText.offsetX(this.finalScoreText.width() / 2);
     this.group.add(this.finalScoreText);
 
-<<<<<<< HEAD
     // Victor card & boxer image
-=======
-    // Victor card + boxer image
->>>>>>> e53a5cc3e2dfd84c8eb2cbeb28f21785026b5ada
     this.loadStickFigure();
 
     // Leaderboard text
