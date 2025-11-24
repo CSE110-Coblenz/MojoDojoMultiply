@@ -20,7 +20,7 @@ export class StartPageController extends ScreenController {
    * Takes the user to the main game by switching screens
    */
   private handleStartClick(): void {
-    this.screenSwitcher.switchToScreen({ type: "intro", round: 1 });
+    this.screenSwitcher.switchToScreen({ type: "intro"});
   }
 
   /**

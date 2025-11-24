@@ -26,7 +26,10 @@ export class MainPageView implements View {
 	private playerHealthBarText: Konva.Text;
 	private opponentHealthBarText : Konva.Text;
 	private opponentHealthBar: Konva.Rect;
-	// optional key handler for keyboard answer selection
+	// Konva image for the player's avatar
+	private playerAvatar?: Konva.Image;
+	// Konva image for the opponent's avatar
+	private opponentAvatar?: Konva.Image;
 	private keyHandler?: (e: KeyboardEvent) => void;
 
 	/** Animated Sprites */
@@ -102,7 +105,6 @@ export class MainPageView implements View {
 			fill: GAMECST.DARK_COLOR
 		});
 		this.roundText.offsetX(this.roundText.width());
-		//this.roundText.offsetY(this.roundText.height() / 2);
 		this.group.add(this.roundText);
 
 		//Group that holds the pause/play button

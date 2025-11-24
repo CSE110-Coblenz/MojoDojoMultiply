@@ -1,7 +1,6 @@
 import { ScreenController } from "../types";
 import type { ScreenSwitcher} from "../types";
 import { HelpPageView } from "./HelpPageView";
-import { getGlobalState } from "../storageManager";
 import { MainPageController } from "../MainPageScreen/MainPageController";
 
 export class HelpPageController extends ScreenController {
@@ -35,9 +34,7 @@ export class HelpPageController extends ScreenController {
      * Handle help to main game button
      */
     private handleStartGameClick(): void {
-        const state = getGlobalState();
-        const startRound = state.currentRound;
-        this.screenSwitcher.switchToScreen({ type: "intro", round:startRound });
+        this.screenSwitcher.switchToScreen({ type: "intro"});
     }
 
     /**
