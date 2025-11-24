@@ -36,6 +36,7 @@ export class BonusLevelController extends ScreenController {
       return this.view;
   }
 
+  // TODO I vibe coded the crap out of this fix/understand later
   /**
    * Helper to calculate total points from previous rounds stored in localStorage
    */
