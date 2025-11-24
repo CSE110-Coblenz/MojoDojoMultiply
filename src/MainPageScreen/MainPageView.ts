@@ -322,7 +322,7 @@ export class MainPageView implements View {
 		playerHealthGroup.add(this.playerHealthBar);
 
 		this.playerHealthBarText = new Konva.Text({
-			x: playerHealthGroup.x() + playerBarBacking.width() / 2 + 115,
+			x: playerHealthGroup.x() + playerBarBacking.width() / 2 + 113,
 			y: playerHealthGroup.y() + playerBarBacking.height() + 258,
 			text: "PLAYER",
 			fontSize: 20,
