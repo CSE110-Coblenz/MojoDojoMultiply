@@ -31,6 +31,8 @@ export const GLOBAL_DATA_KEY = "AppGlobalState";
 
 export const MIN_QUESTION_VALUE_UPDATE = 3;
 export const MAX_QUESTION_VALUE_UPDATE = 2;
+export const INITIAL_MIN_QUESTION_VALUE = 1;
+export const INITIAL_MAX_QUESTION_VALUE = 3;
 
 // round stats storage vars
 export const ROUND_STATS_KEY = "MojoDojoRoundStats";
@@ -57,5 +59,7 @@ export const GAMECST = {
     MAX_QUESTION_VALUE_UPDATE,
     LIGHT_NEUTRAL_COLOR,
     ROUND_STATS_KEY,
-    MAX_HISTORY_PRINT
+    MAX_HISTORY_PRINT,
+    INITIAL_MIN_QUESTION_VALUE,
+    INITIAL_MAX_QUESTION_VALUE
 } as const;
