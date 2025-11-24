@@ -8,7 +8,7 @@ export class BonusLevelModel {
   playerInput: string;
   resultMessage: string;
 
-  time_remaining: number;
+  timeRemaining: number;
   score: number;
   correctCount: number;
   totalQuestions: number;
@@ -20,7 +20,7 @@ export class BonusLevelModel {
     this.playerInput = "";
     this.resultMessage = "";
 
-    this.time_remaining = 30;
+    this.timeRemaining = 30;
     this.score = 0;
     this.correctCount = 0;
     this.totalQuestions = 0;
