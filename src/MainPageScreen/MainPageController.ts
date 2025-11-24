@@ -232,7 +232,7 @@ export class MainPageController extends ScreenController {
         }
 
         // Reset game state
-        this.resetForRound(round);
+        this.resetForRound();
 
         // Update view with initial state
         this.updateScore(this.model.score);
@@ -261,8 +261,7 @@ export class MainPageController extends ScreenController {
     /**
      * reset state for new rounds
      */
-    private resetForRound(round: number): void {
-        this.model.currentRound = round;
+    private resetForRound(): void {
         this.model.playerHealth = this.model.maxHealth;
         this.model.opponentHealth = this.model.maxHealth;
         this.model.roundCorrect = 0;
