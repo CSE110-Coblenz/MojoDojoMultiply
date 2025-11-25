@@ -1,11 +1,16 @@
 import Konva from "konva";
 import { GAMECST } from "../constants";
+import { AnimatedSprite } from "../AnimatedSprites"
 
 export class RoundIntroView {
   private group: Konva.Group;
   private roundText: Konva.Text;
   private nextButton: Konva.Group;
   private backButton: Konva.Group;
+
+  /** Animated Sprites */
+    private playerIdleSprite?: AnimatedSprite;
+    private opponentIdleSprite?: AnimatedSprite;
 
   private gongSound: HTMLAudioElement;
   private isMuted: boolean = false;
@@ -16,6 +21,7 @@ export class RoundIntroView {
     onHoverStart: () => void,
     onHoverEnd: () => void
   ) {
+
     this.group = new Konva.Group({ visible: false });
 
     // mute state from MainPage mute button (via localStorage)
@@ -24,6 +30,75 @@ export class RoundIntroView {
     this.gongSound = new Audio("/gong.mp3"); 
     this.gongSound.onerror = (e) => {
       console.error("Error loading gong sound:", e);
+    };
+
+    const fightingStage = new Konva.Group();
+      fightingStage.position({ x: 120, y: 160 });
+      this.group.add(fightingStage); 
+
+    const playerGroup = new Konva.Group({
+          x: 80,
+          y: GAMECST.STAGE_HEIGHT / 3,
+        });
+        fightingStage.add(playerGroup);
+    
+    const opponentGroup = new Konva.Group({
+      x: 300,
+      y: GAMECST.STAGE_HEIGHT / 3,
+    });
+    fightingStage.add(opponentGroup);
+
+    /** Animated Sprites */
+    // Player Idle
+    const playerIdleImg = new Image();
+    playerIdleImg.src = "/player_roundIntro.png"; 
+
+    playerIdleImg.onload = () => {
+      const animLayer = this.group.getLayer() as Konva.Layer | null;
+      if (!animLayer) {
+        console.warn("MainPageView: no layer found for playerIdleSprite");
+        return;
+      }
+      this.playerIdleSprite = new AnimatedSprite(animLayer, {
+        image: playerIdleImg,
+        frameWidth: 128,   
+        frameHeight: 128,  
+        frameCount: 6,     
+        frameRate: 8,
+        loop: true,
+        x: playerGroup.x() + 130,
+        y: playerGroup.y() - 475,
+        scale: 3.85,        
+      });
+      playerGroup.add(this.playerIdleSprite.node);
+      this.playerIdleSprite.play();
+      this.group.getLayer()?.draw();
+    };
+
+    // Opponent idle
+    const opponentIdleImg = new Image();
+    opponentIdleImg.src = "/opponent_idle.png"; 
+
+    opponentIdleImg.onload = () => {
+      const animLayer = this.group.getLayer() as Konva.Layer | null;
+      if (!animLayer) {
+        console.warn("MainPageView: no layer found for opponentIdleSprite");
+        return;
+      }
+      this.opponentIdleSprite = new AnimatedSprite(animLayer, {
+        image: opponentIdleImg,
+        frameWidth: 128,   
+        frameHeight: 128,  
+        frameCount: 8,     
+        frameRate: 6,
+        loop: true,
+        x: opponentGroup.x() - 850,
+        y: opponentGroup.y() - 510,
+        scale: 4.10,
+      });
+      opponentGroup.add(this.opponentIdleSprite.node);
+      this.opponentIdleSprite.play();
+      this.group.getLayer()?.draw();
     };
 
     //Text that tells the user what round they are about to start
@@ -139,7 +214,7 @@ export class RoundIntroView {
 
     this.gongSound.currentTime = 0;
     this.gongSound.play().catch(() => {
-      // ignore autoplay / gesture issues
+    // ignore autoplay / gesture issues
     });
   }
 
