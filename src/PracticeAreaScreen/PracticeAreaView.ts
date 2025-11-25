@@ -1,6 +1,7 @@
 import Konva from "konva";
 import type { View } from "../types.js";
 import { GAMECST } from "../constants.js";
+import { AnimatedSprite } from "../AnimatedSprites.js";
 
 /**
  * gamePageView - Renders the main game screen
@@ -18,10 +19,9 @@ export class PracticeAreaView implements View {
 	private answerTexts: Konva.Text[];
 	private correctAnswerText: Konva.Text;
 	private incorrectAnswerText: Konva.Text;
-	// Konva image for the player's avatar
-	private playerAvatar?: Konva.Image;
-	// Konva image for the opponent's avatar
-	private opponentAvatar?: Konva.Image;
+	/** Animated Sprites */
+	private playerIdleSprite?: AnimatedSprite;
+	private playerPunchSprite?: AnimatedSprite;
 	// optional key handler for keyboard answer selection
 	private keyHandler?: (e: KeyboardEvent) => void;
 
@@ -39,33 +39,33 @@ export class PracticeAreaView implements View {
 		this.group = new Konva.Group({ visible: false });
 
 		//Stage background for Konva Group
-		const bg = new Konva.Rect({
+		const bg1 = new Konva.Rect({
 			x: 0,
 			y: 0,
 			width: GAMECST.STAGE_WIDTH,
 			height: GAMECST.STAGE_HEIGHT,
-			fill: "#D8E9FA"
+			fill: GAMECST.BCKGRD_COLOR
 		});
-		this.group.add(bg);
+		this.group.add(bg1);
 
-		/*
-		// Score display (bottom-center). origin will be set to the center so
-		// the text remains centered as its content changes.
-		this.scoreText = new Konva.Text({
-			x: GAMECST.STAGE_WIDTH / 2,
-			y: GAMECST.STAGE_HEIGHT - 20,
-			text: "Score: -- ",
-			fontSize: 40,
-			fontFamily: GAMECST.DEFAULT_FONT,
-			fill: GAMECST.DARK_COLOR,
+		const bg2 = new Konva.Rect({
+			x: 0,
+			y: GAMECST.STAGE_HEIGHT / 2 + 30,
+			width: GAMECST.STAGE_WIDTH,
+			height: GAMECST.STAGE_HEIGHT / 2,
+			fill: "#f1e6afff"
 		});
-		// make origin the visual center
-		this.scoreText.offsetX(this.scoreText.width() / 2);
-		this.scoreText.offsetY(this.scoreText.height());
-		this.group.add(this.scoreText);
-		*/
+		this.group.add(bg2);
 
-		//TODO: Add function that changes the round number
+		const bg3 = new Konva.Rect({
+			x: 0,
+			y: GAMECST.STAGE_HEIGHT / 2 + 50,
+			width: GAMECST.STAGE_WIDTH,
+			height: GAMECST.STAGE_HEIGHT / 2,
+			fill: "#ebdfaaff"
+		});
+		this.group.add(bg3);
+
 		this.roundText = new Konva.Text({
 			x: GAMECST.STAGE_WIDTH - 40,
 			Y: 30,
@@ -150,106 +150,81 @@ export class PracticeAreaView implements View {
 		//Cycles between the play and pause logos when the button is clicked
 		pausePlayButtonGroup.on('click tap', () => { pauseResumeGame() });
 
-
-		// //Health bar that visualizes the health of the player's character
-		// const playerHealthGroup = new Konva.Group();
-		// this.group.add(playerHealthGroup);
-		// const healthBarWidth = 150;
-
-		// //Background to visualize the full size of the health bar
-		// const playerBarBacking = new Konva.Rect({
-		// 	x: 80,
-		// 	y: GAMECST.STAGE_HEIGHT * 2 / 3,
-		// 	width: healthBarWidth,
-		// 	height: 40,
-		// 	stroke: GAMECST.DARK_COLOR,
-		// 	strokeWidth: 4,
-		// 	fill: GAMECST.NEUTRAL_COLOR
-		// });
-		// playerHealthGroup.add(playerBarBacking);
-
-		// //Health bar that shrinks to model the health level of the player 
-		// this.playerHealthBar = new Konva.Rect({
-		// 	x: playerBarBacking.x() + 2,
-		// 	y: playerBarBacking.y() + 2,
-		// 	width: healthBarWidth - 4,
-		// 	height: 36,
-		// 	strokeEnabled: false,
-		// 	fill: GAMECST.ALERT_COLOR
-		// });
-		// playerHealthGroup.add(this.playerHealthBar);
-
-		// //Health bar that visualizes the health of the opponent's character
-		// const opponentHealthGroup = new Konva.Group();
-		// this.group.add(opponentHealthGroup);
-
-		// //Background to visualize the full size of the health bar
-		// const opponentBarBacking = new Konva.Rect({
-		// 	x: 300,
-		// 	y: playerBarBacking.y(),
-		// 	width: healthBarWidth,
-		// 	height: 40,
-		// 	stroke: GAMECST.DARK_COLOR,
-		// 	strokeWidth: 4,
-		// 	fill: GAMECST.NEUTRAL_COLOR
-		// });
-		// opponentHealthGroup.add(opponentBarBacking);
-
-		// //Health bar that shrinks to model the health level of the opponent
-		// this.opponentHealthBar = new Konva.Rect({
-		// 	x: opponentBarBacking.x() + 2,
-		// 	y: opponentBarBacking.y() + 2,
-		// 	width: healthBarWidth - 4,
-		// 	height: 36,
-		// 	strokeEnabled: false,
-		// 	fill: GAMECST.ALERT_COLOR
-		// });
-		// opponentHealthGroup.add(this.opponentHealthBar);
-
 		//Group that contains all the elements of the fight scene
 		const fightingStage = new Konva.Group();
 		fightingStage.position({ x: 120, y: 160 });
 		this.group.add(fightingStage); 
 
 		// load boxer image and store it on the instance so other code can access it
-		Konva.Image.fromURL('/punchingBag.png', (image) => {
+		Konva.Image.fromURL('/practice_area-dummy.png', (image) => {
 			// keep a reference to the Konva.Image node
-			this.opponentAvatar = image;
 
 			// set desired scale and position (adjust values as needed)
-			image.scale({ x: 0.20, y: 0.20 });
-			image.position({ x: 0, y: 0 });
+			image.scale({ x: 2.5, y: 2.5 });
+			image.position({ x: -20, y: 40 });
 
 			// add to the fighting stage group
 			fightingStage.add(image);
 		});
 
-		// load boxer image and store it on the instance so other code can access it
-		// load boxer image and store it on the instance so other code can access it
-		Konva.Image.fromURL('/boxer2.png', (image) => {
-			// keep a reference to the Konva.Image node
-			this.playerAvatar = image;
-
-			// set desired scale and position (adjust values as needed)
-			image.scale({ x: 0.35, y: 0.35 });
-			image.position({ x: 80, y: 20 });
-
-			// add to the fighting stage group
-			fightingStage.add(image);
+		const playerGroup = new Konva.Group({
+			x: 80,
+			y: GAMECST.STAGE_HEIGHT / 3,
 		});
+		fightingStage.add(playerGroup);
 
-		// // load boxer image and store it on the instance so other code can access it
-		// Konva.Image.fromURL('/boxer2.png', (image) => {
-		// 	// keep a reference to the Konva.Image node
-		// 	this.opponentAvatar = image;
+		/** Animated Sprites */
+		// Player Idle
+		const playerIdleImg = new Image();
+		playerIdleImg.src = "/player_idle.png"; 
 
-		// 	// set desired scale and position (adjust values as needed)
-		// 	image.scale({ x: 0.3, y: 0.3 });
-		// 	image.position({ x: 300, y: GAMECST.STAGE_HEIGHT / 3 });
+		playerIdleImg.onload = () => {
+			const animLayer = this.group.getLayer() as Konva.Layer | null;
+			if (!animLayer) {
+				console.warn("MainPageView: no layer found for playerIdleSprite");
+				return;
+			}
+			this.playerIdleSprite = new AnimatedSprite(animLayer, {
+				image: playerIdleImg,
+				frameWidth: 128,   
+				frameHeight: 128,  
+				frameCount: 6,     
+				frameRate: 8,
+				loop: true,
+				x: playerGroup.x() - 120,
+				y: playerGroup.y() - 370,
+				scale: 2.5,        
+			});
+			playerGroup.add(this.playerIdleSprite.node);
+			this.playerIdleSprite.play();
+			this.group.getLayer()?.draw();
+		};
 
-		// 	// add to the fighting stage group
-		// 	fightingStage.add(image);
-		// });
+		// Player punch
+		const playerPunchImg = new Image();
+		playerPunchImg.src = "/player_kick.png"; 
+
+		playerPunchImg.onload = () => {
+			const animLayer = this.group.getLayer() as Konva.Layer | null;
+			if (!animLayer) {
+				console.warn("MainPageView: no layer found for playerPunchSprite");
+				return;
+			}
+			this.playerPunchSprite = new AnimatedSprite(animLayer, {
+				image: playerPunchImg,
+				frameWidth: 128,   
+				frameHeight: 128,  
+				frameCount: 6,     
+				frameRate: 8,
+				loop: false,
+				x: playerGroup.x() - 120,
+				y: playerGroup.y() - 450,
+				scale: 2.5,
+			});
+			playerGroup.add(this.playerPunchSprite.node);
+			this.playerPunchSprite.node.visible(false);
+			this.group.getLayer()?.draw();
+		};
 
 		// Create four answer squares in a 2x2 grid pattern in the center of the screen
 		const squareSize = 90;
@@ -831,16 +806,33 @@ export class PracticeAreaView implements View {
         return this.timerImageNodes;
     }
 
-    /**
-     * Update the health bars with new percentage values
-	 * @param playerHealthPercent The percentage of health for the player (0-1)
-	 * @param opponentHealthPercent The percentage of health for the opponent (0-1)
-	 * @returns void
-     */
-    updateHealthBars(playerHealthPercent: number, opponentHealthPercent: number): void {
-        const healthBarWidth = 150;
-        //this.playerHealthBar.width((healthBarWidth - 4) * playerHealthPercent);
-        //this.opponentHealthBar.width((healthBarWidth - 4) * opponentHealthPercent);
-        this.group.getLayer()?.draw();
-    }
+
+	/** Player attack animation: punch, then back to idle */
+	playPlayerAttack(): void {
+		if (!this.playerIdleSprite || !this.playerPunchSprite) return;
+
+		this.playerIdleSprite.node.visible(false);
+		this.playerIdleSprite.stop();
+
+		this.playerPunchSprite.reset();
+		this.playerPunchSprite.node.visible(true);
+		this.playerPunchSprite.play();
+		this.group.getLayer()?.draw();
+
+		const durationMs = this.playerPunchSprite.getDurationMs();
+
+		window.setTimeout(() => {
+			if (!this.playerIdleSprite || !this.playerPunchSprite) return;
+
+			this.playerPunchSprite.node.visible(false);
+			this.playerPunchSprite.stop();
+			this.playerPunchSprite.reset();
+
+			this.playerIdleSprite.node.visible(true);
+			this.playerIdleSprite.reset();
+			this.playerIdleSprite.play();
+
+			this.group.getLayer()?.draw();
+		}, durationMs);
+	}
 }

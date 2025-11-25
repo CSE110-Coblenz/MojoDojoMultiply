@@ -233,6 +233,7 @@ export class PracticeAreaController extends ScreenController {
         //Shows the correct or incorrect text on view based on users answer
         if (this.model.playerResponse == this.model.correctAnswer) {
             this.view.correctAnswer();
+            this.view.playPlayerAttack();
         } else {
             this.view.incorrectAnswer();
         }

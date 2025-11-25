@@ -10,6 +10,7 @@ import { ResultsScreenController} from "./ResultsPageScreen/ResultsPageControlle
 import { RoundIntroController } from "./RoundIntroScreen/RoundIntroController";
 import { RoundStatsController } from "./RoundStatsScreen/RoundStatsController";
 import { BonusLevelController } from "./BonusLevelScreen/BonusLevelController";
+import { AnimatedSprite } from "./AnimatedSprites"
 
 class App implements ScreenSwitcher {
   private stage: Konva.Stage;
@@ -57,6 +58,7 @@ class App implements ScreenSwitcher {
 
     // Start on start screen
     this.startController.show();
+
   
   }
 
