@@ -21,6 +21,7 @@ export class MainPageView implements View {
 	private answerTexts: Konva.Text[];
 	private correctAnswerText: Konva.Text;
 	private incorrectAnswerText: Konva.Text;
+	private showCorrectAnswerText: Konva.Text;
 	private healthBarWidth: number;
 	private playerHealthBar: Konva.Rect;
 	private playerHealthBarText: Konva.Text;
@@ -679,7 +680,7 @@ export class MainPageView implements View {
 		//Text that tells the user they answered correctly
 		this.correctAnswerText = new Konva.Text({
 			x: totalWidth / 2,
-			y: answer3Box.y() + answer3Box.width() + spacing,
+			y: answer3Box.y() + answer3Box.width() + spacing - 10,
 			text: "Correct!",
 			fill: "green",
 			fontSize: 40,
@@ -695,7 +696,7 @@ export class MainPageView implements View {
 		//Text that tells the user they answered correctly
 		this.incorrectAnswerText = new Konva.Text({
 			x: totalWidth / 2,
-			y: answer3Box.y() + answer3Box.width() + spacing,
+			y: answer3Box.y() + answer3Box.width() + spacing - 10,
 			text: "Incorrect",
 			fill: "red",
 			fontSize: 40,
@@ -707,6 +708,19 @@ export class MainPageView implements View {
 
 		//Center the origin point of the text
 		this.incorrectAnswerText.offsetX(this.incorrectAnswerText.width() / 2);
+
+		// Text that shows the correct answer when player answers wrong
+		this.showCorrectAnswerText = new Konva.Text({
+			x: totalWidth / 2,
+			y: this.incorrectAnswerText.y() + 40,
+			text: "Correct: 0",
+			fill: "green",
+			fontSize: 20,
+			fontFamily: GAMECST.DEFAULT_FONT,
+			visible: false
+		});
+		gameQuestAnsGroup.add(this.showCorrectAnswerText);
+		this.showCorrectAnswerText.offsetX(this.showCorrectAnswerText.width() / 2);
 
 		// Attach click/hover handlers now that answerTexts exist
 		answer1Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[0].text())));
@@ -958,6 +972,7 @@ export class MainPageView implements View {
 	correctAnswer(): void {
 		this.incorrectAnswerText.visible(false);
 		this.correctAnswerText.visible(true);
+		this.showCorrectAnswerText.visible(false);
 	}
 
 	/**
@@ -974,6 +989,16 @@ export class MainPageView implements View {
 	hideCorrectIncorrect(): void {
 		this.correctAnswerText.visible(false);
 		this.incorrectAnswerText.visible(false);
+		this.showCorrectAnswerText.visible(false);
+	}
+
+	/**
+	 * Shows the correct answer below the incorrect text
+	 */
+	showCorrectAnswer(num1: number, num2: number, answer: number): void {
+		this.showCorrectAnswerText.text(`${num1} x ${num2} = ${answer}`);
+		this.showCorrectAnswerText.offsetX(this.showCorrectAnswerText.width() / 2);
+		this.showCorrectAnswerText.visible(true);
 	}
 
 	/**

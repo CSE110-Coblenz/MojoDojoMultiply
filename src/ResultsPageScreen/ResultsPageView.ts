@@ -2,41 +2,47 @@ import Konva from "konva";
 import type { View } from "../types";
 import { STAGE_WIDTH } from "../constants";
 import { GAMECST } from "../constants.js";
-import { LeaderboardEntry } from "./ResultsPageModel";
+import { RoundStatsEntry } from "./ResultsPageModel";
 
 /**
  * ResultsScreenView - Renders the results screen
  */
 export class ResultsPageView implements View {
   private group: Konva.Group;
+  private title: Konva.Text;
   private finalScoreText: Konva.Text;
   private leaderboardText: Konva.Text;
   private playerAvatar?: Konva.Image;
 
-  constructor(onNextRoundClick: () => void, onMainMenuClick: () => void) {
+  constructor(
+    onNextRoundClick: () => void, 
+    onMainMenuClick: () => void,
+    onHoverStart: () => void,
+    onHoverEnd: () => void
+  ) {
     this.group = new Konva.Group({ visible: false });
 
     // Title
 	//TODO: Import counter variable to announce what specific round is over
-    const title = new Konva.Text({
+    this.title = new Konva.Text({
       x: 50,
       y: 60,
-      text: "ROUND __ COMPLETE!",
-      fontSize: 48,
-      fontFamily: "Arial",
+      text: "GAME OVER",
+      fontSize: 60,
+      fontFamily: GAMECST.DEFAULT_FONT,
       fill: GAMECST.HIGHLIGHT_COLOR,
       width: STAGE_WIDTH - 100,
       align: "left",
     });
-    this.group.add(title);
+    this.group.add(this.title);
 
     // Final score
     this.finalScoreText = new Konva.Text({
       x: STAGE_WIDTH / 2 + 50,
       y: 150,
-      text: "Final Score: 0",
+      text: "Final Game Score: 0",
       fontSize: 36,
-      fontFamily: "Arial",
+      fontFamily: GAMECST.DEFAULT_FONT,
       fill: "black",
       width: STAGE_WIDTH,
       align: "left",
@@ -54,7 +60,7 @@ export class ResultsPageView implements View {
       y: 205,
       text: "Top Round Scores: (Play more rounds to get higher scores!)",
       fontSize: 18,
-      fontFamily: "Arial",
+      fontFamily: GAMECST.DEFAULT_FONT,
       fill: "#665",
       align: "left",
       width: STAGE_WIDTH,
@@ -70,24 +76,25 @@ export class ResultsPageView implements View {
       y: 480,
       width: 200,
       height: 60,
-      fill: "#665",
-      cornerRadius: 10,
-      stroke: "rgba(66, 66, 60, 1)",
-      strokeWidth: 3,
+      fill: GAMECST.HIGHLIGHT_COLOR,
+      stroke: GAMECST.DARK_COLOR,
+      strokeWidth: 4,
     });
     const nextRoundText = new Konva.Text({
-      x: STAGE_WIDTH / 2 - 120,
-      y: 495,
-      text: "NEXT ROUND",
-      fontSize: 24,
-      fontFamily: "Arial",
-      fill: GAMECST.HIGHLIGHT_COLOR,
+      x: nextRoundButton.x() + nextRoundButton.width() / 2,
+      y: nextRoundButton.y() + nextRoundButton.height() / 2,
+      text: "NEW GAME",
+      fontSize: 32,
+      fontFamily: GAMECST.DEFAULT_FONT,
+      fill: GAMECST.DARK_COLOR,
       align: "center",
     });
-    nextRoundText.offsetX(nextRoundText.width() / 2);
+    nextRoundText.offset({x: nextRoundText.width() / 2, y: nextRoundText.height() / 2});
 
     nextRoundButtonGroup.add(nextRoundButton, nextRoundText);
     nextRoundButtonGroup.on("click", onNextRoundClick);
+    nextRoundButtonGroup.on("mouseover", onHoverStart);
+    nextRoundButtonGroup.on("mouseout", onHoverEnd);
     this.group.add(nextRoundButtonGroup);
 
     // MENU button
@@ -97,24 +104,25 @@ export class ResultsPageView implements View {
       y: 480,
       width: 200,
       height: 60,
-      fill: "#665",
-      cornerRadius: 10,
-      stroke: "rgba(66, 66, 60, 1)",
-      strokeWidth: 3,
+      fill: GAMECST.HIGHLIGHT_COLOR,
+      stroke: GAMECST.DARK_COLOR,
+      strokeWidth: 4,
     });
     const mainMenuText = new Konva.Text({
-      x: STAGE_WIDTH / 2 + 120,
-      y: 495,
-      text: "MENU",
-      fontSize: 24,
-      fontFamily: "Arial",
-      fill: GAMECST.HIGHLIGHT_COLOR,
+      x: mainMenuButton.x() + mainMenuButton.width() / 2,
+      y: mainMenuButton.y() + mainMenuButton.height() / 2,
+      text: "MAIN MENU",
+      fontSize: 32,
+      fontFamily: GAMECST.DEFAULT_FONT,
+      fill: GAMECST.DARK_COLOR,
       align: "center",
     });
-    mainMenuText.offsetX(mainMenuText.width() / 2);
+    mainMenuText.offset({x: mainMenuText.width() / 2, y: mainMenuText.height() / 2});
 
     mainMenuButtonGroup.add(mainMenuButton, mainMenuText);
     mainMenuButtonGroup.on("click", onMainMenuClick);
+    mainMenuButtonGroup.on("mouseover", onHoverStart);
+    mainMenuButtonGroup.on("mouseout", onHoverEnd);
     this.group.add(mainMenuButtonGroup);
   }
 
@@ -162,6 +170,11 @@ export class ResultsPageView implements View {
     };
   }
 
+  // setRound(roundNum: number): void {
+  //   this.title.text(`ROUND ${roundNum} COMPLETE!`);
+  //   this.group.getLayer()?.draw();
+  // }
+
   	/**
 	 * Update the final score display
 	*/
@@ -174,13 +187,13 @@ export class ResultsPageView implements View {
 	/**
  	* Update the leaderboard display
  	*/
-  updateLeaderboard(entries: LeaderboardEntry[]): void {
+  updateLeaderboard(entries: RoundStatsEntry[]): void {
     if (entries.length === 0) {
       this.leaderboardText.text("Top Scores:\n(No scores yet!)");
     } else {
       let text = "Top Scores:\n";
       entries.forEach((entry, index) => {
-        text += `${index + 1}. ${entry.score} - ${entry.timestamp}\n`;
+        text += `${index + 1}. ${entry.points} - ${entry.timestamp}\n`;
       });
       this.leaderboardText.text(text);
     }

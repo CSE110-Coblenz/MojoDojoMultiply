@@ -1,10 +1,10 @@
 import Konva from "konva";
 import { AnimatedSprite } from "../AnimatedSprites";
 import { ScreenController, type ScreenSwitcher } from "../types";
-import { RoundStatsView, type RoundStatsEntry } from "./RoundStatsView";
+import { RoundStatsView} from "./RoundStatsView";
 import { GAMECST } from "../constants.js";
 import { clearGlobalState, getGlobalState, GlobalState, saveGlobalState } from "../storageManager"
-import { RoundStatsModel } from "./RoundStatsModel";
+import { RoundStatsModel,type RoundStatsEntry } from "./RoundStatsModel";
 
 export class RoundStatsController extends ScreenController {
   private screenSwitcher: ScreenSwitcher;
