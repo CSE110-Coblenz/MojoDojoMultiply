@@ -936,7 +936,6 @@ export class MainPageView implements View {
 			window.removeEventListener('keydown', this.keyHandler as EventListener);
 			window.addEventListener('keydown', this.keyHandler as EventListener);
 		}
-		this.pauseMenu.visible(false);
 		this.group.getLayer()?.draw();
     }
 
