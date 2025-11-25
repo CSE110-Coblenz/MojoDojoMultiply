@@ -3,7 +3,6 @@
  */
 export class MainPageModel {
     tickCallback: ((digits: number[]) => void) | null;
-    score: number;
     num1: number;
     num2: number;
     prevNum1: number;
@@ -29,11 +28,8 @@ export class MainPageModel {
     questionMax = 3;
     questionMin = 1;
 
-
-
     constructor() {
         this.tickCallback = null;
-        this.score = 0;
         this.num1 = 0;
         this.num2 = 0;
         this.prevNum1 = 0;

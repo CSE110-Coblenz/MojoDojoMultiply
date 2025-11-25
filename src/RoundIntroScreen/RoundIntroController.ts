@@ -2,7 +2,7 @@ import { ScreenController, type ScreenSwitcher } from "../types";
 import { RoundIntroView } from "./RoundIntroView";
 import { RoundIntroModel } from "./RoundIntroModel";
 import { GAMECST } from "../constants";
-import { GlobalState } from "../storageManager"
+import { clearGlobalState, GlobalState } from "../storageManager"
 
 export class RoundIntroController extends ScreenController {
   private screenSwitcher: ScreenSwitcher;
@@ -64,6 +64,8 @@ export class RoundIntroController extends ScreenController {
    * Takes the user back to the start page when the main menu button is pressed
    */
   private returnStartPage() {
+    clearGlobalState();
+    localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
     this.screenSwitcher.switchToScreen({type: "start"});
   }
 
