@@ -12,6 +12,9 @@ export class RoundIntroView {
     private playerIdleSprite?: AnimatedSprite;
     private opponentIdleSprite?: AnimatedSprite;
 
+  private gongSound: HTMLAudioElement;
+  private isMuted: boolean = false;
+
   constructor(
     onNext: () => void,
     onBack: () => void,
@@ -20,6 +23,14 @@ export class RoundIntroView {
   ) {
 
     this.group = new Konva.Group({ visible: false });
+
+    // mute state from MainPage mute button (via localStorage)
+    this.isMuted = localStorage.getItem("MojoDojoMuted") === "true";
+
+    this.gongSound = new Audio("/gong.mp3"); 
+    this.gongSound.onerror = (e) => {
+      console.error("Error loading gong sound:", e);
+    };
 
     const fightingStage = new Konva.Group();
       fightingStage.position({ x: 120, y: 160 });
@@ -139,6 +150,7 @@ export class RoundIntroView {
 
     //Adds click and hover functionalities to the game button
     this.nextButton.on("click tap", () => {
+      this.playGong();
       onNext();
     });
     this.nextButton.on("mouseover", onHoverStart);
@@ -195,6 +207,15 @@ export class RoundIntroView {
     this.roundText.text(text);
     this.roundText.offsetX(this.roundText.width() / 2);
     this.group.getLayer()?.draw();
+  }
+
+  private playGong(): void {
+    if (this.isMuted) return; // respect main mute button
+
+    this.gongSound.currentTime = 0;
+    this.gongSound.play().catch(() => {
+    // ignore autoplay / gesture issues
+    });
   }
 
   getGroup(): Konva.Group { return this.group; }
