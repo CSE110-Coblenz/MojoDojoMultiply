@@ -934,6 +934,9 @@ export class MainPageView implements View {
 		if (this.keyHandler) {
 			window.removeEventListener('keydown', this.keyHandler as EventListener);
 		}
+		// Hide pause menu when leaving the page
+		this.pauseMenu.visible(false);
+		
 		this.group.getLayer()?.draw();
 	}
 

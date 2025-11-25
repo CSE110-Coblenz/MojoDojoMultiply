@@ -782,6 +782,9 @@ export class MainPageController extends ScreenController {
      * This is because the game should reset each time the user navigates to this screen
      */
     show(): void {
+
+        this.view.showPauseButton();
+
         // Start background music if not muted
         if (!this.isMuted) {
             this.backgroundMusic.play().catch((e) => {
