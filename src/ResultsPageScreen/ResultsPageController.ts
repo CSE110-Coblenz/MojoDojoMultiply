@@ -17,15 +17,12 @@ export class ResultsScreenController extends ScreenController {
 	private model: ResultsPageModel;
 	private view: ResultsPageView;
 	private screenSwitcher: ScreenSwitcher;
-	private mainModel: MainPageModel;
-	
 
 	private gameOverSound: HTMLAudioElement;
 
-	constructor(screenSwitcher: ScreenSwitcher, mainModel: MainPageModel) {
+	constructor(screenSwitcher: ScreenSwitcher) {
 		super();
 		this.screenSwitcher = screenSwitcher;
-		this.mainModel = mainModel; 
 		this.model = new ResultsPageModel();
 		this.view = new ResultsPageView(
   			() => this.handleNextRoundClick(),
@@ -35,7 +32,7 @@ export class ResultsScreenController extends ScreenController {
 		);
 
 		// TODO: Task 4 - Initialize game over sound audio
-		this.gameOverSound = new Audio("/game-over-arcade-6435.mp3"); // Placeholder
+		this.gameOverSound = new Audio("/gameover.mp3"); // Placeholder
 	}
 
 	showResults(finalScore: number): void {
@@ -63,7 +60,6 @@ export class ResultsScreenController extends ScreenController {
 	 * Handle play again button click
 	 */
 	private handleMainMenuClick(): void {
-		//this.mainModel.currentRound = 1; Can use if we want to have it when user clicks on the start page, it resets 
 		this.screenSwitcher.switchToScreen({ type: "start" });
 	}
 
