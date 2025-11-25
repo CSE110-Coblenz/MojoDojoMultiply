@@ -25,7 +25,7 @@ export class RoundIntroView {
     this.group = new Konva.Group({ visible: false });
 
     // mute state from MainPage mute button (via localStorage)
-    this.isMuted = localStorage.getItem("MojoDojoMuted") === "true";
+    this.isMuted = localStorage.getItem("MojoDojoMuted") === "true" ? true : false;
 
     this.gongSound = new Audio("/gong.mp3"); 
     this.gongSound.onerror = (e) => {
@@ -150,6 +150,7 @@ export class RoundIntroView {
 
     //Adds click and hover functionalities to the game button
     this.nextButton.on("click tap", () => {
+      console.log("Start clicked — attempting gong playback");
       this.playGong();
       onNext();
     });
@@ -210,11 +211,13 @@ export class RoundIntroView {
   }
 
   private playGong(): void {
-    if (this.isMuted) return; // respect main mute button
+    console.log("playGong called, isMuted =", this.isMuted);
+
+    //if (this.isMuted) return;
 
     this.gongSound.currentTime = 0;
-    this.gongSound.play().catch(() => {
-    // ignore autoplay / gesture issues
+    this.gongSound.play().catch((err) => {
+      console.warn("Gong failed to play:", err);
     });
   }
 

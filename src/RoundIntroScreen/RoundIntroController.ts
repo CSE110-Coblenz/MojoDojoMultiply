@@ -18,7 +18,7 @@ export class RoundIntroController extends ScreenController {
       () => this.startRound(),
       () => this.returnStartPage(),
       () => this.handleHoverStart(),
-      () => this.handleHoverEnd()
+      () => this.handleHoverEnd(),
     )
 
     this.setupGlobalStateListener();
