@@ -16,7 +16,7 @@ export class PracticeAreaController extends ScreenController {
         this.screenSwitcher = screenSwitcher;
 
         this.model = new PracticeAreaModel();
-
+        
         // Initialize click sound with error handling
         this.clickSound = new Audio("/PunchSound.mp3");
         this.clickSound.onerror = (e) => {
@@ -49,10 +49,10 @@ export class PracticeAreaController extends ScreenController {
                 if (event.newValue) {
                     try {
                         const newState = JSON.parse(event.newValue) as GlobalState;
-
+                        
                         // Update data with loaded data from JSON
-                        this.model.currentRound = newState.currentRound;
-
+                        this.model.currentRound=newState.currentRound;
+                        
                     } catch (e) {
                         console.error("Failed to parse storage update:", e);
                     }
@@ -79,7 +79,7 @@ export class PracticeAreaController extends ScreenController {
         this.model.correctAnswer = this.model.num1 * this.model.num2;
         this.model.wrongAnswers = this.getWrongAnswers(this.model.correctAnswer, 3);
         this.model.allAnswers = this.randomizeOrder([this.model.correctAnswer, ...this.model.wrongAnswers]);
-
+        
         // Reset response times for new question
         this.model.playerTime = 0;
         this.model.computerTime = 0;
@@ -99,8 +99,8 @@ export class PracticeAreaController extends ScreenController {
         const minDelay = 1000; // 1 second
         const maxDelay = 3000; // 3 seconds
         const delay = Math.random() * (maxDelay - minDelay) + minDelay;
-
-        setTimeout(() => { this.model.computerTime = Date.now(); }, delay);
+        
+        setTimeout(() => {this.model.computerTime = Date.now(); }, delay);
     }
 
     /**
@@ -110,7 +110,7 @@ export class PracticeAreaController extends ScreenController {
     startGame(round: number = this.model.currentRound): void {
         // Reset game state
         this.resetForRound(round);
-
+        
         // Generate first question
         this.generateNewQuestion();
         this.updateQuestion();
@@ -145,7 +145,7 @@ export class PracticeAreaController extends ScreenController {
      */
     private handleGameClick(): void {
         this.endGameEarly();
-        this.screenSwitcher.switchToScreen({ type: "main" });
+        this.screenSwitcher.switchToScreen({ type: "main"});
     }
 
 
@@ -221,7 +221,7 @@ export class PracticeAreaController extends ScreenController {
      * @returns void
      */
     private handleAnswerClick(selectedAnswer: number): void {
-
+        
         // Record player's response and time
         this.model.playerResponse = selectedAnswer;
         this.model.playerTime = Date.now();
@@ -235,7 +235,7 @@ export class PracticeAreaController extends ScreenController {
             this.view.correctAnswer();
             this.view.playPlayerAttack();
 
-            // play sound only when game isn't muted and answer is right
+            // play only when correct and game is not muted
             if (!this.isMuted) {
                 // Play sound effects
                 this.clickSound.play();
@@ -244,11 +244,8 @@ export class PracticeAreaController extends ScreenController {
         } else {
             this.view.incorrectAnswer();
         }
-
-
+        
         this.advanceGame();
-
-
     }
 
     /**
@@ -257,7 +254,7 @@ export class PracticeAreaController extends ScreenController {
      */
     private handlePausePlayGame() {
         console.log(this.model.gamePaused);
-        if (this.model.gamePaused) {
+        if(this.model.gamePaused) {
             this.resumeGame();
         } else {
             this.pauseGame();
@@ -286,7 +283,7 @@ export class PracticeAreaController extends ScreenController {
         this.view.hideCorrectIncorrect();
 
         //Switch to the stats page if the player looses or the results page if the player wins
-        if (playerLost) {
+        if(playerLost) {
             this.screenSwitcher.switchToScreen({ type: "results" });
         } else {
             // // gives bonus points if win w/ > 50% health
@@ -295,13 +292,13 @@ export class PracticeAreaController extends ScreenController {
             //     this.model.roundScore += 400;
             //     this.updateScore(400);
             // }
-            this.screenSwitcher.switchToScreen({ type: "stats" });
+            this.screenSwitcher.switchToScreen({ type: "stats"});
         }
     }
 
-    /**
-      * Pause the game
-      */
+   /**
+     * Pause the game
+     */
     pauseGame(): void {
         //this.pauseQuestionTimer();
         this.model.gamePaused = true;
