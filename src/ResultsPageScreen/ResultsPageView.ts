@@ -11,6 +11,7 @@ export class ResultsPageView implements View {
   private group: Konva.Group;
   private title: Konva.Text;
   private finalScoreText: Konva.Text;
+  private roundsPlayedText: Konva.Text;
   private leaderboardText: Konva.Text;
   private playerAvatar?: Konva.Image;
 
@@ -22,8 +23,7 @@ export class ResultsPageView implements View {
   ) {
     this.group = new Konva.Group({ visible: false });
 
-    // Title
-	//TODO: Import counter variable to announce what specific round is over
+    //Title that announces game over
     this.title = new Konva.Text({
       x: 50,
       y: 60,
@@ -38,38 +38,55 @@ export class ResultsPageView implements View {
 
     // Final score
     this.finalScoreText = new Konva.Text({
-      x: STAGE_WIDTH / 2 + 50,
-      y: 150,
-      text: "Final Game Score: 0",
-      fontSize: 36,
+      x: 50,
+      y: this.title.y() + this.title.height() + 15,
+      text: "Final Score: 000000 pts",
+      fontSize: 28,
+      fontFamily: GAMECST.DEFAULT_FONT,
+      fill: "black",
+    });
+    this.group.add(this.finalScoreText);
+
+    // Final score
+    this.roundsPlayedText = new Konva.Text({
+      x: this.finalScoreText.x() + this.finalScoreText.width() + 10,
+      y: this.finalScoreText.y(),
+      text: "Rounds Won: 0",
+      fontSize: 28,
       fontFamily: GAMECST.DEFAULT_FONT,
       fill: "black",
       width: STAGE_WIDTH,
       align: "left",
     });
-    this.finalScoreText.offsetX(this.finalScoreText.width() / 2);
-    this.group.add(this.finalScoreText);
+    this.group.add(this.roundsPlayedText);
 
-    // Victor card & boxer image
-    this.loadStickFigure();
+    //Background for the display of best rounds in the game
+    const leaderboardBackground = new Konva.Rect({
+      x: 50,
+      y: this.roundsPlayedText.y() + this.roundsPlayedText.height() + 15,
+      width: 450,
+      height: 250,
+      fill: GAMECST.LIGHT_NEUTRAL_COLOR,
+      stroke: GAMECST.NEUTRAL_COLOR,
+      strokeWidth: 4
+    });
+    this.group.add(leaderboardBackground);
 
     // Leaderboard text
-	//TODO: Import counter variable to announce what specific round user is on
     this.leaderboardText = new Konva.Text({
-      x: STAGE_WIDTH / 2 + 50,
-      y: 205,
+      x: leaderboardBackground.x() + 10,
+      y: leaderboardBackground.y() + 10,
       text: "Top Round Scores: (Play more rounds to get higher scores!)",
       fontSize: 18,
-      fontFamily: GAMECST.DEFAULT_FONT,
-      fill: "#665",
+      fontFamily: 'Arial',
+      fill: GAMECST.DARK_COLOR,
       align: "left",
       width: STAGE_WIDTH,
       lineHeight: 1.5,
     });
-    this.leaderboardText.offsetX(this.leaderboardText.width() / 2);
     this.group.add(this.leaderboardText);
 
-    // NEXT ROUND button
+    // New Game button that lets the user start a new game
     const nextRoundButtonGroup = new Konva.Group();
     const nextRoundButton = new Konva.Rect({
       x: STAGE_WIDTH / 2 - 220,
@@ -80,6 +97,8 @@ export class ResultsPageView implements View {
       stroke: GAMECST.DARK_COLOR,
       strokeWidth: 4,
     });
+
+    //Text that tells the user what the new game button does
     const nextRoundText = new Konva.Text({
       x: nextRoundButton.x() + nextRoundButton.width() / 2,
       y: nextRoundButton.y() + nextRoundButton.height() / 2,
@@ -92,6 +111,8 @@ export class ResultsPageView implements View {
     nextRoundText.offset({x: nextRoundText.width() / 2, y: nextRoundText.height() / 2});
 
     nextRoundButtonGroup.add(nextRoundButton, nextRoundText);
+
+    //Add hover and click functionality to button
     nextRoundButtonGroup.on("click", onNextRoundClick);
     nextRoundButtonGroup.on("mouseover", onHoverStart);
     nextRoundButtonGroup.on("mouseout", onHoverEnd);
@@ -108,6 +129,8 @@ export class ResultsPageView implements View {
       stroke: GAMECST.DARK_COLOR,
       strokeWidth: 4,
     });
+
+    //Text that tells the user what the button does
     const mainMenuText = new Konva.Text({
       x: mainMenuButton.x() + mainMenuButton.width() / 2,
       y: mainMenuButton.y() + mainMenuButton.height() / 2,
@@ -120,67 +143,67 @@ export class ResultsPageView implements View {
     mainMenuText.offset({x: mainMenuText.width() / 2, y: mainMenuText.height() / 2});
 
     mainMenuButtonGroup.add(mainMenuButton, mainMenuText);
+
+    //Adds hover and click functionality to the buttons
     mainMenuButtonGroup.on("click", onMainMenuClick);
     mainMenuButtonGroup.on("mouseover", onHoverStart);
     mainMenuButtonGroup.on("mouseout", onHoverEnd);
+
     this.group.add(mainMenuButtonGroup);
+
+    //Background for the image of the defeated avatar
+    const figureBackground = new Konva.Rect({
+      x: leaderboardBackground.x() + leaderboardBackground.width() + 30,
+      y: leaderboardBackground.y(),
+      width: 200,
+      height: 250,
+      stroke: "#f77",
+      fill: "rgba(236, 147, 138, 1)",
+      strokeWidth: 4,
+    });
+    this.group.add(figureBackground);
+    
+    //Text that tells the user that they were defeated by the adversary
+    const defeatText = new Konva.Text({
+      text: "Defeat",
+      x: figureBackground.x() + figureBackground.width() / 2,
+      y: figureBackground.y() + 10,
+      fontSize: 40,
+      fontFamily: GAMECST.DEFAULT_FONT,
+      fill: "#e54",
+    });
+    defeatText.offsetX(defeatText.width() / 2);
+    this.group.add(defeatText);
+
+    //Image of the avatar on the ground, defeated
+    Konva.Image.fromURL('/player_defeat.png', (image) => {
+      this.playerAvatar = image;
+      this.group.add(this.playerAvatar);
+
+      this.playerAvatar.x(figureBackground.x() + figureBackground.width() / 2);
+      this.playerAvatar.offsetX(this.playerAvatar.width() / 2);
+      this.playerAvatar.y(defeatText.y() + defeatText.height() + 5);
+      this.playerAvatar.scale({x: 0.5, y: 0.5});
+    })
+
   }
 
-  private loadStickFigure(): void {
-    const img = new Image();
-    img.src = "/boxer.png";
-
-    img.onload = () => {
-      const borderX = STAGE_WIDTH - 225;
-      const borderY = 150;
-
-      const border = new Konva.Rect({
-        x: borderX,
-        y: borderY,
-        width: 180,
-        height: 220,
-        stroke: "#f77",
-        fill: "rgba(236, 147, 138, 1)",
-        strokeWidth: 4,
-        cornerRadius: 6,
-      });
-
-      const victorText = new Konva.Text({
-        text: "Victor!",
-        x: borderX + 12,
-        y: borderY + 8,
-        fontSize: 28,
-        fontStyle: "bold",
-        fill: "#e54",
-      });
-
-      const figure = new Konva.Image({
-        x: borderX + 30,
-        y: borderY + 60,
-        width: 120,
-        height: 140,
-        image: img,
-        listening: false,
-      });
-
-      this.playerAvatar = figure;
-
-      this.group.add(border, victorText, figure);
-      this.group.getLayer()?.batchDraw();
-    };
+  /**
+   * Sets the number of rounds that the user played before loosing
+   * 
+   * @param roundNum Number of rounds that were played until loosing
+   */
+  setRound(roundNum: number): void {
+    this.roundsPlayedText.text(`Rounds Won: ${roundNum}`);
+    this.group.getLayer()?.draw();
   }
 
-  // setRound(roundNum: number): void {
-  //   this.title.text(`ROUND ${roundNum} COMPLETE!`);
-  //   this.group.getLayer()?.draw();
-  // }
-
-  	/**
-	 * Update the final score display
+	/**
+	* Update the final score display
 	*/
   updateFinalScore(score: number): void {
-    this.finalScoreText.text(`Final Score: ${score}`);
-    this.finalScoreText.offsetX(this.finalScoreText.width() / 2);
+    this.finalScoreText.text(`Final Score: ${score} pts`);
+    //this.finalScoreText.offsetX(this.finalScoreText.width() / 2);
     this.group.getLayer()?.draw();
   }
 
@@ -197,7 +220,7 @@ export class ResultsPageView implements View {
       });
       this.leaderboardText.text(text);
     }
-    this.leaderboardText.offsetX(this.leaderboardText.width() / 2);
+    //this.leaderboardText.offsetX(this.leaderboardText.width() / 2);
     this.group.getLayer()?.draw();
   }
 
