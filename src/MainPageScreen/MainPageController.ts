@@ -15,6 +15,7 @@ export class MainPageController extends ScreenController {
     private screenSwitcher: ScreenSwitcher;
     private clickSound: HTMLAudioElement;
     private backgroundMusic: HTMLAudioElement;
+    private gongSound: HTMLAudioElement;
     private playerLost: boolean = false;
     private isMuted: boolean = false;
     private isRunning: boolean = false;
@@ -32,6 +33,13 @@ export class MainPageController extends ScreenController {
         this.clickSound.volume = 0.5;
         this.clickSound.onerror = (e) => {
             console.error('Error loading sound:', e);
+        };
+
+        // Initialize gong sound with error handling
+        this.gongSound = new Audio("/gong.mp3");
+        this.gongSound.volume = 0.5;
+        this.gongSound.onerror = (e) => {
+            console.error("Error loading sound:", e);
         };
 
         // Initialize background music with looping enabled
@@ -239,6 +247,10 @@ export class MainPageController extends ScreenController {
      * @returns void
      */
     startGame(): void {
+
+        //Play the gong sound to start the round
+        if(!this.isMuted) this.gongSound.play();
+
         // Start background music if not muted
         if (!this.isMuted) {
             this.backgroundMusic.play().catch((e) => {
