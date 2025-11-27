@@ -1,6 +1,7 @@
 import { ScreenController, type ScreenSwitcher } from "../types";
 import { BonusLevelView } from "./BonusLevelView";
 import { BonusLevelModel } from "./BonusLevelModel";
+import { clearGlobalState, getGlobalState, GlobalState, saveGlobalState } from "../storageManager";
 import { GAMECST } from "../constants";
 
 export class BonusLevelController extends ScreenController {
@@ -111,7 +112,12 @@ export class BonusLevelController extends ScreenController {
 
     const bonusPoints = this.model.score;
 
-    this.screenSwitcher.switchToScreen({ type: "results" });
+    //increment round num thats in the save system
+    const savedState = getGlobalState();
+    savedState.currentRound++;
+    saveGlobalState(savedState);
+
+    this.screenSwitcher.switchToScreen({ type: "intro" });
   }
 
   /**

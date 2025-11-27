@@ -735,7 +735,7 @@ export class MainPageController extends ScreenController {
         //Switch to the stats page if the player looses or the results page if the player wins
         if(playerLost) {
             this.saveRoundStats();
-            this.screenSwitcher.switchToScreen({ type: "bonus" });
+            this.screenSwitcher.switchToScreen({ type: "results" });
             localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
             clearGlobalState();
         } else {
@@ -748,7 +748,11 @@ export class MainPageController extends ScreenController {
 
             // TODO need to decide if we want to go maingame --> bonus --> stats or maingame --> stats --> bonus etc.
             // Check if we should go to the bonus level
-            this.screenSwitcher.switchToScreen({ type: "stats"});
+            if (this.model.currentRound % GAMECST.ROUNDS_UNTIL_BONUS === 0) {
+                this.screenSwitcher.switchToScreen({ type: "bintro" });
+            } else {
+                this.screenSwitcher.switchToScreen({ type: "stats"});
+            }
         }
     }
 
