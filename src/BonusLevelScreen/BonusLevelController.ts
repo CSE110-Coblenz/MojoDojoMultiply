@@ -10,6 +10,7 @@ export class BonusLevelController extends ScreenController {
   private isShowingResult: boolean = false;
   private maxAnswer: number = 10;
   private maxDivisor: number = 10;
+  private timerInterval: number | null = null;
 
   constructor(screenSwitcher: ScreenSwitcher) {
     super();
@@ -39,21 +40,78 @@ export class BonusLevelController extends ScreenController {
    * Show view and start event listener
    */
   show(): void {
-    this.isShowingResult = false;
+    this.resetBonusRound();
+
     this.generateNewQuestion();
+    
     this.view.update(this.model);
+    
     this.view.show();
     // Starts listener that looks for any keydown ie key pressed down
     window.addEventListener("keydown", this.handleKeyDown);
+    this.startTimer()
   }
 
   /**
    * Hides view and stops event listener
    */
   hide(): void {
+    this.stopTimer();
     this.view.hide();
     // Stops listener
     window.removeEventListener("keydown", this.handleKeyDown);
+  }
+
+  /**
+   * Resets model values
+   */
+  private resetBonusRound(): void {
+    this.isShowingResult = false;
+    this.model.timeRemaining = GAMECST.BONUS_DURATION;
+    this.model.score = 0;
+    this.model.correctCount = 0;
+    this.model.totalQuestions = 0;
+    this.generateNewQuestion();
+    this.view.update(this.model);
+  }
+
+  /**
+   * Starts bonusRound local timer
+   */
+  private startTimer(): void {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval)
+    };
+    
+    this.timerInterval = window.setInterval(() => {
+        this.model.timeRemaining--;
+        this.view.update(this.model);
+
+        if (this.model.timeRemaining <= 0) {
+            this.endBonusRound();
+        }
+    }, 1000);
+  }
+
+  /**
+   * Stops bonusRound local timer
+   */
+  private stopTimer(): void {
+    if (this.timerInterval) {
+        clearInterval(this.timerInterval);
+        this.timerInterval = null;
+    }
+  }
+
+  /**
+   * Ends the bonus round, saves stats, and switches to results
+   */
+  private endBonusRound(): void {
+    this.stopTimer();
+
+    const bonusPoints = this.model.score;
+
+    this.screenSwitcher.switchToScreen({ type: "results" });
   }
 
   /**
@@ -109,9 +167,16 @@ export class BonusLevelController extends ScreenController {
    */
   private checkAnswer(): boolean {
     const isCorrect = this.checkDivisionAnswer();
-    this.model.resultMessage = isCorrect
-      ? "Correct!"
-      : `Wrong! ${this.model.dividend} / ${this.model.divisor} = ${this.model.quotient}`;
+    this.model.totalQuestions++;
+    
+    if (isCorrect) {
+        this.model.score += GAMECST.POINTS_PER_ANSWER;
+        this.model.correctCount++;
+        this.model.resultMessage = "Correct!";
+    } else {
+        this.model.resultMessage = `Wrong! ${this.model.dividend} / ${this.model.divisor} = ${this.model.quotient}`;
+    }
+    
     return isCorrect;
   }
   
