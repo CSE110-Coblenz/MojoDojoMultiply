@@ -21,6 +21,7 @@ export class MainPageView implements View {
 	private answerTexts: Konva.Text[];
 	private correctAnswerText: Konva.Text;
 	private incorrectAnswerText: Konva.Text;
+	private timesUpText: Konva.Text;
 	private showCorrectAnswerText: Konva.Text;
 	private healthBarWidth: number;
 	private playerHealthBar: Konva.Rect;
@@ -726,6 +727,19 @@ export class MainPageView implements View {
 		gameQuestAnsGroup.add(this.showCorrectAnswerText);
 		this.showCorrectAnswerText.offsetX(this.showCorrectAnswerText.width() / 2);
 
+		// Text that shows the user they ran out of time
+		this.timesUpText = new Konva.Text({
+			x: totalWidth / 2,
+            y: answer3Box.y() + answer3Box.width() + spacing - 10,
+            text: "Time's Up!",
+            fill: "red",
+            fontSize: 40,
+            fontFamily: GAMECST.DEFAULT_FONT,
+            visible: false
+		})
+		gameQuestAnsGroup.add(this.timesUpText);
+        this.timesUpText.offsetX(this.timesUpText.width() / 2);
+
 		// Attach click/hover handlers now that answerTexts exist
 		answer1Group.on('click tap', () => onAnswerClick(parseInt(this.answerTexts[0].text())));
 		answer1Group.on('mouseover', onHoverStart);
@@ -977,6 +991,7 @@ export class MainPageView implements View {
 		this.incorrectAnswerText.visible(false);
 		this.correctAnswerText.visible(true);
 		this.showCorrectAnswerText.visible(false);
+		this.timesUpText.visible(false);
 	}
 
 	/**
@@ -985,6 +1000,17 @@ export class MainPageView implements View {
 	incorrectAnswer(): void {
 		this.correctAnswerText.visible(false);
 		this.incorrectAnswerText.visible(true);
+		this.timesUpText.visible(false); 
+	}
+
+	/**
+	 * Internal function that tells the user they ran out of time to answer
+	 */
+	timesUp(): void {
+		this.correctAnswerText.visible(false);
+        this.incorrectAnswerText.visible(false);
+        this.showCorrectAnswerText.visible(false);
+        this.timesUpText.visible(true);
 	}
 
 	/**
@@ -994,6 +1020,7 @@ export class MainPageView implements View {
 		this.correctAnswerText.visible(false);
 		this.incorrectAnswerText.visible(false);
 		this.showCorrectAnswerText.visible(false);
+		this.timesUpText.visible(false);
 	}
 
 	/**
