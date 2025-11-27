@@ -113,7 +113,7 @@ export class ResultsScreenController extends ScreenController {
 		const history = this.loadHistory();
 		const globalState = getGlobalState();
 
-		//this.view.setRound(globalState.currentRound);
+		this.view.setRound(globalState.currentRound - 1);
 		this.view.updateFinalScore(globalState.totalScore);
 
 		if (history.length > 0) {
