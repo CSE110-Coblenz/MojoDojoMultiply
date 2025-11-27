@@ -145,7 +145,8 @@ export class PracticeAreaController extends ScreenController {
      */
     private handleGameClick(): void {
         this.endGameEarly();
-        this.screenSwitcher.switchToScreen({ type: "main"});
+        // Starting game takes you to intro rather than main game
+        this.screenSwitcher.switchToScreen({ type: "intro"});
     }
 
 
