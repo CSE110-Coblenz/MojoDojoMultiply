@@ -483,6 +483,8 @@ export class MainPageView implements View {
 			height: bubbleHeight,
 			fill: "white",
 			cornerRadius: 10,
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 2
 		});
 		opponentBubbleGroup.add(opponentBubbleRect);
 
@@ -496,6 +498,8 @@ export class MainPageView implements View {
 			closed: true,
 			fill: "white",
 			lineJoin: "round",
+			stroke: GAMECST.DARK_COLOR,
+			strokeWidth: 2
 		});
 		opponentBubbleGroup.add(opponentBubbleTail);
 
