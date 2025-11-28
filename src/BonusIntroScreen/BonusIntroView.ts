@@ -14,7 +14,7 @@ export class BonusRoundIntroView {
 
   constructor(
     onNext: () => void,
-    onBack: () => void,
+    onSkip: () => void,
     onHoverStart: () => void,
     onHoverEnd: () => void
   ) {
@@ -165,7 +165,7 @@ export class BonusRoundIntroView {
 
     //Text that tells the user what the start page button does
     const backButtonText = new Konva.Text({
-      text: "Main Menu",
+      text: "Skip",
       x: backButtonBackground.x(),
       y: backButtonBackground.y(),
       fontSize: 36,
@@ -179,7 +179,7 @@ export class BonusRoundIntroView {
     backButtonText.offsetY(backButtonText.height() / 2);
 
     //Adds hover and click functionality to the start page button
-    this.backButton.on("click", onBack);
+    this.backButton.on("click", onSkip);
     this.backButton.on("mouseover", onHoverStart);
     this.backButton.on("mouseout", onHoverEnd);
 

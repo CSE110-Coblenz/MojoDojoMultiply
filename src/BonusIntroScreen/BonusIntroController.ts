@@ -2,7 +2,7 @@ import { ScreenController, type ScreenSwitcher } from "../types";
 import { BonusRoundIntroView } from "./BonusIntroView";
 import { BonusRoundIntroModel } from "./BonusIntroModel";
 import { GAMECST } from "../constants";
-import { clearGlobalState, GlobalState } from "../storageManager"
+import { getGlobalState, saveGlobalState, clearGlobalState, GlobalState } from "../storageManager"
 
 export class BonusIntroController extends ScreenController {
   private screenSwitcher: ScreenSwitcher;
@@ -16,7 +16,7 @@ export class BonusIntroController extends ScreenController {
 
     this.view = new BonusRoundIntroView(
       () => this.startBonus(),
-      () => this.returnStartPage(),
+      () => this.skipBonus(),
       () => this.handleHoverStart(),
       () => this.handleHoverEnd(),
     )
@@ -63,10 +63,14 @@ export class BonusIntroController extends ScreenController {
   /**
    * Takes the user back to the start page when the main menu button is pressed
    */
-  private returnStartPage() {
-    clearGlobalState();
-    localStorage.removeItem(GAMECST.ROUND_STATS_KEY);
-    this.screenSwitcher.switchToScreen({type: "start"});
+  private skipBonus() {
+    //increment round num thats in the save system
+    // const savedState = getGlobalState();
+    // savedState.currentRound++;
+    // saveGlobalState(savedState);
+
+
+    this.screenSwitcher.switchToScreen({type: "intro"});
   }
 
   /**
