@@ -402,6 +402,7 @@ export class MainPageController extends ScreenController {
     private onQuestionTimeout(): void {
         if(!this.isRunning) return;
         this.clearQuestionTimer();
+        this.view.timesUp();
         this.model.playerResponse = NaN;
         this.model.playerTime = Number.POSITIVE_INFINITY;
         const damages = this.damageCalculation();
