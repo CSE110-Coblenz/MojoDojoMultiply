@@ -235,16 +235,18 @@ export class PracticeAreaController extends ScreenController {
         if (this.model.playerResponse == this.model.correctAnswer) {
             this.view.correctAnswer();
             this.view.playPlayerAttack();
+
+            // play only when correct and game is not muted
+            if (!this.isMuted) {
+                // Play sound effects
+                this.clickSound.play();
+                this.clickSound.currentTime = 0;
+            }
         } else {
             this.view.incorrectAnswer();
         }
-
-
+        
         this.advanceGame();
-        // Play sound effects
-        this.clickSound.play();
-        this.clickSound.currentTime = 0;
-
     }
 
     /**
