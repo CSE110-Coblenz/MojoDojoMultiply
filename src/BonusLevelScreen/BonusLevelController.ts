@@ -115,6 +115,7 @@ export class BonusLevelController extends ScreenController {
     //increment round num thats in the save system
     const savedState = getGlobalState();
     savedState.currentRound++;
+    savedState.totalScore+=this.model.score;
     saveGlobalState(savedState);
 
     this.screenSwitcher.switchToScreen({ type: "intro" });
