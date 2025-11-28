@@ -96,7 +96,7 @@ export class RoundStatsView implements View {
     this.leaderboardText = new Konva.Text({
       x: STAGE_WIDTH / 2 + 50,
       y: 205,
-      text: "Round History:\n(No rounds yet!)",
+      text: "Round History:\n\tNo previous rounds yet. (Keep playing!)",
       fontSize: 18,
       fontFamily: "Arial",
       fill: DARK_COLOR,
@@ -269,7 +269,7 @@ export class RoundStatsView implements View {
   // Update the history section
   updateLeaderboard(entries: RoundStatsEntry[]): void {
     if (entries.length === 0) {
-      this.leaderboardText.text("Round History:\n(No rounds yet!)");
+      this.leaderboardText.text("Round History:\n\tNo previous rounds yet. (Keep playing!)");
     } else {
       let text = "Round History:\n";
       for (const entry of entries) {
