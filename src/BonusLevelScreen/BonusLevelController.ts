@@ -1,6 +1,7 @@
 import { ScreenController, type ScreenSwitcher } from "../types";
 import { BonusLevelView } from "./BonusLevelView";
 import { BonusLevelModel } from "./BonusLevelModel";
+import { clearGlobalState, getGlobalState, GlobalState, saveGlobalState } from "../storageManager";
 import { GAMECST } from "../constants";
 
 export class BonusLevelController extends ScreenController {
@@ -111,7 +112,7 @@ export class BonusLevelController extends ScreenController {
 
     const bonusPoints = this.model.score;
 
-    this.screenSwitcher.switchToScreen({ type: "results" });
+    this.screenSwitcher.switchToScreen({ type: "intro" });
   }
 
   /**

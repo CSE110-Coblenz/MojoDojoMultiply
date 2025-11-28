@@ -10,6 +10,7 @@ import { ResultsScreenController} from "./ResultsPageScreen/ResultsPageControlle
 import { RoundIntroController } from "./RoundIntroScreen/RoundIntroController";
 import { RoundStatsController } from "./RoundStatsScreen/RoundStatsController";
 import { BonusLevelController } from "./BonusLevelScreen/BonusLevelController";
+import { BonusIntroController } from "./BonusIntroScreen/BonusIntroController";
 import { AnimatedSprite } from "./AnimatedSprites"
 
 class App implements ScreenSwitcher {
@@ -23,7 +24,8 @@ class App implements ScreenSwitcher {
   private resultsController: ResultsScreenController;
   private roundIntroController: RoundIntroController;
   private roundStatsController: RoundStatsController;
-  private bonusLevelController: BonusLevelController;
+  private BonusLevelController: BonusLevelController;
+  private BonusIntroController: BonusIntroController;
 
   constructor(containerId: string) {
     this.stage = new Konva.Stage({
@@ -42,7 +44,8 @@ class App implements ScreenSwitcher {
     this.resultsController = new ResultsScreenController(this);
     this.roundIntroController = new RoundIntroController(this);
     this.roundStatsController = new RoundStatsController(this, this.layer);
-    this.bonusLevelController = new BonusLevelController(this);
+    this.BonusLevelController = new BonusLevelController(this);
+    this.BonusIntroController = new BonusIntroController(this);
 
     // Add screen groups to same layer
     this.layer.add(this.startController.getView().getGroup());
@@ -52,7 +55,8 @@ class App implements ScreenSwitcher {
     this.layer.add(this.resultsController.getView().getGroup());
     this.layer.add(this.roundIntroController.getView().getGroup());
     //this.layer.add(this.roundStatsController.getView().getGroup());
-    this.layer.add(this.bonusLevelController.getView().getGroup());
+    this.layer.add(this.BonusLevelController.getView().getGroup());
+    this.layer.add(this.BonusIntroController.getView().getGroup());
 
     this.layer.draw();
 
@@ -69,8 +73,9 @@ class App implements ScreenSwitcher {
     this.practiceController.hide();
     this.resultsController.hide();
     this.roundIntroController.hide();
-    //this.roundStatsController.hide();
-    this.bonusLevelController.hide();
+    this.roundStatsController.hide();
+    this.BonusLevelController.hide();
+    this.BonusIntroController.hide();
 
     switch (screen.type) {
       case "start": this.startController.show(); break;
@@ -92,7 +97,10 @@ class App implements ScreenSwitcher {
         this.resultsController.show();
         break;
       case "bonus":
-        this.bonusLevelController.show();
+        this.BonusLevelController.show();
+        break;
+      case "bintro":
+        this.BonusIntroController.show();
         break;
     }
   }
