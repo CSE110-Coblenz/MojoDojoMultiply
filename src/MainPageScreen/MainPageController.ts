@@ -746,13 +746,15 @@ export class MainPageController extends ScreenController {
 
             this.saveRoundStats();
 
-            // TODO need to decide if we want to go maingame --> bonus --> stats or maingame --> stats --> bonus etc.
-            // Check if we should go to the bonus level
-            if (this.model.currentRound % GAMECST.ROUNDS_UNTIL_BONUS === 0) {
-                this.screenSwitcher.switchToScreen({ type: "bintro" });
-            } else {
-                this.screenSwitcher.switchToScreen({ type: "stats"});
-            }
+            this.screenSwitcher.switchToScreen({ type: "stats" });
+
+            // // TODO need to decide if we want to go maingame --> bonus --> stats or maingame --> stats --> bonus etc.
+            // // Check if we should go to the bonus level
+            // if (this.model.currentRound % GAMECST.ROUNDS_UNTIL_BONUS === 0) {
+            //     this.screenSwitcher.switchToScreen({ type: "bintro" });
+            // } else {
+            //     this.screenSwitcher.switchToScreen({ type: "stats"});
+            // }
         }
     }
 

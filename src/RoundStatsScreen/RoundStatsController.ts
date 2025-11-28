@@ -107,7 +107,12 @@ export class RoundStatsController extends ScreenController {
     savedState.currentRound++;
     saveGlobalState(savedState);
 
-    this.screenSwitcher.switchToScreen({type: "intro"});
+    if((savedState.currentRound - 1) % GAMECST.ROUNDS_UNTIL_BONUS === 0) {
+      this.screenSwitcher.switchToScreen({type: "bintro"});
+    } else {
+      this.screenSwitcher.switchToScreen({type: "intro"});
+    }
+    
   }
 
   /**
