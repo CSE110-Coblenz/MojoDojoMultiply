@@ -216,7 +216,7 @@ export class RoundStatsView implements View {
     const spriteY = 140 - scaledHeight / 2 + 30; 
 
 
-    Konva.Image.fromURL('/player_victory2.png', (image) => {
+    Konva.Image.fromURL('/player_victory.png', (image) => {
       this.playerAvatar = image;
       this.group.add(this.playerAvatar);
 
