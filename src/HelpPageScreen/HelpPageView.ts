@@ -23,8 +23,8 @@ export class HelpPageView implements View {
 
         // Title text
         const title = new Konva.Text({
-            x: GAMECST.STAGE_WIDTH * 0.08,
-            y: GAMECST.STAGE_HEIGHT * 0.12,
+            x: 60,
+            y: 40,
             text: "How to Play",
             fontSize: 48,
             fontFamily: GAMECST.DEFAULT_FONT,
@@ -32,9 +32,10 @@ export class HelpPageView implements View {
         });
         this.group.add(title);
 
-        const leftMargin = GAMECST.STAGE_WIDTH * 0.08;
-        const startY = GAMECST.STAGE_HEIGHT * 0.25; //starting Y for first line
-        const lineSpacing = 60; // pixel gap in between lines
+        const leftMargin = 40;
+        const lineSpacing = 55;
+        const startY = title.y() + title.height() + 20; //starting Y for first line
+         // pixel gap in between lines
 
         //Editable instruction text array
         const instructions = [
@@ -43,6 +44,8 @@ export class HelpPageView implements View {
             "3. Shows opponents answer (doesn't mean correct) ",
             "4. Whoever's health bar is gone first, loses!",
             "5. Earn points for each attack, loose points if hit",
+            "6. Bonus round comes after every 3 rounds & adds to your final score",
+            "7. In bonus round, type your answer & hit enter. You only have 30 seconds!"
         ];
 
         instructions.forEach((text, i) => {
@@ -75,7 +78,7 @@ export class HelpPageView implements View {
         const helpNavigationOptions = new Konva.Group();
         this.group.add(helpNavigationOptions);
 
-        helpNavigationOptions.position({x: 40, y: GAMECST.STAGE_HEIGHT * 3 / 4});
+        helpNavigationOptions.position({x: 40, y: GAMECST.STAGE_HEIGHT - 100});
         
 
         //Start Training Button
