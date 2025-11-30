@@ -85,7 +85,7 @@ export class MainPageView implements View {
 		this.scoreText = new Konva.Text({
 			x: GAMECST.STAGE_WIDTH / 2,
 			y: GAMECST.STAGE_HEIGHT - 30,
-			text: "Game Score: 0000000",
+			text: "Game Score: 0000",
 			fontSize: 30,
 			fontFamily: GAMECST.DEFAULT_FONT,
 			fill: GAMECST.DARK_COLOR,
@@ -909,7 +909,7 @@ export class MainPageView implements View {
 	 * Internal method to update score text
 	 */
 	setScoreText(score: number): void {
-		this.scoreText.text("Game Score: " + score.toString().padStart(7, "0"));
+		this.scoreText.text("Game Score: " + score.toString().padStart(4, "0"));
 	}
 	
 

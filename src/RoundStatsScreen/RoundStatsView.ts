@@ -163,37 +163,26 @@ export class RoundStatsView implements View {
     menu.on("mouseout", onHoverEnd)
     menu.on("click", onMainMenuClick);
     this.group.add(menu);
-  }
-
-  // Loads the "Victor" panel + adds the celebrating animation
-  private loadPlayerFigure(): void {
-
-  const redFill = "#f77";
-  const redBackground = "rgba(236,147,138,1)";
-  const redText = "#e54";
-
-  // Create Image object
-  const playerCelebrating = new Image();
-
-  // Handle successful load
-  playerCelebrating.onload = () => {
 
     const panelX = STAGE_WIDTH - 225;
-    const panelY = 150;
+    const panelY = 110;
 
     this.victorPanel = new Konva.Group({
       x: panelX,
       y: panelY,
-      width: 230,
-      height: 330,
     });
+
+    const redFill = "#f77";
+    const redBackground = "rgba(236,147,138,1)";
+    const redText = "#e54";
+
 
     // Background box
     const victorBg = new Konva.Rect({
       x: 0,
       y: 0,
       width: 200,
-      height: 280,
+      height: 320,
       stroke: redFill,
       fill: redBackground,
       strokeWidth: 4,
@@ -226,27 +215,33 @@ export class RoundStatsView implements View {
     const spriteX = this.victorPanel.width() / 2 - scaledWidth / 2 - 15;
     const spriteY = 140 - scaledHeight / 2 + 30; 
 
-    this.victorySprite = new AnimatedSprite(this.layer, {
-      image: playerCelebrating,
-      frameWidth,
-      frameHeight,
-      frameCount: 5,
-      frameRate: 10,
-      loop: true,
-      x: spriteX,
-      y: spriteY,
+
+    Konva.Image.fromURL('/player_victory.png', (image) => {
+      this.playerAvatar = image;
+      this.group.add(this.playerAvatar);
+
+      this.playerAvatar.x(panelX + victorBg.width() / 2);
+      this.playerAvatar.offsetX(this.playerAvatar.width() / 2);
+      this.playerAvatar.y(panelY + victorText.height() + 15);
+      this.playerAvatar.scale({x: 0.67, y: 0.67});
+
     });
+  }
 
-    this.victorySprite.node.scale({ x: scale, y: scale });
+  // Loads the "Victor" panel + adds the celebrating animation
+  private loadPlayerFigure(): void {
 
-    this.victorPanel.add(this.victorySprite.node);
+  
+  // Create Image object
+  const playerCelebrating = new Image();
 
-    this.victorySprite.play();
+  // Handle successful load
+  playerCelebrating.onload = () => {
 
-    this.layer.draw();
+    
   };
 
-  playerCelebrating.src = "/player_celebration.png";
+  //playerCelebrating.src = "/player_celebration.png";
 
   }
 
