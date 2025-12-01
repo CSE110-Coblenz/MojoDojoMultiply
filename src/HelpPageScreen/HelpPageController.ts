@@ -16,7 +16,8 @@ export class HelpPageController extends ScreenController {
         this.view = new HelpPageView(
             () => this.handleMenuClick(),
             () => this.handleStartGameClick(),
-            () => this.handleStartPracticeClick()
+            () => this.handleStartPracticeClick(),
+            () => this.handleResumeGameClick()
         );
     }
 
@@ -37,6 +38,13 @@ export class HelpPageController extends ScreenController {
      */
     private handleStartGameClick(): void {
         this.screenSwitcher.switchToScreen({ type: "intro"});
+    }
+
+    /**
+     * Handles help page to main game when the user was in the middle of the round
+     */
+    private handleResumeGameClick(): void {
+        this.screenSwitcher.switchToScreen({ type: "main" });
     }
 
     /**
