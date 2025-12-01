@@ -61,7 +61,8 @@ class App implements ScreenSwitcher {
     this.layer.draw();
 
     // Start on start screen
-    this.startController.show();
+    //this.startController.show();
+    this.switchToScreen({type: "bintro"})
 
   
   }

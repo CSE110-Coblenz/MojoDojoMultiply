@@ -43,7 +43,7 @@ export class HelpPageView implements View {
             "2. If wrong, opponent attacks you and if correct, you attack opponent",
             "3. Shows opponents answer (doesn't mean correct) ",
             "4. Whoever's health bar is gone first, loses!",
-            "5. Earn points for each attack, loose points if hit",
+            "5. Earn points for each attack",
             "6. Bonus round comes after every 3 rounds & adds to your final score",
             "7. In bonus round, type your answer & hit enter. You only have 30 seconds!"
         ];
