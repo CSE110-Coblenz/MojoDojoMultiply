@@ -17,7 +17,8 @@ export class HelpPageView implements View {
     constructor(
         onMenu: () => void, 
         onGame: () => void,
-        onPractice: () => void
+        onPractice: () => void,
+        onResume: () => void
     ) {
         this.group = new Konva.Group({ visible: false });
 
@@ -167,7 +168,7 @@ export class HelpPageView implements View {
 
         startGameButton.on("mouseenter", () => (document.body.style.cursor = "pointer"));
         startGameButton.on("mouseleave", () => (document.body.style.cursor = "default"));
-        startGameButton.on("click", onGame);
+        startGameButton.on("click", onResume);
 
         //Button that allows the user to move back to the main menu from the help page
         const startPageButton = new Konva.Group({});

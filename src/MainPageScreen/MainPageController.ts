@@ -292,7 +292,7 @@ export class MainPageController extends ScreenController {
         this.view.show();
 
         // Start timer
-        this.startQuestionTimer();
+        if(!this.model.gamePaused) this.startQuestionTimer();
     }
 
     /**
