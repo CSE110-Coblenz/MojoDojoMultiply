@@ -1009,7 +1009,7 @@ export class MainPageView implements View {
 	timesUp(): void {
 		this.correctAnswerText.visible(false);
         this.incorrectAnswerText.visible(false);
-        this.showCorrectAnswerText.visible(false);
+        this.showCorrectAnswerText.visible(true);
         this.timesUpText.visible(true);
 	}
 
@@ -1024,7 +1024,7 @@ export class MainPageView implements View {
 	}
 
 	/**
-	 * Shows the correct answer below the incorrect text
+	 * Shows the correct answer below the incorrect and times up text 
 	 */
 	showCorrectAnswer(num1: number, num2: number, answer: number): void {
 		this.showCorrectAnswerText.text(`${num1} x ${num2} = ${answer}`);

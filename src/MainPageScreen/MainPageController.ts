@@ -403,6 +403,7 @@ export class MainPageController extends ScreenController {
         if(!this.isRunning) return;
         this.clearQuestionTimer();
         this.view.timesUp();
+        this.view.showCorrectAnswer(this.model.num1, this.model.num2, this.model.correctAnswer);
         this.model.playerResponse = NaN;
         this.model.playerTime = Number.POSITIVE_INFINITY;
         const damages = this.damageCalculation();
