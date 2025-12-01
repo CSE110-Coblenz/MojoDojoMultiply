@@ -56,7 +56,7 @@ export class BonusRoundIntroView {
         frameRate: 8,
         loop: true,
         x: playerGroup.x() + 130,
-        y: playerGroup.y() - 475,
+        y: playerGroup.y() - 440,
         scale: 3.85,        
       });
       playerGroup.add(this.playerIdleSprite.node);
@@ -82,7 +82,7 @@ export class BonusRoundIntroView {
         frameRate: 6,
         loop: true,
         x: opponentGroup.x() - 850,
-        y: opponentGroup.y() - 510,
+        y: opponentGroup.y() - 490,
         scale: 4.10,
       });
       opponentGroup.add(this.opponentIdleSprite.node);
@@ -96,7 +96,7 @@ export class BonusRoundIntroView {
       x: GAMECST.STAGE_WIDTH / 2,
       y: GAMECST.STAGE_HEIGHT / 3,
       fontFamily: GAMECST.DEFAULT_FONT,
-      fontSize: 80,
+      fontSize: 60,
       fill: "black",
     });
     this.group.add(this.roundText);
