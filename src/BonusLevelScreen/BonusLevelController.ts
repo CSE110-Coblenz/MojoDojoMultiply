@@ -112,6 +112,12 @@ export class BonusLevelController extends ScreenController {
 
     const bonusPoints = this.model.score;
 
+    const globalState = getGlobalState();
+
+    globalState.totalScore += bonusPoints;
+
+    saveGlobalState(globalState);
+
     this.screenSwitcher.switchToScreen({ type: "intro" });
   }
 
