@@ -37,7 +37,7 @@ export class BonusLevelView implements View {
 
     // Score
     this.scoreText = new Konva.Text({
-        x: STAGE_WIDTH - 150,
+        x: STAGE_WIDTH - 160,
         y: 20,
         text: "Score: 0",
         fontSize: 32,
